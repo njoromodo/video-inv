@@ -1,0 +1,35 @@
+.mainHead {
+    padding-top: 1.5em;
+    padding-bottom: 1em;
+    text-align: center;
+    font-size: 4em;
+}
+
+.prompt {
+    text-align: center;
+    font-size: 2em;
+    line-height: 1.5;
+    width: 75%;
+
+    padding: 0 1em 0;
+}
+
+#quote {
+    text-align: center;
+    font-size: 1.5em;
+    font-style: italic;
+    line-height: 1.5;
+    width: 1px;
+
+}
+
+#options {
+    padding-top: 1.5em;
+    width: 26em;
+}
+
+#logo {
+    height: 7em;
+    display: block;
+    margin: 5.5em auto 3em;
+}

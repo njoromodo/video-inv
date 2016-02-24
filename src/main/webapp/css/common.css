@@ -1,0 +1,77 @@
+body {
+    font-family: Helvetica, sans-serif;
+}
+
+table {
+    max-width: 1000px;
+    width: 100%;
+
+    align-items: center;
+    margin: 0 auto;
+}
+
+table.main {
+    text-align: center;
+}
+
+button {
+    align-items: center;
+
+    margin: .75em;
+    padding: .25em;
+
+    text-align: center;
+
+    background: lightgray;
+    border: 1px solid black;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+button.panelButton {
+    height: 5em;
+    width: 12em;
+
+    font-size: 1.5em;
+}
+
+button.halfHeight {
+    height: 2.5em;
+}
+
+button.full {
+    width: 25.6em;
+}
+
+button.bold {
+    font-weight: bold;
+}
+
+.userID {
+    align-items: center;
+
+    height: 2em;
+    width: 15em;
+
+    margin-bottom: 3em;
+
+    font-size: 1.5em;
+    text-align: center;
+
+    background: lightgray;
+    border: 1px solid black;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+
+}
+
+.error {
+    text-align: center;
+    color: red;
+    font-size: 1.5em;
+
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
