@@ -40,6 +40,10 @@ td.delete {
     font-size: 1.25em;
 }
 
+td.center {
+    text-align: center;
+}
+
 footer {
     position: fixed;
     bottom: 1.5em;
