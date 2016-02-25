@@ -30,19 +30,17 @@ table.items {
     border-bottom: thin solid black;
 }
 
-tr.header > td {
-    padding: 0 0 .25em;
-    line-height: normal;
-}
-
 td.delete {
     text-align: center;
     font-size: 1.25em;
 }
 
-td.center {
-    text-align: center;
+tr.header > td {
+    padding: 0 0 .25em;
+    line-height: normal;
+    font-size: inherit;
 }
+
 
 footer {
     position: fixed;
