@@ -157,7 +157,7 @@ public class DB {
                 item = new Item(resultSet.getInt("id"),
                         pubID,
                         resultSet.getString("name"),
-                        resultSet.getString("comments"));
+                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "");
             }
 
             resultSet.close();
@@ -252,5 +252,15 @@ public class DB {
         }
 
         return quote;
+    }
+
+    /**
+     * Add a new Inventory Item to the DB
+     *
+     * @param pubID {@link Integer} Barcode ID
+     * @param name  {@link String} Item Name
+     */
+    public static void addItem(final Integer pubID, final String name) {
+        executeStatement("INSERT INTO inventory(pub_id, name) VALUES (" + pubID + ", '" + name.replace("'", "") + "');");
     }
 }

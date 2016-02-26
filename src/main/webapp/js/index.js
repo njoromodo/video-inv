@@ -13,7 +13,7 @@ function check_in() {
 }
 
 function tools() {
-    window.top.location = "tools.html?id=" + userID;
+    window.top.location = "tools/index.html";
 }
 
 function login() {
@@ -71,9 +71,9 @@ function loadQuote() {
             if (response.status == 200) {
                 quote = JSON.parse(xmlHttp.responseText);
                 console.log(quote);
-                setQuote(quote.text, quote.author)
+                setQuote(quote.text, quote.author);
             }
-        3}
+        }
     };
 
     xmlHttp.open('GET', "api/quote");

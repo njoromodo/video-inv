@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 /**
  * Primary Web Interface
@@ -57,7 +58,7 @@ public class Web {
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getItem(@QueryParam("id") final Integer pubID) {
-        Item item = DB.getItem(pubID);
+        Item item = DB.getItem(pubID / 10);
         if (item != null) {
             return Response.status(Response.Status.OK).entity(GSON.toJson(item)).build();
         } else {
@@ -88,6 +89,29 @@ public class Web {
                     "  \"message\": \"pin does not exist\",\n" +
                     "}").build();
         }
+    }
+
+    /**
+     * Add Inventory Item
+     * @param name {@link String} Item Name
+     * @return {@link Response} Sticker XML
+     */
+    @Path("addItem")
+    @GET
+    @Consumes(MediaType.WILDCARD)
+    @Produces(MediaType.APPLICATION_XML)
+    public Response addItem(@QueryParam("name") final String name) {
+        int id;
+        do {
+            Random rnd = new Random();
+            id = 100000 + rnd.nextInt(900000);
+        } while (DB.getItem(id) != null); // Generate 6 Digit ID, and check that it doesn't already exist
+
+        String xml = Label.generateLabel(id);
+
+        DB.addItem(id, name);
+
+        return Response.status(Response.Status.CREATED).entity(xml).build();
     }
 
     private String hash(final String string) {

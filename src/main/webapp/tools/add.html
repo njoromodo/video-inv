@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Item</title>
+
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/add.css">
+
+    <script type="application/javascript" src="../js/add.js"></script>
+    <script src="http://labelwriter.com/software/dls/sdk/js/DYMO.Label.Framework.latest.js"
+            type="text/javascript" charset="UTF-8"></script>
+
+</head>
+<body>
+<table>
+    <tr>
+        <td class="pageSubHead">Add new Inventory Item</td>
+    </tr>
+    <tr>
+        <td>
+            <form action="#" onsubmit="addItem()">
+                <input type="hidden" name="id" value="{{REDID}}">
+                <table>
+                    <tr>
+                        <td>
+                            Name:
+                        </td>
+                        <td>
+                            <input class="inputBox" title="Item Name" type="text" id="itemName" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <button class="submitButton" type="submit" title="Submit"
+                                    onclick="return confirm('Are you sure?')">
+                                Create Item
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
