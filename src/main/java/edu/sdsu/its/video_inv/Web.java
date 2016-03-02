@@ -93,13 +93,14 @@ public class Web {
 
     /**
      * Add Inventory Item
+     *
      * @param name {@link String} Item Name
-     * @return {@link Response} Sticker XML
+     * @return {@link Response} Item JSON
      */
     @Path("addItem")
     @GET
     @Consumes(MediaType.WILDCARD)
-    @Produces(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response addItem(@QueryParam("name") final String name) {
         int id;
         do {
@@ -107,12 +108,41 @@ public class Web {
             id = 100000 + rnd.nextInt(900000);
         } while (DB.getItem(id) != null); // Generate 6 Digit ID, and check that it doesn't already exist
 
-        String xml = Label.generateLabel(id);
+        Item item = new Item(id, name);
 
-        DB.addItem(id, name);
+        DB.addItem(item);
 
-        return Response.status(Response.Status.CREATED).entity(xml).build();
+        return Response.status(Response.Status.CREATED).entity(GSON.toJson(item)).build();
     }
+
+    /**
+     * Get Asset Tag Label XML
+     *
+     * @param pubID {@link String} Public Identifier
+     * @return {@link Response} Label XML
+     */
+    @Path("label")
+    @GET
+    @Consumes(MediaType.WILDCARD)
+    @Produces(MediaType.APPLICATION_XML)
+    public Response getLabel(@QueryParam("id") final String pubID) {
+        int itemID;
+        if (pubID.length() > 6) {
+            // Supplied Checksum includes the checksum, we don't care about the checksum
+            itemID = Integer.parseInt(pubID) / 10;
+        } else if (pubID.length() == 6) {
+            itemID = Integer.parseInt(pubID);
+        } else {
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
+                    "  \"message\": \"invalid ID Length\",\n" +
+                    "}").build();
+        }
+
+        String xml = Label.generateLabel(itemID);
+
+        return Response.status(Response.Status.OK).entity(xml).build();
+    }
+
 
     private String hash(final String string) {
         try {

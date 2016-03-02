@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Item</title>
+
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/tools-item.css">
+
+    <script type="application/javascript" src="../js/tools-item.js"></script>
+    <script src="../js/dymo.js" type="text/javascript" charset="UTF-8"></script>
+</head>
+<body>
+<table id="view">
+    <tr>
+        <td class="pageHead">Item Utilities</td>
+    </tr>
+    <tr>
+        <td class="pageSubHead">View Inventory Items</td>
+    </tr>
+    <tr>
+        <td>
+            <div id="item-name" style="visibility: hidden">Name</div>
+            <div id="comments" style="visibility: hidden">Comment</div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form action="#" onsubmit="reprint()">
+                <button class="submitButton small" type="submit" title="Reprint Label" id="reprintButton"
+                        onclick="return confirm('Are you sure?')" style="margin-bottom: 5em; visibility: hidden;">
+                    Reprint Label
+                </button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form action="#" onsubmit="getItemByID()">
+                <table>
+                    <tr>
+                        <td align="left" colspan="2">
+                            ID:
+                            <input class="inputBox" title="Item Name" type="text" id="itemID" required autofocus
+                                   autocomplete="off">
+                        </td>
+                    </tr>
+                    <tr class="buttonBar">
+                        <td>
+                            <button class="submitButton" type="submit" title="Submit">
+                                Search for Item
+                            </button>
+                        </td>
+                        <td>
+                            <button class="submitButton" type="button" title="Submit"
+                                    onclick="showCreate(); return false;">
+                                Create New Item
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form action="#" onsubmit="">
+
+            </form>
+        </td>
+    </tr>
+</table>
+<table id="create" style="display: none">
+    <tr>
+        <td class="pageHead">Item Utilities</td>
+    </tr>
+    <tr>
+        <td class="pageSubHead">Add new Inventory Item</td>
+    </tr>
+    <tr>
+        <td>
+            <form action="#" onsubmit="addItem()">
+                <table>
+                    <tr>
+                        <td>
+                            Name:
+                        </td>
+                        <td>
+                            <input class="inputBox" title="Item Name" type="text" id="itemName" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button class="submitButton" type="submit" title="Submit"
+                                    onclick="return confirm('Are you sure?')">
+                                Create Item
+                            </button>
+                        </td>
+                        <td>
+                            <button class="submitButton" type="button" title="Submit"
+                                    onclick="showView(); return false;">
+                                Done Creating
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

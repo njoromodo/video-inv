@@ -257,10 +257,9 @@ public class DB {
     /**
      * Add a new Inventory Item to the DB
      *
-     * @param pubID {@link Integer} Barcode ID
-     * @param name  {@link String} Item Name
+     * @param item {@link Item} Item to Create
      */
-    public static void addItem(final Integer pubID, final String name) {
-        executeStatement("INSERT INTO inventory(pub_id, name) VALUES (" + pubID + ", '" + name.replace("'", "") + "');");
+    public static void addItem(final Item item) {
+        executeStatement("INSERT INTO inventory(pub_id, name) VALUES (" + item.pubID + ", '" + item.name.replace("'", "") + "');");
     }
 }

@@ -19,4 +19,9 @@ public class Item {
         this.name = name;
         this.comments = comments;
     }
+
+    public Item(int pubID, String name) {
+        this.pubID = pubID;
+        this.name = name;
+    }
 }
