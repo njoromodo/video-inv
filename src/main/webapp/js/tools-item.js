@@ -26,7 +26,7 @@ function addItem() {
         }
     };
 
-    xmlHttp.open('GET', "../api/addItem?name=" + name);
+    xmlHttp.open('GET', "../api/addItem?name=" + encodeURIComponent(name));
     xmlHttp.send();
 }
 
