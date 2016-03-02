@@ -27,7 +27,7 @@ public class Barcode {
      * @return {@link Integer} Full Barcode Value, including Checksum
      * @throws IOException Thrown if there are problems writing to the file
      */
-    public static void generateBarcode(final int code, final File outputFile) throws IOException {
+    public static void generateBarcode(final String code, final File outputFile) throws IOException {
         // Create the barcode bean
         UPCEBean bean = new UPCEBean();
         final int dpi = 600;
@@ -40,7 +40,7 @@ public class Barcode {
                 out, "image/png", dpi, BufferedImage.TYPE_BYTE_BINARY, true, 0);
 
         // Generate the barcode
-        bean.generateBarcode(canvas, "0" + Integer.toString(code));
+        bean.generateBarcode(canvas, code);
 
 
         // Signal end of generation
@@ -48,7 +48,7 @@ public class Barcode {
     }
 
     public static void main(String[] args) {
-        Integer code = 123456;
+        final String code = "1123456";
         try {
             File outFile = File.createTempFile("out", ".png");
 

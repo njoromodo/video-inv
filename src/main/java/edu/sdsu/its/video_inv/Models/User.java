@@ -22,4 +22,11 @@ public class User {
         this.lastName = lastName;
         this.supervisor = supervisor;
     }
+
+    public User(int pubID, String firstName, String lastName, boolean supervisor) {
+        this.pubID = pubID;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.supervisor = supervisor;
+    }
 }

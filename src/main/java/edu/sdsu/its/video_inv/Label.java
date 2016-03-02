@@ -35,7 +35,26 @@ public class Label {
 
         try {
             File barcode = File.createTempFile(Integer.toString(id), ".png");
-            Barcode.generateBarcode(id, barcode);
+            Barcode.generateBarcode("0" + Integer.toString(id), barcode);
+
+            byte[] encodedBarcode = Base64.encodeBase64(FileUtils.readFileToByteArray(barcode));
+            String encodedBarcodeString = new String(encodedBarcode, "UTF8");
+
+            String template = readFile("ITS Asset Tags.label");
+
+            return template.replace("{{barcode}}", encodedBarcodeString);
+        } catch (IOException e) {
+            LOGGER.error("Problem Generating Label File", e);
+            return "";
+        }
+    }
+
+    public static String generateUserLabel(final int id) {
+        LOGGER.info("Generating User Template for ID: " + id);
+
+        try {
+            File barcode = File.createTempFile(Integer.toString(id), ".png");
+            Barcode.generateBarcode("1" + Integer.toString(id), barcode);
 
             byte[] encodedBarcode = Base64.encodeBase64(FileUtils.readFileToByteArray(barcode));
             String encodedBarcodeString = new String(encodedBarcode, "UTF8");

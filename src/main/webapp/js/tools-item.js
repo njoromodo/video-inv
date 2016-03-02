@@ -1,7 +1,3 @@
-/**
- * Created by tpaulus on 2/26/16.
- */
-
 var currentItemID = 0;
 
 function showCreate(){

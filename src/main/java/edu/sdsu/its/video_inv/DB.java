@@ -260,6 +260,22 @@ public class DB {
      * @param item {@link Item} Item to Create
      */
     public static void addItem(final Item item) {
-        executeStatement("INSERT INTO inventory(pub_id, name) VALUES (" + item.pubID + ", '" + item.name.replace("'", "") + "');");
+        executeStatement("INSERT INTO inventory(pub_id, name) VALUES (" + item.pubID + ", '" + sanitize(item.name) + "');");
+    }
+
+    /**
+     * Add a new VIMS User to the DB
+     *
+     * @param user {@link User} User to Create
+     * @param pinHash {@link String} User's Pin Hash
+     */
+    public static void addUser(final User user, final String pinHash) {
+        executeStatement("INSERT INTO users(pub_id, first_name, last_name, supervisor, pin) VALUES (" + user.pubID +
+                ", '" + sanitize(user.firstName) + "', '" + sanitize(user.lastName) + "', " + (user.supervisor ? 1 : 0) + "," +
+                "'" + pinHash + "');");
+    }
+
+    private static String sanitize(final String s) {
+        return s.replace("'", "");
     }
 }

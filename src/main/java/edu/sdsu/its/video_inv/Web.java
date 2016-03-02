@@ -143,6 +143,61 @@ public class Web {
         return Response.status(Response.Status.OK).entity(xml).build();
     }
 
+    /**
+     * Add a new User to the System
+     *
+     * @param firstName {@link String} User's First Nam
+     * @param lastName {@link String} User's Last Name
+     * @param supervisor {@link Boolean} Supervisor Switch
+     * @param pin {@link String} User's Pin
+     * @return {@link Response} User JSON
+     */
+    @Path("addUser")
+    @GET
+    @Consumes(MediaType.WILDCARD)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createUser(@QueryParam("first") final String firstName, @QueryParam("last") final String lastName,
+                               @QueryParam("sup") final Boolean supervisor, @QueryParam("pin") final String pin) {
+        int id;
+        do {
+            Random rnd = new Random();
+            id = 100000 + rnd.nextInt(900000);
+        } while (DB.getUser(id) != null); // Generate 6 Digit ID, and check that it doesn't already exist
+
+        User user = new User(id, firstName, lastName, supervisor);
+
+        DB.addUser(user, hash(pin));
+
+        return Response.status(Response.Status.CREATED).entity(GSON.toJson(user)).build();
+    }
+
+    /**
+     * Get a User's Label
+     *
+     * @param pubID {@link String} User's Public ID
+     * @return {@link Response} Label XML
+     */
+    @Path("userLabel")
+    @GET
+    @Consumes(MediaType.WILDCARD)
+    @Produces(MediaType.APPLICATION_XML)
+    public Response getUserLabel(@QueryParam("id") final String pubID) {
+        int userID;
+        if (pubID.length() > 6) {
+            // Supplied Checksum includes the checksum, we don't care about the checksum
+            userID = Integer.parseInt(pubID) / 10;
+        } else if (pubID.length() == 6) {
+            userID = Integer.parseInt(pubID);
+        } else {
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
+                    "  \"message\": \"invalid ID Length\",\n" +
+                    "}").build();
+        }
+
+        String xml = Label.generateUserLabel(userID);
+
+        return Response.status(Response.Status.OK).entity(xml).build();
+    }
 
     private String hash(final String string) {
         try {
