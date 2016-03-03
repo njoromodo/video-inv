@@ -99,7 +99,7 @@ function reprint() {
 
 
 function getItemByID() {
-    var itemID = document.getElementById("itemName").value;
+    var itemID = document.getElementById("itemID").value;
     var xmlHttp = new XMLHttpRequest();
 
     xmlHttp.onreadystatechange = function () {

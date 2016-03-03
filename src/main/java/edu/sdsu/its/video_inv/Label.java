@@ -54,7 +54,7 @@ public class Label {
 
         try {
             File barcode = File.createTempFile(Integer.toString(id), ".png");
-            Barcode.generateBarcode("1" + Integer.toString(id), barcode);
+            Barcode.generateBarcode("0" + Integer.toString(id), barcode);
 
             byte[] encodedBarcode = Base64.encodeBase64(FileUtils.readFileToByteArray(barcode));
             String encodedBarcodeString = new String(encodedBarcode, "UTF8");

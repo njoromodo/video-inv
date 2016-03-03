@@ -27,16 +27,28 @@ public class Web {
     /**
      * Get a User's Information based on their Public ID.
      *
-     * @param pubID {@link Integer} User's Public Identifier
+     * @param pubID {@link String} User's Public Identifier
      * @return {@link Response} User Information as JSON
      */
     @Path("user")
     @GET
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUser(@QueryParam("id") final Integer pubID) {
-        LOGGER.info(String.format("Recieved GET Request to USER - id = %d", pubID));
-        User user = DB.getUser(pubID);
+    public Response getUser(@QueryParam("id") final String pubID) {
+        LOGGER.info(String.format("Recieved GET Request to USER - id = %s", pubID));
+        int userID;
+        if (pubID.length() > 6) {
+            // Supplied Checksum includes the checksum, we don't care about the checksum
+            userID = Integer.parseInt(pubID) / 10;
+        } else if (pubID.length() == 6) {
+            userID = Integer.parseInt(pubID);
+        } else {
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
+                    "  \"message\": \"invalid ID Length\",\n" +
+                    "}").build();
+        }
+
+        User user = DB.getUser(userID);
         if (user != null) {
             return Response.status(Response.Status.OK).entity(GSON.toJson(user)).build();
         } else {
@@ -57,8 +69,19 @@ public class Web {
     @GET
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getItem(@QueryParam("id") final Integer pubID) {
-        Item item = DB.getItem(pubID / 10);
+    public Response getItem(@QueryParam("id") final String pubID) {
+        int itemID;
+        if (pubID.length() > 6) {
+            // Supplied Checksum includes the checksum, we don't care about the checksum
+            itemID = Integer.parseInt(pubID) / 10;
+        } else if (pubID.length() == 6) {
+            itemID = Integer.parseInt(pubID);
+        } else {
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
+                    "  \"message\": \"invalid ID Length\",\n" +
+                    "}").build();
+        }
+        Item item = DB.getItem(itemID);
         if (item != null) {
             return Response.status(Response.Status.OK).entity(GSON.toJson(item)).build();
         } else {
