@@ -59,7 +59,7 @@ public class Label {
             byte[] encodedBarcode = Base64.encodeBase64(FileUtils.readFileToByteArray(barcode));
             String encodedBarcodeString = new String(encodedBarcode, "UTF8");
 
-            String template = readFile("ITS Asset Tags.label");
+            String template = readFile("User Tags.label");
 
             return template.replace("{{barcode}}", encodedBarcodeString);
         } catch (IOException e) {
