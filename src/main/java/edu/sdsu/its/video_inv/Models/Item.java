@@ -1,20 +1,22 @@
 package edu.sdsu.its.video_inv.Models;
 
+import edu.sdsu.its.video_inv.DB;
+
 /**
- * TODO JavaDoc
+ * Models an Item in the DB
  *
  * @author Tom Paulus
  *         Created on 2/23/16.
  */
 public class Item {
-    public int dbID;
+    public int id;
     public int pubID;
 
     public String name;
     public String comments;
 
-    public Item(int dbID, int pubID, String name, String comments) {
-        this.dbID = dbID;
+    public Item(int id, int pubID, String name, String comments) {
+        this.id = id;
         this.pubID = pubID;
         this.name = name;
         this.comments = comments;
@@ -23,5 +25,16 @@ public class Item {
     public Item(int pubID, String name) {
         this.pubID = pubID;
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        // Used by DB.addTransaction()
+        if (this.id == 0) this.id = DB.getItem(this.pubID).id;
+
+        return String.format("{\n" +
+                "  \"id\": %d,\n" +
+                "  \"comments\": \"%s\"\n" +
+                "}", this.id, this.comments);
     }
 }

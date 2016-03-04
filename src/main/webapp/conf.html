@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation</title>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/index.css">
+
+    <script type="application/javascript" src="js/common.js"></script>
+</head>
+<body>
+<table id="success">
+    <tr>
+        <td class="mainHead">That's All!
+            <br>
+            <span id="action">Check Out</span> Successful!
+        </td>
+    </tr>
+    <tr>
+        <td class="prompt">
+            <div id="outText" style="display: none"> You successfully checked out <span id="numItemsO">10 items</span>!
+                <br>
+                When you are ready to check your items back in, select check-in at the main menu,
+                then scan one of the items you checked out.
+            </div>
+            <div id="inText" style="display: none"> You successfully checked in <span id="numItemsI">10 items</span>!
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="quote">
+            <br>
+            This page will automatically redirect to the homepage in a few seconds.
+        </td>
+    </tr>
+</table>
+<table id="error" style="display: none">
+    <tr>
+        <td class="mainHead">Oh No!
+            <br>
+            Something went wrong!
+        </td>
+    </tr>
+    <tr>
+        <td class="prompt">
+            This is usually caused by an error in the transaction process. Please try again, if this problem
+            continues to persist, please file an issue report.
+            <br>
+            <br>
+            <b><a href="https://github.com/sdsu-its/video-inv/issues" target="_blank">Report Issues on GitHub!</a></b>
+        </td>
+    </tr>
+    <tr>
+        <td class="quote">
+            <br>
+            This page will automatically redirect to the homepage in a few seconds.
+        </td>
+    </tr>
+</table>
+
+</body>
+<script type="application/javascript">
+    setTimeout(function () {
+        window.location = "index.html"
+    }, 15000);
+
+    if (getParameterByName("status") == "ok") {
+        var numItems = getParameterByName("num");
+        if (getParameterByName("action") == "out") {
+            document.getElementById("action").innerHTML = "Check Out";
+            document.getElementById("numItemsO").innerHTML = numItems;
+            if (numItems > 1) {
+                document.getElementById("numItemsO").innerHTML += " items";
+            } else {
+                document.getElementById("numItemsO").innerHTML += " item";
+            }
+            document.getElementById("outText").style.display = "";
+        } else {
+            document.getElementById("action").innerHTML = "Check In";
+            document.getElementById("numItemsI").innerHTML = numItems;
+            if (numItems > 1) {
+                document.getElementById("numItemsI").innerHTML += " items";
+            } else {
+                document.getElementById("numItemsI").innerHTML += " item";
+            }
+            document.getElementById("inText").style.display = "";
+        }
+    } else {
+        document.getElementById("success").style.display = "none";
+        document.getElementById("error").style.display = "";
+    }
+</script>
+</html>

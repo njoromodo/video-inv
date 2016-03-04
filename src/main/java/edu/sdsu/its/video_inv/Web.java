@@ -2,6 +2,7 @@ package edu.sdsu.its.video_inv;
 
 import com.google.gson.Gson;
 import edu.sdsu.its.video_inv.Models.Item;
+import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
 import org.apache.log4j.Logger;
 
@@ -169,10 +170,10 @@ public class Web {
     /**
      * Add a new User to the System
      *
-     * @param firstName {@link String} User's First Nam
-     * @param lastName {@link String} User's Last Name
+     * @param firstName  {@link String} User's First Nam
+     * @param lastName   {@link String} User's Last Name
      * @param supervisor {@link Boolean} Supervisor Switch
-     * @param pin {@link String} User's Pin
+     * @param pin        {@link String} User's Pin
      * @return {@link Response} User JSON
      */
     @Path("addUser")
@@ -220,6 +221,34 @@ public class Web {
         String xml = Label.generateUserLabel(userID);
 
         return Response.status(Response.Status.OK).entity(xml).build();
+    }
+
+    @Path("complete")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addTransaction(final String payload) {
+        LOGGER.debug("COMPLETE [POST] Recieved: " + payload);
+        Transaction transaction = GSON.fromJson(payload, Transaction.class);
+
+        final User ownerUser = DB.getUser(transaction.ownerID);
+        if (transaction.ownerID == 0 || ownerUser == null) {
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
+                    "  \"message\": \"invalid ownerID\",\n" +
+                    "}").build();
+        }
+        final User supervisorUser = DB.getUser(transaction.supervisorID);
+        if (transaction.supervisorID == 0 || supervisorUser == null || !supervisorUser.supervisor) {
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
+                    "  \"message\": \"invalid supervisorID\",\n" +
+                    "}").build();
+        }
+
+
+        DB.addTransaction(transaction);
+        transaction.items.forEach(DB::updateComments);
+
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 
     private String hash(final String string) {

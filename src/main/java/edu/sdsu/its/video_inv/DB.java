@@ -1,6 +1,7 @@
 package edu.sdsu.its.video_inv;
 
 import edu.sdsu.its.video_inv.Models.Item;
+import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
 import org.apache.log4j.Logger;
 
@@ -30,6 +31,11 @@ public class DB {
         return connection;
     }
 
+    /**
+     * Execute a SQL Statement
+     *
+     * @param sql {@link String} SQL Statement to Execute
+     */
     private static void executeStatement(final String sql) {
         new Thread() {
             @Override
@@ -100,6 +106,12 @@ public class DB {
         return user;
     }
 
+    /**
+     * Get User Information by Pin
+     *
+     * @param pin {@link String} Pin Hash
+     * @return {@link User} User
+     */
     public static User getUser(final String pin) {
         Connection connection = getConnection();
         Statement statement = null;
@@ -260,19 +272,55 @@ public class DB {
      * @param item {@link Item} Item to Create
      */
     public static void addItem(final Item item) {
-        executeStatement("INSERT INTO inventory(pub_id, name) VALUES (" + item.pubID + ", '" + sanitize(item.name) + "');");
+        final String sql = "INSERT INTO inventory(pub_id, name) VALUES (" + item.pubID + ", '" + sanitize(item.name) + "');";
+        executeStatement(sql);
     }
 
     /**
      * Add a new VIMS User to the DB
      *
-     * @param user {@link User} User to Create
+     * @param user    {@link User} User to Create
      * @param pinHash {@link String} User's Pin Hash
      */
     public static void addUser(final User user, final String pinHash) {
-        executeStatement("INSERT INTO users(pub_id, first_name, last_name, supervisor, pin) VALUES (" + user.pubID +
+        final String sql = "INSERT INTO users(pub_id, first_name, last_name, supervisor, pin) VALUES (" + user.pubID +
                 ", '" + sanitize(user.firstName) + "', '" + sanitize(user.lastName) + "', " + (user.supervisor ? 1 : 0) + "," +
-                "'" + pinHash + "');");
+                "'" + pinHash + "');";
+        executeStatement(sql);
+    }
+
+    /**
+     * TODO JavaDoc
+     *
+     * @param transaction
+     */
+    public static void addTransaction(final Transaction transaction) {
+        final String sql = "INSERT INTO transactions (owner, supervisor, items, check_out_time) VALUES (\n" +
+                "  (SELECT id FROM users WHERE pub_id = " + transaction.ownerID + "), (SELECT id FROM users WHERE pub_id = " + transaction.supervisorID + "),\n" +
+                "  '" + transaction.items.toString() + "', now()\n" +
+                ");";
+        executeStatement(sql);
+    }
+
+
+    /**
+     * TODO JavaDoc
+     *
+     * @param item
+     */
+    public static void updateComments(final Item item) {
+        final String sql;
+        if (item.id != 0) {
+            sql = "UPDATE inventory\n" +
+                    "SET comments = '" + sanitize(item.comments) + "'\n" +
+                    "WHERE id = " + item.id + ";";
+        } else {
+            sql = "UPDATE inventory\n" +
+                    "SET comments = '" + sanitize(item.comments) + "'\n" +
+                    "WHERE pub_id = " + item.pubID + ";";
+        }
+
+        executeStatement(sql);
     }
 
     private static String sanitize(final String s) {

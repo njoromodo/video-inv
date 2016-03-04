@@ -4,7 +4,7 @@
  * Created by tpaulus on 2/15/16.
  */
 var items = [];
-
+var owner_id = getParameterByName("id");
 var supervisor_id = 0;
 
 const notifyChime = new Audio("error.mp3");
@@ -76,11 +76,11 @@ function doAddItem(item) {
     if (item != null && items.indexOf(item.dbID) == -1) {
         document.getElementById("error").style.visibility = "hidden"; // Hide the Error Message
 
-        items[items.length] = item.dbID; // Add itemID of list of Items in Check Out Batch
+        items[items.length] = item.id; // Add itemID of list of Items in Check Out Batch
 
         var row = itemsTable.insertRow(-1);
 
-        row.id = "i-" + item.dbID;
+        row.id = "i-" + item.id;
 
         row.insertCell(0).innerHTML = item.name;                        //Name
 
@@ -221,7 +221,7 @@ function doSupervisorLogin(user) {
     if (user != null && user.supervisor) {
         // Login is Valid
 
-        supervisor_id = user.id;
+        supervisor_id = user.pubID;
 
         document.getElementById("supervisor_pin").style.display = "none";
         document.getElementById("confirm-buttons").style.display = "none";
@@ -245,6 +245,52 @@ function doSupervisorLogin(user) {
  * Post the List to the Server (Supervisor Pin, User ID, items, and comments)
  */
 function finish() {
-    alert("Yay!");
-    // TODO
+    var postJSON = "{\n";
+    postJSON += ("\"ownerID\": " + owner_id + ",\n");
+    postJSON += ("\"supervisorID\": " + supervisor_id + ",\n");
+    postJSON += ("\"items\": [");
+
+    for (var i = 0; i < items.length; i++) {
+        var itemID = items[i];
+        var itemComments = document.getElementById("i-" + itemID + "-com-div").innerHTML;
+
+        var itemJSON = "{\n";
+        itemJSON += ("\"id\": " + itemID + ", \n");
+        itemJSON += ("\"comments\": \"" + itemComments + "\"\n");
+        itemJSON += "}";
+
+        if (i != items.length - 1) {    // Include a comma on all, except the last item in the Items List
+            itemJSON += ",";
+        }
+
+        postJSON += itemJSON;
+    }
+
+    postJSON += ("]\n");
+    postJSON += "}";
+
+    var xmlHttp = new XMLHttpRequest();
+
+    xmlHttp.onreadystatechange = function () {
+        if (xmlHttp.readyState == 4) {
+            console.log("Status: " + xmlHttp.status);
+            doFinish(xmlHttp.status);
+        }
+    };
+
+    xmlHttp.open('POST', "api/complete");
+    xmlHttp.setRequestHeader("Content-type", "application/json");
+    xmlHttp.send(postJSON);
+
+}
+
+function doFinish(status) {
+    var statusText;
+    if (status == 202) {
+        statusText = "ok";
+    } else {
+        statusText = "error";
+    }
+
+    window.location = "conf.html?status=" + statusText + "&action=out&num=" + items.length;
 }
