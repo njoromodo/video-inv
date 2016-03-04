@@ -1,5 +1,15 @@
 var currentItemID = 0;
 
+document.onkeypress = function () {
+    const inputBox = document.getElementById("itemID");
+
+    if (document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+        var value = inputBox.value;
+        inputBox.select();
+        inputBox.value = value;
+    }
+};
+
 function showCreate(){
     document.getElementById("view").style.display  ="none";
     document.getElementById("create").style.display = "";
@@ -113,6 +123,17 @@ function getItemByID() {
 
                 currentItemID = item.pubID;
                 doShowItem(item);
+                document.getElementById("itemID").value = "";
+                document.getElementById("error").style.display = "none";
+            }
+
+            else {
+                document.getElementById("itemID").value = "";
+                document.getElementById("error").style.display = "";
+                document.getElementById("item-name").style.visibility = 'hidden';
+                document.getElementById("comments").style.visibility = 'hidden';
+                document.getElementById("reprintButton").style.visibility = 'hidden';
+
             }
         }
     };
