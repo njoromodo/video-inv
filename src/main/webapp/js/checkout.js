@@ -73,7 +73,7 @@ function addItem() {
  */
 function doAddItem(item) {
     const itemsTable = document.getElementById("items");
-    if (item != null && items.indexOf(item.dbID) == -1) {
+    if (item != null && items.indexOf(item.id) == -1) {
         document.getElementById("error").style.visibility = "hidden"; // Hide the Error Message
 
         items[items.length] = item.id; // Add itemID of list of Items in Check Out Batch
@@ -96,7 +96,7 @@ function doAddItem(item) {
 
         document.getElementById("complete_button").disabled = false;
 
-    } else if (item != null && items.indexOf(item.dbID) > -1) {
+    } else if (item != null && items.indexOf(parseInt(item.id)) > -1) {
         console.log("Item already in list, skipping")
     } else {
         document.getElementById("error").style.visibility = "visible";
@@ -246,8 +246,8 @@ function doSupervisorLogin(user) {
  */
 function finish() {
     var postJSON = "{\n";
-    postJSON += ("\"ownerID\": " + owner_id + ",\n");
-    postJSON += ("\"supervisorID\": " + supervisor_id + ",\n");
+    postJSON += ("\"ownerID\": " + parseInt(owner_id) + ",\n");
+    postJSON += ("\"supervisorID\": " + parseInt(supervisor_id) + ",\n");
     postJSON += ("\"items\": [");
 
     for (var i = 0; i < items.length; i++) {

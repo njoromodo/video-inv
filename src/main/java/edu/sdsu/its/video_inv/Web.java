@@ -233,12 +233,14 @@ public class Web {
 
         final User ownerUser = DB.getUser(transaction.ownerID);
         if (transaction.ownerID == 0 || ownerUser == null) {
+            LOGGER.warn("Invalid Owner ID");
             return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
                     "  \"message\": \"invalid ownerID\",\n" +
                     "}").build();
         }
         final User supervisorUser = DB.getUser(transaction.supervisorID);
         if (transaction.supervisorID == 0 || supervisorUser == null || !supervisorUser.supervisor) {
+            LOGGER.warn("Invalid Supervisor ID");
             return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
                     "  \"message\": \"invalid supervisorID\",\n" +
                     "}").build();

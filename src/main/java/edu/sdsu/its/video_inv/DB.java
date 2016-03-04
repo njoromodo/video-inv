@@ -5,6 +5,7 @@ import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
 import org.apache.log4j.Logger;
 
+import javax.ws.rs.core.Response;
 import java.sql.*;
 
 /**
@@ -75,9 +76,19 @@ public class DB {
         Statement statement = null;
         User user = null;
 
+        int uid;
+        if (pubID > Math.pow(10,6)) {
+            // Supplied Checksum includes the checksum, we don't care about the checksum
+            uid = pubID / 10;
+        } else if (pubID > Math.pow(10,5)) {
+            uid = pubID;
+        } else {
+            return null;
+        }
+
         try {
             statement = connection.createStatement();
-            final String sql = "SELECT * FROM users WHERE pub_id = " + pubID + ";";
+            final String sql = "SELECT * FROM users WHERE pub_id = " + uid + ";";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
