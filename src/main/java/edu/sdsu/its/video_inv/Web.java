@@ -125,14 +125,14 @@ public class Web {
     @GET
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addItem(@QueryParam("name") final String name) {
+    public Response addItem(@QueryParam("name") final String name, @QueryParam("short") final String shortName) {
         int id;
         do {
             Random rnd = new Random();
             id = 100000 + rnd.nextInt(900000);
         } while (DB.getItem(id) != null); // Generate 6 Digit ID, and check that it doesn't already exist
 
-        Item item = new Item(id, name);
+        Item item = new Item(id, name, shortName);
 
         DB.addItem(item);
 
@@ -162,7 +162,7 @@ public class Web {
                     "}").build();
         }
 
-        String xml = Label.generateLabel(itemID);
+        String xml = Label.generateLabel(DB.getItem(itemID).shortName, itemID);
 
         return Response.status(Response.Status.OK).entity(xml).build();
     }

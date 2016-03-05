@@ -22,6 +22,7 @@ function showView() {
 
 function addItem() {
     var name = document.getElementById("itemName").value;
+    var short = document.getElementById("itemShortName").value;
     var xmlHttp = new XMLHttpRequest();
 
     xmlHttp.onreadystatechange = function () {
@@ -36,7 +37,7 @@ function addItem() {
         }
     };
 
-    xmlHttp.open('GET', "../api/addItem?name=" + encodeURIComponent(name));
+    xmlHttp.open('GET', "../api/addItem?name=" + encodeURIComponent(name) + "&short=" + encodeURIComponent(short));
     xmlHttp.send();
 }
 

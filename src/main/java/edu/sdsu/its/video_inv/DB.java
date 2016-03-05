@@ -179,6 +179,7 @@ public class DB {
                 item = new Item(resultSet.getInt("id"),
                         pubID,
                         resultSet.getString("name"),
+                        resultSet.getString("short_name"),
                         resultSet.getString("comments") != null ? resultSet.getString("comments") : "");
             }
 
@@ -282,7 +283,7 @@ public class DB {
      * @param item {@link Item} Item to Create
      */
     public static void addItem(final Item item) {
-        final String sql = "INSERT INTO inventory(pub_id, name) VALUES (" + item.pubID + ", '" + sanitize(item.name) + "');";
+        final String sql = "INSERT INTO inventory(pub_id, name, short_name) VALUES (" + item.pubID + ", '" + sanitize(item.name) + "', '" + sanitize(item.shortName) + "');";
         executeStatement(sql);
     }
 

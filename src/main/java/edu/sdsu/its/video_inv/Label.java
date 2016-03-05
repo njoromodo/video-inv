@@ -27,10 +27,11 @@ public class Label {
     /**
      * Generate Label XML File for JS Framework
      *
-     * @param id {@link int} Barcode ID (No Checksum)
+     * @param name {@link String} Short Name (If null, prints 'ITS Video')
+     * @param id   {@link int} Barcode ID (No Checksum)
      * @return {@link String} Label XML
      */
-    public static String generateLabel(final int id) {
+    public static String generateLabel(final String name, final int id) {
         LOGGER.info("Generating Template for ID: " + id);
 
         try {
@@ -42,7 +43,8 @@ public class Label {
 
             String template = readFile("ITS Asset Tags.label");
 
-            return template.replace("{{barcode}}", encodedBarcodeString);
+
+            return template.replace("{{short_name}}", name != null ? name : "ITS Video").replace("{{barcode}}", encodedBarcodeString);
         } catch (IOException e) {
             LOGGER.error("Problem Generating Label File", e);
             return "";

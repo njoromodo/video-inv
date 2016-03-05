@@ -13,18 +13,21 @@ public class Item {
     public int pubID;
 
     public String name;
+    public String shortName;
     public String comments;
 
-    public Item(int id, int pubID, String name, String comments) {
+    public Item(int id, int pubID, String name, String shortName, String comments) {
         this.id = id;
         this.pubID = pubID;
         this.name = name;
+        this.shortName = shortName;
         this.comments = comments;
     }
 
-    public Item(int pubID, String name) {
+    public Item(int pubID, String name, String shortName) {
         this.pubID = pubID;
         this.name = name;
+        this.shortName = shortName;
     }
 
     @Override
