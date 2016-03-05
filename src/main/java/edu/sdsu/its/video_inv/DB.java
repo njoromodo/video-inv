@@ -5,7 +5,6 @@ import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
 import org.apache.log4j.Logger;
 
-import javax.ws.rs.core.Response;
 import java.sql.*;
 
 /**
@@ -77,10 +76,10 @@ public class DB {
         User user = null;
 
         int uid;
-        if (pubID > Math.pow(10,6)) {
+        if (pubID > Math.pow(10, 6)) {
             // Supplied Checksum includes the checksum, we don't care about the checksum
             uid = pubID / 10;
-        } else if (pubID > Math.pow(10,5)) {
+        } else if (pubID > Math.pow(10, 5)) {
             uid = pubID;
         } else {
             return null;
@@ -301,9 +300,9 @@ public class DB {
     }
 
     /**
-     * TODO JavaDoc
+     * Add a Transaction record to the DB
      *
-     * @param transaction
+     * @param transaction {@link Transaction} Transaction to Save
      */
     public static void addTransaction(final Transaction transaction) {
         final String sql = "INSERT INTO transactions (owner, supervisor, items, check_out_time) VALUES (\n" +
@@ -315,9 +314,10 @@ public class DB {
 
 
     /**
-     * TODO JavaDoc
+     * Update Item Comments.
+     * Item comments are saved both together with the item in the Transaction record, as well as with the Item.
      *
-     * @param item
+     * @param item {@link Item} Item to Update with Updated Comments
      */
     public static void updateComments(final Item item) {
         final String sql;

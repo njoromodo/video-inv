@@ -17,14 +17,14 @@ function tools() {
 }
 
 function login() {
-    userID = document.getElementById("userID").value;
-    getUser(userID);
+    getUser(document.getElementById("userID").value);
 }
 
 function doLogin(user) {
     if (user != null) {
         // Login Valid
 
+        userID = user.pubID;
         document.getElementById("login").style.display = "none";
         document.getElementById("options").style.display = "";
 
