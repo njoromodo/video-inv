@@ -30,6 +30,25 @@ public class Item {
         this.shortName = shortName;
     }
 
+    public void completeItem() {
+        Item item = null;
+        if (this.id == 0 && this.pubID != 0) {
+            item = DB.getItem(pubID);
+            this.id = item.id;
+        } else if (this.id != 0) {
+            item = DB.getItemByDB(this.id);
+            this.pubID = item.pubID;
+        }
+        if (this.name == null) {
+            if (item == null) {
+                DB.getItemByDB(this.id);
+            }
+            if (item != null) {
+                this.name = item.name;
+            }
+        }
+    }
+
     @Override
     public String toString() {
         // Used by DB.addTransaction()

@@ -4,6 +4,9 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +18,7 @@ import java.util.Scanner;
  * @author Tom Paulus
  *         Created on 2/26/16.
  */
+@Path("/")
 public class Label {
     public static final Logger LOGGER = Logger.getLogger(Label.class);
 
@@ -22,6 +26,34 @@ public class Label {
         InputStream inputStream = Label.class.getClassLoader().getResourceAsStream(path);
         Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
         return scanner.hasNext() ? scanner.next() : "";
+    }
+
+    /**
+     * Get Asset Tag Label XML
+     *
+     * @param pubID {@link String} Public Identifier
+     * @return {@link Response} Label XML
+     */
+    @Path("label")
+    @GET
+    @Consumes(MediaType.WILDCARD)
+    @Produces(MediaType.APPLICATION_XML)
+    public Response getLabel(@QueryParam("id") final String pubID) {
+        int itemID;
+        if (pubID.length() > 6) {
+            // Supplied Checksum includes the checksum, we don't care about the checksum
+            itemID = Integer.parseInt(pubID) / 10;
+        } else if (pubID.length() == 6) {
+            itemID = Integer.parseInt(pubID);
+        } else {
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
+                    "  \"message\": \"invalid ID Length\",\n" +
+                    "}").build();
+        }
+
+        String xml = Label.generateLabel(DB.getItem(itemID).shortName, itemID);
+
+        return Response.status(Response.Status.OK).entity(xml).build();
     }
 
     /**

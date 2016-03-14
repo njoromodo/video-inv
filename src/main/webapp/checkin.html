@@ -4,15 +4,110 @@
     <meta charset="UTF-8">
     <title>Check In Equipment</title>
 
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/checkin.css">
+
+    <script type="application/javascript" src="js/common.js"></script>
     <script type="application/javascript" src="js/checkin.js"></script>
 
 </head>
 <body>
-<table>
+<table class="main" id="item-entry">
     <tr>
-        <td>This is where the Check In will go!</td>
+        <td class="pageHead">Equipment Check In</td>
+    </tr>
+    <tr>
+        <td class="pageSubHead" id="instructions">First Scan one of the items you checked out.</td>
+    </tr>
+    <tr>
+        <td>
+            <table class="items" id="items">
+                <tr class="header">
+                    <td>Item</td>
+                    <td>Comments</td>
+                    <td class="status">Status</td>
+                </tr>
+            </table>
+        </td>
     </tr>
 </table>
+
+<table id="supervisor_pin" style="display: none">
+    <tr>
+        <td class="pageHead">Supervisor Check</td>
+    </tr>
+    <tr>
+        <td class="pageSubHead">Please enter your supervisor pin to complete the check in. <br>
+            Press Enter to continue. You will be able to verify the checkout on the next screen.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form action="#" onsubmit="checkSup(); return false;">
+                <input type="password" autocomplete="off" id="supervisor_pin-i" class="userID" title="Supervisor PIN"
+                       maxlength="4" autofocus>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            <div id="badCred" class="error" style="visibility: hidden;">User Credentials Invalid...</div>
+        </td>
+    </tr>
+</table>
+
+<footer id="footer">
+    <table id="add-items-buttons">
+        <tr>
+            <td>
+                <form action="#" onsubmit="addItem(); return false;">
+                    <span>Input Item ID:</span>&nbsp;&nbsp;
+                    <input class="itemID" type="text" id="input-itemID" title="Item ID Entry" autofocus
+                           autocomplete="off">&nbsp;&nbsp;
+                    <button type="submit">Add Item</button>
+                </form>
+                <span id="error" style="visibility: hidden;">Invalid Item ID!</span>
+            </td>
+            <td>
+                <form action="#" onsubmit="complete_checkin(); return false;">
+                    <button type="submit" class="complete_button" id="complete_button" disabled="disabled">Finish
+                        Check In
+                    </button>
+                </form>
+            </td>
+        </tr>
+    </table>
+    <table id="confirm-buttons" style="display:none;">
+        <tr>
+            <td>
+                <form action="#" onsubmit="back_to_add(); return false;">
+                    <button type="submit" class="complete_button">Edit Check In</button>
+                </form>
+            </td>
+            <td>
+                <form action="#" onsubmit="show_supervisor_login(); return false;">
+                    <button type="submit" class="complete_button">Confirm</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+    <table id="super-confirm-buttons" style="display:none;">
+        <tr>
+            <td>
+                <form action="#" onsubmit="back_to_add(); return false;">
+                    <button type="submit" class="complete_button">Edit Check In</button>
+                </form>
+            </td>
+            <td>
+                <form action="#" onsubmit="finish(); return false;">
+                    <button type="submit" class="complete_button">Complete Check In</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</footer>
 </body>
 </html>

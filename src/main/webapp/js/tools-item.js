@@ -1,3 +1,5 @@
+// TODO Documentation
+
 var currentItemID = 0;
 
 document.onkeypress = function () {

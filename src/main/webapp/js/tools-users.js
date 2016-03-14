@@ -1,3 +1,5 @@
+// TODO Documentation
+
 function createUser() {
     var fname = document.getElementById("user_first").value;
     var lname = document.getElementById("user_last").value;

@@ -1,6 +1,8 @@
 /**
  * Manage Index Page Interactions, Routing, and Dynamically loaded content
  * Created by tpaulus on 2/15/16.
+ *
+ * TODO Improve Docs
  */
 var userID;
 

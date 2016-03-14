@@ -278,12 +278,16 @@ function finish() {
         }
     };
 
-    xmlHttp.open('POST', "api/complete");
+    xmlHttp.open('POST', "api/checkout");
     xmlHttp.setRequestHeader("Content-type", "application/json");
     xmlHttp.send(postJSON);
 
 }
 
+/**
+ * Redirect to Conformation Page
+ * @param status Status of the Post request for the Transaction
+ */
 function doFinish(status) {
     var statusText;
     if (status == 202) {

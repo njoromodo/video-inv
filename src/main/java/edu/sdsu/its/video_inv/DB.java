@@ -1,11 +1,14 @@
 package edu.sdsu.its.video_inv;
 
+import com.google.gson.Gson;
 import edu.sdsu.its.video_inv.Models.Item;
 import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Communicate with Inventory DB
@@ -201,6 +204,109 @@ public class DB {
     }
 
     /**
+     * Get inventory item by its database id (Not the same as their Public ID).
+     *
+     * @param dbID {@link int} Item's DataBase ID
+     * @return {@link Item} Inventory Item
+     */
+    public static Item getItemByDB(final int dbID) {
+        Connection connection = getConnection();
+        Statement statement = null;
+        Item item = null;
+
+        try {
+            statement = connection.createStatement();
+            final String sql = "SELECT * FROM inventory WHERE id = " + dbID + ";";
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            if (resultSet.next()) {
+                item = new Item(dbID,
+                        resultSet.getInt("pub_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("short_name"),
+                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "");
+            }
+
+            resultSet.close();
+        } catch (SQLException e) {
+            LOGGER.error("Problem querying DB for Inventory Item by dbID", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+        return item;
+    }
+
+    /**
+     * Retrieve a Transaction by an Item in the Transaction and the direction of the transaction
+     *
+     * @param direction {@link int} CheckOut/CheckIn
+     * @param item      {@link Item} Item in the Transaction
+     * @return {@link Transaction} Transaction Record with designated Item
+     */
+    public static Transaction getTransactionByItem(final int direction, final Item item) {
+        Connection connection = getConnection();
+        Statement statement = null;
+        Transaction transaction = null;
+
+        try {
+            statement = connection.createStatement();
+            final String sql = "SELECT *\n" +
+                    "FROM videoinv.transactions\n" +
+                    "WHERE INSTR(items, '\"id\": " + item.id + "' ) AND direction = " + direction + "\n" +
+                    "ORDER BY id DESC\n" +
+                    "LIMIT 1;";
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            if (resultSet.next()) {
+                final Gson gson = new Gson();
+
+                List<Item> itemList = new ArrayList<>();
+                final String items = resultSet.getString("items");
+                for (String s : items.substring(1, items.length() - 1).split("},")) {
+                    if (!s.endsWith("}")) {
+                        s += "}"; // We removed the last } to split the Item Array
+                    }
+
+                    Item i = gson.fromJson(s, Item.class);
+                    i.completeItem();
+                    itemList.add(i);
+                }
+
+                transaction = new Transaction(resultSet.getInt("direction"),
+                        resultSet.getInt("id"),
+                        resultSet.getInt("owner"),
+                        resultSet.getInt("supervisor"),
+                        itemList);
+            }
+
+            resultSet.close();
+        } catch (SQLException e) {
+            LOGGER.error("Problem querying DB for Transaction Record by Item", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+        return transaction;
+    }
+
+    /**
      * Get the total number of Quotes in the DB.
      * This method assumes that the quotes are have a sequential unique ID!
      *
@@ -306,13 +412,12 @@ public class DB {
      * @param transaction {@link Transaction} Transaction to Save
      */
     public static void addTransaction(final Transaction transaction) {
-        final String sql = "INSERT INTO transactions (owner, supervisor, items, check_out_time) VALUES (\n" +
-                "  (SELECT id FROM users WHERE pub_id = " + transaction.ownerID + "), (SELECT id FROM users WHERE pub_id = " + transaction.supervisorID + "),\n" +
+        final String sql = "INSERT INTO transactions (direction, owner, supervisor, items, time) VALUES (\n" +
+                transaction.direction + ", (SELECT id FROM users WHERE pub_id = " + transaction.ownerID + "), (SELECT id FROM users WHERE pub_id = " + transaction.supervisorID + "),\n" +
                 "  '" + transaction.items.toString() + "', now()\n" +
                 ");";
         executeStatement(sql);
     }
-
 
     /**
      * Update Item Comments.

@@ -140,34 +140,6 @@ public class Web {
     }
 
     /**
-     * Get Asset Tag Label XML
-     *
-     * @param pubID {@link String} Public Identifier
-     * @return {@link Response} Label XML
-     */
-    @Path("label")
-    @GET
-    @Consumes(MediaType.WILDCARD)
-    @Produces(MediaType.APPLICATION_XML)
-    public Response getLabel(@QueryParam("id") final String pubID) {
-        int itemID;
-        if (pubID.length() > 6) {
-            // Supplied Checksum includes the checksum, we don't care about the checksum
-            itemID = Integer.parseInt(pubID) / 10;
-        } else if (pubID.length() == 6) {
-            itemID = Integer.parseInt(pubID);
-        } else {
-            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
-                    "  \"message\": \"invalid ID Length\",\n" +
-                    "}").build();
-        }
-
-        String xml = Label.generateLabel(DB.getItem(itemID).shortName, itemID);
-
-        return Response.status(Response.Status.OK).entity(xml).build();
-    }
-
-    /**
      * Add a new User to the System
      *
      * @param firstName  {@link String} User's First Nam
@@ -221,36 +193,6 @@ public class Web {
         String xml = Label.generateUserLabel(userID);
 
         return Response.status(Response.Status.OK).entity(xml).build();
-    }
-
-    @Path("complete")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response addTransaction(final String payload) {
-        LOGGER.debug("COMPLETE [POST] Recieved: " + payload);
-        Transaction transaction = GSON.fromJson(payload, Transaction.class);
-
-        final User ownerUser = DB.getUser(transaction.ownerID);
-        if (transaction.ownerID == 0 || ownerUser == null) {
-            LOGGER.warn("Invalid Owner ID");
-            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
-                    "  \"message\": \"invalid ownerID\",\n" +
-                    "}").build();
-        }
-        final User supervisorUser = DB.getUser(transaction.supervisorID);
-        if (transaction.supervisorID == 0 || supervisorUser == null || !supervisorUser.supervisor) {
-            LOGGER.warn("Invalid Supervisor ID");
-            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
-                    "  \"message\": \"invalid supervisorID\",\n" +
-                    "}").build();
-        }
-
-
-        DB.addTransaction(transaction);
-        transaction.items.forEach(DB::updateComments);
-
-        return Response.status(Response.Status.ACCEPTED).build();
     }
 
     private String hash(final String string) {
