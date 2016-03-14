@@ -1,8 +1,6 @@
 /**
  * Manage Index Page Interactions, Routing, and Dynamically loaded content
  * Created by tpaulus on 2/15/16.
- *
- * TODO Improve Docs
  */
 var userID;
 
@@ -21,24 +19,10 @@ function tools() {
 function login() {
     getUser(document.getElementById("userID").value);
 }
-
-function doLogin(user) {
-    if (user != null) {
-        // Login Valid
-
-        userID = user.pubID;
-        document.getElementById("login").style.display = "none";
-        document.getElementById("options").style.display = "";
-
-        if (user.supervisor) {
-            document.getElementById("toolsB").style.display = "";
-        }
-    } else {
-        document.getElementById("badCred").style.visibility = "visible";
-        document.getElementById("userID").value = "";
-    }
-}
-
+/**
+ * Call the API to see if a UserID is valid
+ * @param id ID from Form
+ */
 function getUser(id) {
     var xmlHttp = new XMLHttpRequest();
 
@@ -61,28 +45,67 @@ function getUser(id) {
     xmlHttp.send();
 }
 
-function loadQuote() {
-    var xmlHttp = new XMLHttpRequest();
+/**
+ * Login a User
+ * @param user User to Login (Retrieved from getUser)
+ */
+function doLogin(user) {
+    if (user != null) {
+        // Login Valid
 
-    xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4) {
-            var response = xmlHttp;
-            console.log("Status: " + response.status);
-            var quote = null;
+        userID = user.pubID;
+        document.getElementById("login").style.display = "none";
+        document.getElementById("options").style.display = "";
 
-            if (response.status == 200) {
-                quote = JSON.parse(xmlHttp.responseText);
-                console.log(quote);
-                setQuote(quote.text, quote.author);
-            }
+        if (user.supervisor) {
+            document.getElementById("toolsB").style.display = "";
         }
-    };
-
-    xmlHttp.open('GET', "api/quote");
-    xmlHttp.send();
-
+    } else {
+        document.getElementById("badCred").style.visibility = "visible";
+        document.getElementById("userID").value = "";
+    }
 }
+/**
+ * Retrieve the Daily quote from the server
+ */
+function loadQuote() {
+    var quoteText = getCookie("quoteText");
+    var quoteAuthor = getCookie("quoteAuthor");
+    if (quoteText == null || quoteText == "" || quoteAuthor == null || quoteAuthor == "") {
+        var xmlHttp = new XMLHttpRequest();
 
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState == 4) {
+                var response = xmlHttp;
+                console.log("Status: " + response.status);
+                var quote = null;
+
+                if (response.status == 200) {
+                    quote = JSON.parse(xmlHttp.responseText);
+                    console.log(quote);
+                    var qText = quote.text;
+                    var qAuthor = quote.author;
+
+                    setCookie("quoteText", qText);
+                    setCookie("quoteAuthor", qAuthor);
+
+                    setQuote(qText, qAuthor);
+                }
+            }
+        };
+
+        xmlHttp.open('GET', "api/quote");
+        xmlHttp.send();
+    }
+    else {
+        setQuote(getCookie("quoteText"), getCookie("quoteAuthor"));
+    }
+}
+/**
+ * Update and Display the Quote on the Index Page
+ * @param text Quote Text
+ * @param author Quote Author
+ */
 function setQuote(text, author) {
     document.getElementById("quote").innerHTML = text + "<br>~" + author;
 }
