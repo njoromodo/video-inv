@@ -1,8 +1,13 @@
-// TODO Documentation
+/**
+ * Item Utilities Functions
+ */
 
 var currentItemID = 0;
 
 document.onkeypress = function () {
+    /**
+     * Directs all key input into the Item ID field if it is not in a Text Area
+     */
     const inputBox = document.getElementById("itemID");
 
     if (document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
@@ -11,17 +16,23 @@ document.onkeypress = function () {
         inputBox.value = value;
     }
 };
-
+/**
+ * Show Create Item Form
+ */
 function showCreate(){
     document.getElementById("view").style.display  ="none";
     document.getElementById("create").style.display = "";
 }
+/**
+ * Show View Item Form
+ */
 function showView() {
     document.getElementById("view").style.display  ="";
     document.getElementById("create").style.display = "none";
 }
-
-
+/**
+ * Create new Item in DB
+ */
 function addItem() {
     var name = document.getElementById("itemName").value;
     var short = document.getElementById("itemShortName").value;
@@ -42,7 +53,10 @@ function addItem() {
     xmlHttp.open('GET', "../api/addItem?name=" + encodeURIComponent(name) + "&short=" + encodeURIComponent(short));
     xmlHttp.send();
 }
-
+/**
+ * Get Dymo Label by ID
+ * @param id Public ID
+ */
 function getLabel(id) {
     var xmlHttp = new XMLHttpRequest();
 
@@ -60,7 +74,10 @@ function getLabel(id) {
     xmlHttp.open('GET', "../api/label?id=" + id);
     xmlHttp.send();
 }
-
+/**
+ * Send the Label XML to the Printer via the Dymo JS Framework
+ * @param xml Label XML
+ */
 function makeLabel(xml) {
     try {
         var label = dymo.label.framework.openLabelXml(xml);
@@ -90,7 +107,9 @@ function makeLabel(xml) {
         alert(e.message || e);
     }
 }
-
+/**
+ * Reprint a Label
+ */
 function reprint() {
     var id = currentItemID;
     var xmlHttp = new XMLHttpRequest();
@@ -109,8 +128,9 @@ function reprint() {
     xmlHttp.open('GET', "../api/label?id=" + id);
     xmlHttp.send();
 }
-
-
+/**
+ * Get an Item by ID
+ */
 function getItemByID() {
     var itemID = document.getElementById("itemID").value;
     var xmlHttp = new XMLHttpRequest();
@@ -146,7 +166,10 @@ function getItemByID() {
 
 
 }
-
+/**
+ * Load and Show the Item Information based on the Item JSON
+ * @param json Item JSON
+ */
 function doShowItem(json) {
     var itemName = document.getElementById("item-name");
     var itemComments = document.getElementById("comments");

@@ -1,5 +1,6 @@
-// TODO Documentation
-
+/**
+ * Create a User in the DB
+ */
 function createUser() {
     var fname = document.getElementById("user_first").value;
     var lname = document.getElementById("user_last").value;
@@ -24,7 +25,10 @@ function createUser() {
     xmlHttp.send();
 
 }
-
+/**
+ * Get a User Label
+ * @param id User's Public ID
+ */
 function getLabel(id) {
     var xmlHttp = new XMLHttpRequest();
 
@@ -43,7 +47,10 @@ function getLabel(id) {
     xmlHttp.open('GET', "../api/userLabel?id=" + id);
     xmlHttp.send();
 }
-
+/**
+ * Send the Label XML to the Printer via the Dymo JS Framework
+ * @param xml Label XML
+ */
 function makeLabel(xml) {
     try {
         var label = dymo.label.framework.openLabelXml(xml);
