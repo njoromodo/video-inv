@@ -73,7 +73,15 @@ function addItem() {
  */
 function doAddItem(item) {
     const itemsTable = document.getElementById("items");
-    if (item != null && items.indexOf(item.id) == -1) {
+    if (item == null) {
+        document.getElementById("error").innerHTML = "Invalid Item ID!";
+        document.getElementById("error").style.visibility = "visible";
+        const itemID = document.getElementById("input-itemID");
+        itemID.value = "";
+        itemID.select();
+
+        notifyChime.play();
+    } else if (item != null && items.indexOf(item.id) == -1 && !item.checked_out) {
         document.getElementById("error").style.visibility = "hidden"; // Hide the Error Message
 
         items[items.length] = item.id; // Add itemID of list of Items in Check Out Batch
@@ -98,9 +106,9 @@ function doAddItem(item) {
 
     } else if (item != null && items.indexOf(parseInt(item.id)) > -1) {
         console.log("Item already in list, skipping")
-    } else {
+    } else if (item.checked_out) {
+        document.getElementById("error").innerHTML = "That item is currently Checked Out";
         document.getElementById("error").style.visibility = "visible";
-        const itemID = document.getElementById("input-itemID");
         itemID.value = "";
         itemID.select();
 

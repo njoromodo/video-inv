@@ -183,7 +183,8 @@ public class DB {
                         pubID,
                         resultSet.getString("name"),
                         resultSet.getString("short_name"),
-                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "");
+                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "",
+                        resultSet.getBoolean("checked_out"));
             }
 
             resultSet.close();
@@ -225,7 +226,8 @@ public class DB {
                         resultSet.getInt("pub_id"),
                         resultSet.getString("name"),
                         resultSet.getString("short_name"),
-                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "");
+                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "",
+                        resultSet.getBoolean("checked_out"));
             }
 
             resultSet.close();
@@ -260,7 +262,7 @@ public class DB {
         try {
             statement = connection.createStatement();
             final String sql = "SELECT *\n" +
-                    "FROM videoinv.transactions\n" +
+                    "FROM transactions\n" +
                     "WHERE INSTR(items, '\"id\": " + item.id + "' ) AND direction = " + direction + "\n" +
                     "ORDER BY id DESC\n" +
                     "LIMIT 1;";
@@ -319,7 +321,7 @@ public class DB {
 
         try {
             statement = connection.createStatement();
-            final String sql = "SELECT MAX(id) FROM videoinv.quotes;";
+            final String sql = "SELECT MAX(id) FROM quotes;";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
@@ -357,7 +359,7 @@ public class DB {
 
         try {
             statement = connection.createStatement();
-            final String sql = "SELECT author, text FROM videoinv.quotes WHERE id = " + quoteNum + ";";
+            final String sql = "SELECT author, text FROM quotes WHERE id = " + quoteNum + ";";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
@@ -434,6 +436,21 @@ public class DB {
         } else {
             sql = "UPDATE inventory\n" +
                     "SET comments = '" + sanitize(item.comments) + "'\n" +
+                    "WHERE pub_id = " + item.pubID + ";";
+        }
+
+        executeStatement(sql);
+    }
+
+    public static void updateItemStatus(final Item item) {
+        final String sql;
+        if (item.id != 0) {
+            sql = "UPDATE inventory\n" +
+                    "SET checked_out = " + (item.checked_out ? 1 : 0) + "\n" +
+                    "WHERE id = " + item.id + ";";
+        } else {
+            sql = "UPDATE inventory\n" +
+                    "SET checked_out = " + (item.checked_out ? 1 : 0) + "\n" +
                     "WHERE pub_id = " + item.pubID + ";";
         }
 

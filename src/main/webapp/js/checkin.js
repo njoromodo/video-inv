@@ -110,10 +110,20 @@ function doLoadTransaction(json) {
 }
 
 function doAddItem(item) {
-    checkedIn[checkedIn.length] = item.id;
-
-    var row = document.getElementById("i-" + item.id);
-    row.cells[2].innerHTML = '<i class="fa fa-check"></i>';
+    if (items.indexOf(item.id) != -1) {
+        if (checkedIn.indexOf(item.id) != -1) {
+            document.getElementById("error").style.visibility = "hidden";
+            console.log("Item already checked in. Skipping!")
+        } else {
+            checkedIn[checkedIn.length] = item.id;
+            document.getElementById("error").style.visibility = "hidden";
+            var row = document.getElementById("i-" + item.id);
+            row.cells[2].innerHTML = '<i class="fa fa-check"></i>';
+        }
+    } else {
+        document.getElementById("error").innerHTML = "That item is not part of this checkout!";
+        document.getElementById("error").style.visibility = "visible";
+    }
 }
 
 /**

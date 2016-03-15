@@ -1,6 +1,7 @@
 package edu.sdsu.its.video_inv;
 
 import com.google.gson.Gson;
+import edu.sdsu.its.video_inv.Models.Item;
 import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
 import org.apache.log4j.Logger;
@@ -61,6 +62,9 @@ public class CheckOut {
         transaction.direction = 0;
         DB.addTransaction(transaction);
         transaction.items.forEach(DB::updateComments);
+
+        for (Item i : transaction.items) i.checked_out = true;
+        transaction.items.forEach(DB::updateItemStatus);
 
         return Response.status(Response.Status.ACCEPTED).build();
     }

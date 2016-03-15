@@ -1,6 +1,7 @@
 package edu.sdsu.its.video_inv;
 
 import com.google.gson.Gson;
+import com.sun.tools.corba.se.idl.constExpr.Not;
 import edu.sdsu.its.video_inv.Models.Item;
 import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
@@ -46,7 +47,18 @@ public class CheckIn {
                     "}").build();
         }
         final Item item = DB.getItem(itemID);
+        if (!item.checked_out) {
+            return Response.status(Response.Status.NOT_FOUND).entity("{\n" +
+                    "  \"message\": \"Designated item is not currently checked out\",\n" +
+                    "}").build();
+        }
+
         final Transaction transaction = DB.getTransactionByItem(0, item);
+        if (transaction == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("{\n" +
+                    "  \"message\": \"No matching transaction was found\",\n" +
+                    "}").build();
+        }
 
         return Response.status(Response.Status.OK).entity(GSON.toJson(transaction)).build();
     }
@@ -89,6 +101,9 @@ public class CheckIn {
         transaction.direction = 1;
         DB.addTransaction(transaction);
         transaction.items.forEach(DB::updateComments);
+
+        for (Item i : transaction.items) i.checked_out = false;
+        transaction.items.forEach(DB::updateItemStatus);
 
         return Response.status(Response.Status.ACCEPTED).build();
     }

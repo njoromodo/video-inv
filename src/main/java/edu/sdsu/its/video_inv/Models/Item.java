@@ -16,12 +16,15 @@ public class Item {
     public String shortName;
     public String comments;
 
-    public Item(int id, int pubID, String name, String shortName, String comments) {
+    public boolean checked_out;
+
+    public Item(int id, int pubID, String name, String shortName, String comments, boolean checked_out) {
         this.id = id;
         this.pubID = pubID;
         this.name = name;
         this.shortName = shortName;
         this.comments = comments;
+        this.checked_out = checked_out;
     }
 
     public Item(int pubID, String name, String shortName) {
