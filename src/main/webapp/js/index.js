@@ -5,11 +5,11 @@
 var userID;
 
 function check_out() {
-    window.top.location = "checkout.html?id=" + userID;
+    window.top.location = "checkout.html";
 }
 
 function check_in() {
-    window.top.location = "checkin.html?id=" + userID;
+    window.top.location = "checkin.html";
 }
 
 function tools() {
@@ -19,6 +19,7 @@ function tools() {
 function login() {
     getUser(document.getElementById("userID").value);
 }
+
 /**
  * Call the API to see if a UserID is valid
  * @param id ID from Form
@@ -36,8 +37,8 @@ function getUser(id) {
                 user = JSON.parse(xmlHttp.responseText);
                 console.log(user);
             }
-
             doLogin(user);
+            setCookie("current_user", xmlHttp.responseText);
         }
     };
 
@@ -64,6 +65,7 @@ function doLogin(user) {
         document.getElementById("badCred").style.visibility = "visible";
         document.getElementById("userID").value = "";
     }
+
 }
 /**
  * Retrieve the Daily quote from the server
@@ -86,8 +88,8 @@ function loadQuote() {
                     var qText = quote.text;
                     var qAuthor = quote.author;
 
-                    setCookie("quoteText", qText);
-                    setCookie("quoteAuthor", qAuthor);
+                    setCookie("quoteText", qText, getMidnight());
+                    setCookie("quoteAuthor", qAuthor, getMidnight());
 
                     setQuote(qText, qAuthor);
                 }

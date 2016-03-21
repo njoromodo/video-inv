@@ -2,6 +2,11 @@
  * Item Utilities Functions
  */
 
+var user_id = JSON.parse(getCookie("current_user")).pubID;
+if (user_id == null) {
+    window.top.location = "../403.html";
+}
+
 var currentItemID = 0;
 
 document.onkeypress = function () {
@@ -16,6 +21,7 @@ document.onkeypress = function () {
         inputBox.value = value;
     }
 };
+
 /**
  * Show Create Item Form
  */

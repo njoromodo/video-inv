@@ -1,3 +1,8 @@
+var user_id = JSON.parse(getCookie("current_user")).pubID;
+if (user_id == null) {
+    window.top.location = "../403.html";
+}
+
 /**
  * Create a User in the DB
  */

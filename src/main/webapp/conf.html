@@ -48,7 +48,7 @@
             continues to persist, please file an issue report.
             <br>
             <br>
-            <b><a href="https://github.com/sdsu-its/video-inv/issues" target="_blank">Report Issues on GitHub!</a></b>
+            <b><a href="https://github.com/sdsu-its/video-inv/issues" target="_blank">Please Report Issues on GitHub!</a></b>
         </td>
     </tr>
     <tr>
@@ -63,11 +63,11 @@
 <script type="application/javascript">
     setTimeout(function () {
         window.location = "index.html"
-    }, 15000);
+    }, 10000);
 
-    if (getParameterByName("status") == "ok") {
-        var numItems = getParameterByName("num");
-        if (getParameterByName("action") == "out") {
+    if (getCookie("conf_status") == "ok") {
+        var numItems = getCookie("count");
+        if (getCookie("action") == "out") {
             document.getElementById("action").innerHTML = "Check Out";
             document.getElementById("numItemsO").innerHTML = numItems;
             if (numItems > 1) {
@@ -90,5 +90,10 @@
         document.getElementById("success").style.display = "none";
         document.getElementById("error").style.display = "";
     }
+
+    deleteCookie("current_user");
+    deleteCookie("cont_status");
+    deleteCookie("action");
+    deleteCookie("count");
 </script>
 </html>

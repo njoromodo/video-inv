@@ -1,6 +1,6 @@
 var items = [];
 var checkedIn = [];
-var owner_id = getParameterByName("id");
+var owner_id = JSON.parse(getCookie("current_user")).pubID;
 var supervisor_id = 0;
 
 const notifyChime = new Audio("error.mp3");
@@ -15,6 +15,9 @@ document.onkeypress = function () {
     }
 };
 
+if (owner_id == null) {
+    window.top.location = "403.html";
+}
 
 /**
  * Add item to CheckIn Transaction
@@ -318,6 +321,9 @@ function doFinish(status) {
     } else {
         statusText = "error";
     }
+    setCookie("conf_status", statusText, null);
+    setCookie("action", "in", null);
+    setCookie("count", items.length, null);
 
-    window.location = "conf.html?status=" + statusText + "&action=in&num=" + checkedIn.length;
+    window.location = "conf.html";
 }
