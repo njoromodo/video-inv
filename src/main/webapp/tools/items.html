@@ -27,7 +27,7 @@
     </tr>
     <tr>
         <td>
-            <form action="#" onsubmit="reprint()">
+            <form action="#" onsubmit="reprint(); return false;">
                 <button class="submitButton small" type="submit" title="Reprint Label" id="reprintButton"
                         onclick="return confirm('Are you sure?')" style="margin-bottom: 5em; visibility: hidden;">
                     Reprint Label
@@ -37,7 +37,7 @@
     </tr>
     <tr>
         <td>
-            <form action="#" onsubmit="getItemByID()">
+            <form action="#" onsubmit="getItemByID(); return false;">
                 <table>
                     <tr>
                         <td align="left" colspan="2">
@@ -81,7 +81,7 @@
     </tr>
     <tr>
         <td>
-            <form action="#" onsubmit="addItem()">
+            <form action="#" onsubmit="addItem(); return false;">
                 <table>
                     <tr>
                         <td>
