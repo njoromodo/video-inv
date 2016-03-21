@@ -2,7 +2,6 @@ package edu.sdsu.its.video_inv;
 
 import com.google.gson.Gson;
 import edu.sdsu.its.video_inv.Models.Item;
-import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
 import org.apache.log4j.Logger;
 
@@ -22,8 +21,8 @@ import java.util.Random;
 @Path("/")
 public class Web {
     private static final Logger LOGGER = Logger.getLogger(Web.class);
+    private static final String HASH_SALT = Param.getParam("video_inv", "hash_salt");
     private final Gson GSON = new Gson();
-    private final String HASH_SALT = Param.getParam("video_inv", "hash_salt");
 
     /**
      * Get a User's Information based on their Public ID.
