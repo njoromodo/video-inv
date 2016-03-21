@@ -1,7 +1,6 @@
 package edu.sdsu.its.video_inv;
 
 import com.google.gson.Gson;
-import com.sun.tools.corba.se.idl.constExpr.Not;
 import edu.sdsu.its.video_inv.Models.Item;
 import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
@@ -37,7 +36,7 @@ public class CheckIn {
 
         int itemID;
         if (pubID.length() > 6) {
-            // Supplied Checksum includes the checksum, we don't care about the checksum
+            // Supplied ID includes the checksum, we don't care about the checksum
             itemID = Integer.parseInt(pubID) / 10;
         } else if (pubID.length() == 6) {
             itemID = Integer.parseInt(pubID);
@@ -53,7 +52,7 @@ public class CheckIn {
                     "}").build();
         }
 
-        final Transaction transaction = DB.getTransactionByItem(0, item);
+        final Transaction transaction = DB.getTransactionByItem(item);
         if (transaction == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("{\n" +
                     "  \"message\": \"No matching transaction was found\",\n" +
@@ -73,7 +72,7 @@ public class CheckIn {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addTransaction(final String payload) {
+    public Response updateTransaction(final String payload, @QueryParam("id") final int id) {
         LOGGER.debug("CHECKIN [POST] Recieved: " + payload);
         if (payload == null || payload.length() == 0) {
             return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
@@ -82,6 +81,7 @@ public class CheckIn {
         }
 
         Transaction transaction = GSON.fromJson(payload, Transaction.class);
+        transaction.id = id;
 
         final User ownerUser = DB.getUser(transaction.ownerID);
         if (transaction.ownerID == 0 || ownerUser == null) {
@@ -90,20 +90,19 @@ public class CheckIn {
                     "  \"message\": \"invalid ownerID\",\n" +
                     "}").build();
         }
-        final User supervisorUser = DB.getUser(transaction.supervisorID);
-        if (transaction.supervisorID == 0 || supervisorUser == null || !supervisorUser.supervisor) {
+        final User supervisorUser = DB.getUser(transaction.in_components.supervisorID);
+        if (transaction.in_components.supervisorID == 0 || supervisorUser == null || !supervisorUser.supervisor) {
             LOGGER.warn("Invalid Supervisor ID");
             return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
                     "  \"message\": \"invalid supervisorID\",\n" +
                     "}").build();
         }
 
-        transaction.direction = 1;
-        DB.addTransaction(transaction);
-        transaction.items.forEach(DB::updateComments);
+        DB.updateTransaction(transaction);
+        transaction.in_components.items.forEach(DB::updateComments);
 
-        for (Item i : transaction.items) i.checked_out = false;
-        transaction.items.forEach(DB::updateItemStatus);
+        for (Item i : transaction.in_components.items) i.checked_out = false;
+        transaction.in_components.items.forEach(DB::updateItemStatus);
 
         return Response.status(Response.Status.ACCEPTED).build();
     }

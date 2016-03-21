@@ -259,6 +259,7 @@ function doSupervisorLogin(user) {
 function finish() {
     var postJSON = "{\n";
     postJSON += ("\"ownerID\": " + parseInt(owner_id) + ",\n");
+    postJSON += "\"out_components\": {";
     postJSON += ("\"supervisorID\": " + parseInt(supervisor_id) + ",\n");
     postJSON += ("\"items\": [");
 
@@ -279,7 +280,7 @@ function finish() {
     }
 
     postJSON += ("]\n");
-    postJSON += "}";
+    postJSON += "}\n}";
 
     var xmlHttp = new XMLHttpRequest();
 

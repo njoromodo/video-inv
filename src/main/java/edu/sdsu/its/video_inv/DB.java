@@ -22,7 +22,7 @@ public class DB {
     private static final String db_password = Param.getParam("video_inv", "db-password");
     private static final Logger LOGGER = Logger.getLogger(DB.class);
 
-    public static Connection getConnection() {
+    private static Connection getConnection() {
         Connection connection = null;
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -250,11 +250,10 @@ public class DB {
     /**
      * Retrieve a Transaction by an Item in the Transaction and the direction of the transaction
      *
-     * @param direction {@link int} CheckOut/CheckIn
-     * @param item      {@link Item} Item in the Transaction
+     * @param item {@link Item} Item in the Transaction
      * @return {@link Transaction} Transaction Record with designated Item
      */
-    public static Transaction getTransactionByItem(final int direction, final Item item) {
+    public static Transaction getTransactionByItem(final Item item) {
         Connection connection = getConnection();
         Statement statement = null;
         Transaction transaction = null;
@@ -262,33 +261,25 @@ public class DB {
         try {
             statement = connection.createStatement();
             final String sql = "SELECT *\n" +
-                    "FROM transactions\n" +
-                    "WHERE INSTR(items, '\"id\": " + item.id + "' ) AND direction = " + direction + "\n" +
+                    "FROM videoinv.transactions\n" +
+                    "WHERE INSTR(out_components, '\"id\": " + item.id + "')\n" +
                     "ORDER BY id DESC\n" +
                     "LIMIT 1;";
+
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
             if (resultSet.next()) {
                 final Gson gson = new Gson();
+                Transaction.Component outComponents = gson.fromJson(resultSet.getString("out_components"), Transaction.Component.class);
+                Transaction.Component inComponents = gson.fromJson(resultSet.getString("in_components"), Transaction.Component.class);
 
-                List<Item> itemList = new ArrayList<>();
-                final String items = resultSet.getString("items");
-                for (String s : items.substring(1, items.length() - 1).split("},")) {
-                    if (!s.endsWith("}")) {
-                        s += "}"; // We removed the last } to split the Item Array
-                    }
+                outComponents.items.forEach(Item::completeItem);
+                if (inComponents != null) inComponents.items.forEach(Item::completeItem);
 
-                    Item i = gson.fromJson(s, Item.class);
-                    i.completeItem();
-                    itemList.add(i);
-                }
-
-                transaction = new Transaction(resultSet.getInt("direction"),
-                        resultSet.getInt("id"),
+                transaction = new Transaction(resultSet.getInt("id"),
                         resultSet.getInt("owner"),
-                        resultSet.getInt("supervisor"),
-                        itemList);
+                        outComponents, inComponents);
             }
 
             resultSet.close();
@@ -350,7 +341,7 @@ public class DB {
      * Returns the Quote with the specified ID
      *
      * @param quoteNum {@link int} Quote ID
-     * @return {@link edu.sdsu.its.video_inv.Quote.QuoteModel} Quote Model (Author and Text)
+     * @return {@link Quote.QuoteModel} Quote Model (Author and Text)
      */
     public static Quote.QuoteModel getQuote(final int quoteNum) {
         Connection connection = getConnection();
@@ -414,10 +405,21 @@ public class DB {
      * @param transaction {@link Transaction} Transaction to Save
      */
     public static void addTransaction(final Transaction transaction) {
-        final String sql = "INSERT INTO transactions (direction, owner, supervisor, items, time) VALUES (\n" +
-                transaction.direction + ", (SELECT id FROM users WHERE pub_id = " + transaction.ownerID + "), (SELECT id FROM users WHERE pub_id = " + transaction.supervisorID + "),\n" +
-                "  '" + transaction.items.toString() + "', now()\n" +
+        final String sql = "INSERT INTO videoinv.transactions (owner, out_components, out_time) VALUES (\n" +
+                "  (SELECT id\n" +
+                "   FROM users\n" +
+                "   WHERE pub_id = " + transaction.ownerID + "),\n" +
+                "  '" + transaction.out_components.toString() + "', now()\n" +
                 ");";
+        executeStatement(sql);
+    }
+
+    public static void updateTransaction(final Transaction transaction) {
+        // fixme
+        final String sql = "UPDATE transactions\n" +
+                "SET in_components = '" + transaction.in_components.toString() + "',\n" +
+                "  in_time = now()\n" +
+                "WHERE id = " + transaction.id + ";";
         executeStatement(sql);
     }
 

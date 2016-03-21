@@ -54,7 +54,7 @@ public class Item {
 
     @Override
     public String toString() {
-        // Used by DB.addTransaction()
+        // Used by Transaction.toString()
         if (this.id == 0) this.id = DB.getItem(this.pubID).id;
 
         return String.format("{\n" +

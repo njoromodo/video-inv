@@ -2,6 +2,7 @@ var items = [];
 var checkedIn = [];
 var owner_id = JSON.parse(getCookie("current_user")).pubID;
 var supervisor_id = 0;
+var transaction_id = 0;
 
 const notifyChime = new Audio("error.mp3");
 
@@ -85,7 +86,8 @@ function addItem(itemID) {
 function doLoadTransaction(json) {
     if (json != null) {
         const itemsTable = document.getElementById("items");
-        var transactionItems = json.items;
+        var transactionItems = json.out_components.items;
+        transaction_id = json.id;
 
         for (var i = 0; i < transactionItems.length; i++) {
             var item = transactionItems[i];
@@ -279,6 +281,7 @@ function doSupervisorLogin(user) {
 function finish() {
     var postJSON = "{\n";
     postJSON += ("\"ownerID\": " + parseInt(owner_id) + ",\n");
+    postJSON += "\"in_components\": {";
     postJSON += ("\"supervisorID\": " + parseInt(supervisor_id) + ",\n");
     postJSON += ("\"items\": [");
 
@@ -291,7 +294,7 @@ function finish() {
         itemJSON += ("\"comments\": \"" + itemComments + "\"\n");
         itemJSON += "}";
 
-        if (i != items.length - 1) {    // Include a comma on all, except the last item in the Items List
+        if (i != checkedIn.length - 1) {    // Include a comma on all, except the last item in the Items List
             itemJSON += ",";
         }
 
@@ -299,7 +302,7 @@ function finish() {
     }
 
     postJSON += ("]\n");
-    postJSON += "}";
+    postJSON += "}\n}";
 
     var xmlHttp = new XMLHttpRequest();
 
@@ -310,7 +313,7 @@ function finish() {
         }
     };
 
-    xmlHttp.open('POST', "api/checkin");
+    xmlHttp.open('POST', "api/checkin?id=" + transaction_id);
     xmlHttp.setRequestHeader("Content-type", "application/json");
     xmlHttp.send(postJSON);
 

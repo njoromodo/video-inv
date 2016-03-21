@@ -51,20 +51,18 @@ public class CheckOut {
                     "  \"message\": \"invalid ownerID\",\n" +
                     "}").build();
         }
-        final User supervisorUser = DB.getUser(transaction.supervisorID);
-        if (transaction.supervisorID == 0 || supervisorUser == null || !supervisorUser.supervisor) {
+        final User supervisorUser = DB.getUser(transaction.out_components.supervisorID);
+        if (transaction.out_components.supervisorID == 0 || supervisorUser == null || !supervisorUser.supervisor) {
             LOGGER.warn("Invalid Supervisor ID");
             return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
                     "  \"message\": \"invalid supervisorID\",\n" +
                     "}").build();
         }
 
-        transaction.direction = 0;
+        for (Item i : transaction.out_components.items) i.checked_out = true;
         DB.addTransaction(transaction);
-        transaction.items.forEach(DB::updateComments);
-
-        for (Item i : transaction.items) i.checked_out = true;
-        transaction.items.forEach(DB::updateItemStatus);
+        transaction.out_components.items.forEach(DB::updateComments);
+        transaction.out_components.items.forEach(DB::updateItemStatus);
 
         return Response.status(Response.Status.ACCEPTED).build();
     }
