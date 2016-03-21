@@ -42,7 +42,13 @@ function addItem(itemID) {
                         transaction = JSON.parse(xmlHttp.responseText);
                         console.log(transaction);
                         doLoadTransaction(transaction);
-                        addItem(itemID); // Add the Item to the List once the list has been loaded
+                        for (var i = 0; i < transaction.out_components.items.length; i++) {
+                            var item = transaction.out_components.items[i];
+                            if (item.pubID == itemID) {
+                                doAddItem(item); // Add the Item to the List once the list has been loaded
+                                break;
+                            }
+                        }
                     }
                     else {
                         doLoadTransaction(null);
