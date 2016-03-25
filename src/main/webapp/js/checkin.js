@@ -45,6 +45,9 @@ function addItem(itemID) {
                         doLoadTransaction(transaction);
                         for (var i = 0; i < transaction.out_components.items.length; i++) {
                             var item = transaction.out_components.items[i];
+                            if (itemID.length > 6) {
+                                itemID = itemID.substring(1, itemID.length - 1);
+                            }
                             if (item.pubID == itemID) {
                                 doAddItem(item); // Add the Item to the List once the list has been loaded
                                 break;
@@ -134,6 +137,8 @@ function doAddItem(item) {
     } else {
         document.getElementById("error").innerHTML = "That item is not part of this checkout!";
         document.getElementById("error").style.visibility = "visible";
+
+        notifyChime.play();
     }
 }
 

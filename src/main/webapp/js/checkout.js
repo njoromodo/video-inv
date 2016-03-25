@@ -310,7 +310,7 @@ function doFinish(status) {
     }
 
     setCookie("conf_status", statusText, null);
-    setCookie("action", "in", null);
+    setCookie("action", "out", null);
     setCookie("count", items.length, null);
 
     window.location = "conf.html";
