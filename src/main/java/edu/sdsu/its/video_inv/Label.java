@@ -76,7 +76,7 @@ public class Label {
             String template = readFile("ITS Asset Tags.label");
 
 
-            return template.replace("{{short_name}}", (name != null && name.length() == 0) ? name : "ITS Video").replace("{{barcode}}", encodedBarcodeString);
+            return template.replace("{{short_name}}", (name != null && name.length() != 0) ? name : "ITS Video").replace("{{barcode}}", encodedBarcodeString);
         } catch (IOException e) {
             LOGGER.error("Problem Generating Label File", e);
             return "";
