@@ -45,8 +45,8 @@ function addItem() {
     var xmlHttp = new XMLHttpRequest();
 
     var json = '{' +
-        '"name": ' + name + ',' +
-        '"shortName": ' + short +
+        '"name": "' + name + '" ,' +
+        '"shortName": "' + short + '"' +
         '}';
 
     xmlHttp.onreadystatechange = function () {

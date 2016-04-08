@@ -231,6 +231,8 @@ function checkSup() {
     var supPin = inputBox.value;
 
     if (supPin !== null && supPin !== "") {
+        var json = '{"pin": ' + supPin + '}';
+
         var xmlHttp = new XMLHttpRequest();
 
         xmlHttp.onreadystatechange = function () {
@@ -247,8 +249,9 @@ function checkSup() {
             }
         };
 
-        xmlHttp.open('GET', "api/verifyPin?pin=" + supPin);
-        xmlHttp.send();
+        xmlHttp.open('POST', "api/verifyPin");
+        xmlHttp.setRequestHeader("Content-type", "application/json");
+        xmlHttp.send(json);
     }
 }
 
