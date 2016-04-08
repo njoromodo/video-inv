@@ -41,13 +41,8 @@ function doLoadUsers(json) {
         var pubID = row.insertCell(3);
         pubID.innerHTML = user.pubID;
         var reprint = row.insertCell(4);
-        reprint.innerHTML = '<button class="btn btn-default btn-xs" type="button"><i class="fa fa-print"></i>&nbsp; Reprint</button>';
-        reprint.onclick = function () {
-            getLabel(user.pubID);
-            return false;
-        }
+        reprint.innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="getLabel(' + user.pubID + ');"><i class="fa fa-print"></i>&nbsp; Reprint</button>';
     }
-    
 }
 
 
@@ -64,7 +59,7 @@ function showView() {
     var table = document.getElementById("users");
     var tableRows = document.getElementsByClassName('user');
 
-    for (var x=tableRows.length; x>0; x--) {
+    for (var x = tableRows.length; x > 0; x--) {
         table.deleteRow(-1);
     }
 
