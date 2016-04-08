@@ -120,6 +120,53 @@ public class DB {
     }
 
     /**
+     * Get User Object by their public ID (Not the same as their DB ID).
+     *
+     * @param restriction {@link String} Restriction on the Search, as a WHERE SQL Statement
+     * @return {@link User} User Object
+     */
+    public static User[] getAllUsers(final String restriction) {
+        Connection connection = getConnection();
+        Statement statement = null;
+        List<User> userList = new ArrayList<>();
+
+        try {
+            statement = connection.createStatement();
+            final String sql = "SELECT * FROM users " + restriction + ";";
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                User user = new User(resultSet.getInt("id"),
+                        resultSet.getInt("pub_id"),
+                        resultSet.getString("first_name"),
+                        resultSet.getString("last_name"),
+                        resultSet.getBoolean("supervisor"));
+                userList.add(user);
+            }
+
+            resultSet.close();
+        } catch (SQLException e) {
+            LOGGER.error("Problem querying DB for User by PubID", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+        User[] userArr = new User[userList.size()];
+        for (int u = 0; u < userList.size(); u++) {
+            userArr[u] = userList.get(u);
+        }
+        return userArr;
+    }
+
+    /**
      * Get User Information by Pin
      *
      * @param pin {@link String} Pin Hash

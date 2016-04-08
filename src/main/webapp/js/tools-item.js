@@ -25,15 +25,15 @@ document.onkeypress = function () {
 /**
  * Show Create Item Form
  */
-function showCreate(){
-    document.getElementById("view").style.display  ="none";
+function showCreate() {
+    document.getElementById("view").style.display = "none";
     document.getElementById("create").style.display = "";
 }
 /**
  * Show View Item Form
  */
 function showView() {
-    document.getElementById("view").style.display  ="";
+    document.getElementById("view").style.display = "";
     document.getElementById("create").style.display = "none";
 }
 /**
@@ -43,6 +43,11 @@ function addItem() {
     var name = document.getElementById("itemName").value;
     var short = document.getElementById("itemShortName").value;
     var xmlHttp = new XMLHttpRequest();
+
+    var json = '{' +
+        '"name": ' + name + ',' +
+        '"shortName": ' + short +
+        '}';
 
     xmlHttp.onreadystatechange = function () {
         if (xmlHttp.readyState == 4) {
@@ -56,8 +61,9 @@ function addItem() {
         }
     };
 
-    xmlHttp.open('GET', "../api/addItem?name=" + encodeURIComponent(name) + "&short=" + encodeURIComponent(short));
-    xmlHttp.send();
+    xmlHttp.open('POST', "../api/addItem");
+    xmlHttp.setRequestHeader("Content-type", "application/json");
+    xmlHttp.send(json);
 }
 /**
  * Get Dymo Label by ID

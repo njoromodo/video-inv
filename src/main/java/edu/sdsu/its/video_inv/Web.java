@@ -59,6 +59,18 @@ public class Web {
         }
     }
 
+    @Path("allUsers")
+    @GET
+    @Consumes(MediaType.WILDCARD)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllUsers() {
+        LOGGER.info("Recieved GET Request to ALLUSERS");
+
+        User[] users = DB.getAllUsers("");
+        return Response.status(Response.Status.OK).entity(GSON.toJson(users)).build();
+
+    }
+
     /**
      * Get an Inventory Item's Information based on its Public ID.
      *
@@ -94,15 +106,16 @@ public class Web {
     /**
      * Verify the Supervisor's Pin
      *
-     * @param pin {@link String} Supervisor's Pin
+     * @param payload {@link String} JSON Payload with Pin
      * @return {@link Response} User as JSON
      */
     @Path("verifyPin")
-    @GET
-    @Consumes(MediaType.WILDCARD)
+    @POST // TODO FrontEnd
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response verifyPin(@QueryParam("pin") final String pin) {
-        User user = DB.getUser(hash(pin));
+    public Response verifyPin(final String payload) {
+        User user = GSON.fromJson(payload, User.class);
+        user = DB.getUser(hash(user.pin));
 
         if (user != null) {
             return Response.status(Response.Status.OK).entity(GSON.toJson(user)).build();
@@ -117,21 +130,21 @@ public class Web {
     /**
      * Add Inventory Item
      *
-     * @param name {@link String} Item Name
-     * @return {@link Response} Item JSON
+     * @param payload {@link String} {@see Models.Item} Item JSON
      */
     @Path("addItem")
-    @GET
-    @Consumes(MediaType.WILDCARD)
+    @POST // TODO FrontEnd
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addItem(@QueryParam("name") final String name, @QueryParam("short") final String shortName) {
+    public Response addItem(final String payload) {
+        Item item = GSON.fromJson(payload, Item.class);
         int id;
         do {
             Random rnd = new Random();
             id = 100000 + rnd.nextInt(900000);
         } while (DB.getItem(id) != null); // Generate 6 Digit ID, and check that it doesn't already exist
 
-        Item item = new Item(id, name, shortName);
+        item.id = id;
 
         DB.addItem(item);
 
@@ -141,27 +154,24 @@ public class Web {
     /**
      * Add a new User to the System
      *
-     * @param firstName  {@link String} User's First Nam
-     * @param lastName   {@link String} User's Last Name
-     * @param supervisor {@link Boolean} Supervisor Switch
-     * @param pin        {@link String} User's Pin
+     * @param payload {@link String} {@see Models.User} User JSON
      * @return {@link Response} User JSON
      */
     @Path("addUser")
-    @GET
-    @Consumes(MediaType.WILDCARD)
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(@QueryParam("first") final String firstName, @QueryParam("last") final String lastName,
-                               @QueryParam("sup") final Boolean supervisor, @QueryParam("pin") final String pin) {
+    public Response createUser(final String payload) {
+        User user = GSON.fromJson(payload, User.class);
+
         int id;
         do {
             Random rnd = new Random();
             id = 100000 + rnd.nextInt(900000);
         } while (DB.getUser(id) != null); // Generate 6 Digit ID, and check that it doesn't already exist
+        user.pubID = id;
 
-        User user = new User(id, firstName, lastName, supervisor);
-
-        DB.addUser(user, hash(pin));
+        DB.addUser(user, hash(user.pin));
 
         return Response.status(Response.Status.CREATED).entity(GSON.toJson(user)).build();
     }
@@ -194,10 +204,18 @@ public class Web {
         return Response.status(Response.Status.OK).entity(xml).build();
     }
 
-    private String hash(final String string) {
+    /**
+     * Generate MD5 Hash with Salt.
+     *
+     * Object toString will be used to create the hash
+     *
+     * @param obj {@link Object} Object to Hash
+     * @return {@link String} Hashed String
+     */
+    private String hash(final Object obj) {
         try {
             final MessageDigest md = MessageDigest.getInstance("MD5");
-            final byte[] thedigest = md.digest(String.format(HASH_SALT, string).getBytes());
+            final byte[] thedigest = md.digest(String.format(HASH_SALT, obj.toString()).getBytes());
             final StringBuilder sb = new StringBuilder();
             for (byte aThedigest : thedigest) {
                 sb.append(Integer.toHexString((aThedigest & 0xFF) | 0x100).substring(1, 3));

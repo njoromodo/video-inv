@@ -2,6 +2,28 @@ body {
     font-size: 1.5em;
 }
 
+h1 {
+    text-align: center;
+    padding-bottom: 1em;
+}
+
+.header {
+    font-size: 1em;
+    font-weight: bold;
+    border-bottom: thin solid black;
+}
+
+td.button {
+    text-align: center;
+    font-size: 1.25em;
+}
+
+tr.header > td {
+    padding: 0 0 .25em;
+    line-height: normal;
+    font-size: inherit;
+}
+
 .pageHead {
     padding-top: .5em;
     padding-bottom: .75em;
@@ -23,30 +45,27 @@ body {
 table {
     max-width: 500px;
     text-align: center;
-}
-
-input {
-    font-size: .75em;
-    height: 1em;
-    width: 85%;
-}
-
-button.submitButton {
-    font-size: .75em;
-
-    margin-left: .5em;
-    margin-right: .5em;
-
-    height: 2em;
     width: 100%;
+
+    align-items: center;
+    margin: 0 auto;
 }
 
-button.small {
-    width: 75%;
+button {
+    margin-left: 1.5em;
+    margin-right: 1.5em;
+}
+
+button.add {
+    margin: 2.5em auto auto;
 }
 
 div {
     text-align: center;
+}
+
+input {
+    margin-left: .5em;
 }
 
 #comments {
@@ -74,4 +93,12 @@ tr.buttonBar td {
     border-radius: 10px;
 
     margin: .25em 1em 0;
+}
+
+#createUser td {
+    padding-top: .25em;
+    padding-bottom: .25em;
+}
+#createUser select {
+    margin-left: .4em;
 }
