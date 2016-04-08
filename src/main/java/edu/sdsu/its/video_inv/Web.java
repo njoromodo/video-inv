@@ -144,7 +144,7 @@ public class Web {
             id = 100000 + rnd.nextInt(900000);
         } while (DB.getItem(id) != null); // Generate 6 Digit ID, and check that it doesn't already exist
 
-        item.id = id;
+        item.pubID = id;
 
         DB.addItem(item);
 
