@@ -107,7 +107,7 @@ function doLoadTransaction(json) {
                 '<textarea title="Comments" name="comments" class="comments" id="' + row.id + '-com-ta">' + item.comments + '</textarea></td>';   //Comments
 
             var status = row.insertCell(2);                         //Status
-            status.innerHTML = '<i class="fa fa-times"></i>';
+            status.innerHTML = '<span class="out"><i class="fa fa-times"></i>&nbsp; Out</span>';
             status.className = "status";
 
             document.getElementById("complete_button").disabled = false;
@@ -132,7 +132,7 @@ function doAddItem(item) {
             checkedIn[checkedIn.length] = item.id;
             document.getElementById("error").style.visibility = "hidden";
             var row = document.getElementById("i-" + item.id);
-            row.cells[2].innerHTML = '<i class="fa fa-check"></i>';
+            row.cells[2].innerHTML = '<span class="in"><i class="fa fa-check"></i>&nbsp; In</span>';
         }
     } else {
         document.getElementById("error").innerHTML = "That item is not part of this checkout!";

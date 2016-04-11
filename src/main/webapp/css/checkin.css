@@ -85,10 +85,10 @@ button.complete_button {
     text-align: center;
 }
 
-.fa-times {
+.out {
     color: red;
 }
 
-.fa-check {
+.in {
     color: darkgreen;
 }
