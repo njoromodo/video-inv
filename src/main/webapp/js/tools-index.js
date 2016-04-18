@@ -16,3 +16,7 @@ function items() {
 function users() {
     window.top.location = "users.html";
 }
+
+function inventory() {
+    window.top.location = "inventory.html";
+}

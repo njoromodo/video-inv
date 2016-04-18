@@ -66,3 +66,7 @@ function getMidnight() {
 
     return d;
 }
+
+function getPosition(str, m, i) {
+    return str.split(m, i).join(m).length;
+}

@@ -133,7 +133,7 @@ public class Web {
      * @param payload {@link String} {@see Models.Item} Item JSON
      */
     @Path("addItem")
-    @POST // TODO FrontEnd
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addItem(final String payload) {

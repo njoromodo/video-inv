@@ -34,6 +34,8 @@ button.panelButton {
     width: 12em;
 
     font-size: 1.5em;
+    color: black;
+    background: darkgray;
 }
 
 button.halfHeight {

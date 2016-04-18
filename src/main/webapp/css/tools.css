@@ -2,7 +2,7 @@ body {
     font-size: 1.5em;
 }
 
-h1 {
+h1, h2 {
     text-align: center;
     padding-bottom: 1em;
 }
@@ -18,10 +18,11 @@ td.button {
     font-size: 1.25em;
 }
 
-tr.header > td {
+tr.header > td, th {
     padding: 0 0 .25em;
     line-height: normal;
     font-size: inherit;
+    text-align: center;
 }
 
 .pageHead {
@@ -43,7 +44,7 @@ tr.header > td {
 }
 
 table {
-    max-width: 500px;
+    max-width: 750px;
     text-align: center;
     width: 100%;
 
@@ -60,7 +61,7 @@ button.add {
     margin: 2.5em auto auto;
 }
 
-div {
+#list {
     text-align: center;
 }
 
@@ -95,10 +96,19 @@ tr.buttonBar td {
     margin: .25em 1em 0;
 }
 
-#createUser td {
+#createUser, #createItem td {
     padding-top: .25em;
     padding-bottom: .25em;
 }
 #createUser select {
     margin-left: .4em;
+}
+
+.fa-spinner {
+    font-size: 5em;
+    color: #333333;
+}
+
+td, th {
+    padding: .5em;
 }

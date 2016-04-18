@@ -24,7 +24,7 @@ public class User {
     public boolean supervisor;
 
     @Expose(serialize = false)
-    public int pin;
+    public String pin;
 
     public User(int dbID, int pubID, String firstName, String lastName, boolean supervisor) {
         this.dbID = dbID;

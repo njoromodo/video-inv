@@ -17,6 +17,7 @@ public class Item {
     public String comments;
 
     public boolean checked_out;
+    public String lastTransactionDate;
 
     public Item(int id, int pubID, String name, String shortName, String comments, boolean checked_out) {
         this.id = id;

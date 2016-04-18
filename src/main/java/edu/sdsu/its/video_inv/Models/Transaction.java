@@ -1,5 +1,6 @@
 package edu.sdsu.its.video_inv.Models;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -11,14 +12,20 @@ import java.util.List;
 public class Transaction {
     public int id;
     public int ownerID;
+    public int ownerPubID;
     public Component out_components;
     public Component in_components;
+    public Timestamp out_time;
+    public Timestamp in_time;
 
-    public Transaction(int id, int ownerID, Component out_components, Component in_components) {
+    public Transaction(int id, int ownerID, int ownerPubID, Component out_components, Component in_components, Timestamp out_time, Timestamp in_time) {
         this.id = id;
         this.ownerID = ownerID;
+        this.ownerPubID = ownerPubID;
         this.out_components = out_components;
         this.in_components = in_components;
+        this.out_time = out_time;
+        this.in_time = in_time;
     }
 
     public static class Component {

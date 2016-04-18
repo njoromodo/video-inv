@@ -79,7 +79,7 @@ function createUser() {
         '"firstName": ' + fname + ',' +
         '"lastName": ' + lname + ',' +
         '"supervisor": ' + sup + ',' +
-        '"pin": ' + pin +
+        '"pin": "' + pin + '"' +
         '}';
 
 
