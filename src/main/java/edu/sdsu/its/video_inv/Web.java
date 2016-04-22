@@ -110,7 +110,7 @@ public class Web {
      * @return {@link Response} User as JSON
      */
     @Path("verifyPin")
-    @POST // TODO FrontEnd
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response verifyPin(final String payload) {
