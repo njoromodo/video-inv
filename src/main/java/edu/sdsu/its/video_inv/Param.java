@@ -20,6 +20,36 @@ import java.net.URISyntaxException;
 public class Param {
     final private static String URL = System.getenv("KSPATH");
     final private static String KEY = System.getenv("KSKEY");
+    final private static String APP_NAME = System.getenv("VIMS_APP");
+    final private static Logger LOGGER = Logger.getLogger(Param.class);
+
+    public static boolean testConnection() {
+        try {
+            final URI uri = new URIBuilder()
+                    .setScheme("https")
+                    .setHost(URL)
+                    .setPath("/rest/client/echo")
+                    .addParameter("m", "test")
+                    .build();
+
+            final ClientResponse response = get(uri);
+            LOGGER.debug(String.format("Connection Test Returned with status: %d", response.getStatus()));
+            return response.getStatus() == 200;
+        } catch (URISyntaxException e) {
+            LOGGER.error("Problem forming Connection URI - ", e);
+            return false;
+        }
+    }
+
+    /**
+     * Get Parameter form the Default Application (whose name is an environment variable)
+     *
+     * @param parameterName {@link String} Parameter Name
+     * @return {@link String} Parameter Value
+     */
+    public static String getParam(final String parameterName) {
+        return getParam(APP_NAME, parameterName);
+    }
 
 
     /**
@@ -43,7 +73,7 @@ public class Param {
             final ClientResponse response = get(uri);
             return response.getEntity(String.class);
         } catch (URISyntaxException e) {
-            Logger.getLogger(Param.class).error("problem forming Connection URI - ", e);
+            LOGGER.error("problem forming Connection URI - ", e);
             return "";
         }
     }
@@ -55,7 +85,7 @@ public class Param {
      * @return {@link ClientResponse} Response from get Request.
      */
     private static ClientResponse get(final URI uri) {
-        Logger.getLogger(Param.class).info("Making a get request to: " + uri.toString());
+        LOGGER.info("Making a get request to: " + uri.toString());
 
         final Client client = Client.create();
         final WebResource webResource = client.resource(uri);
@@ -64,11 +94,11 @@ public class Param {
         try {
             response = webResource.accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
             if (response.getStatus() != 200) {
-                Logger.getLogger(Param.class).error("Error Connecting to Key Server - HTTP Error Code: " + response.getStatus());
+                LOGGER.error("Error Connecting to Key Server - HTTP Error Code: " + response.getStatus());
             }
         } catch (UniformInterfaceException e) {
             response = null;
-            Logger.getLogger(Param.class).error("Error connecting to Key Server Server", e);
+            LOGGER.error("Error connecting to Key Server Server", e);
         }
 
         return response;

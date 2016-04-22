@@ -21,7 +21,7 @@ import java.util.Random;
 @Path("/")
 public class Web {
     private static final Logger LOGGER = Logger.getLogger(Web.class);
-    private static final String HASH_SALT = Param.getParam("video_inv", "hash_salt");
+    private static final String HASH_SALT = Param.getParam("hash_salt");
     private final Gson GSON = new Gson();
 
     /**
@@ -206,7 +206,7 @@ public class Web {
 
     /**
      * Generate MD5 Hash with Salt.
-     *
+     * <p>
      * Object toString will be used to create the hash
      *
      * @param obj {@link Object} Object to Hash

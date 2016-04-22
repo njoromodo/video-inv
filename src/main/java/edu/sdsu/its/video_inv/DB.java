@@ -18,12 +18,12 @@ import java.util.List;
  *         Created on 2/23/16.
  */
 public class DB {
-    private static final String db_url = Param.getParam("video_inv", "db-url");
-    private static final String db_user = Param.getParam("video_inv", "db-user");
-    private static final String db_password = Param.getParam("video_inv", "db-password");
+    private static final String db_url = Param.getParam("db-url");
+    private static final String db_user = Param.getParam("db-user");
+    private static final String db_password = Param.getParam("db-password");
     private static final Logger LOGGER = Logger.getLogger(DB.class);
 
-    private static Connection getConnection() {
+    public static Connection getConnection() {
         Connection connection = null;
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -398,7 +398,7 @@ public class DB {
                     "  pub_id          AS owner_pubID\n" +
                     "FROM transactions\n" +
                     "  JOIN users ON transactions.owner = users.id\n" +
-                    "WHERE transactions.id = "+transactionID+";";
+                    "WHERE transactions.id = " + transactionID + ";";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
