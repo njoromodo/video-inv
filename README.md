@@ -21,6 +21,8 @@ inventory and record check out/in transactions.
 VIMS uses [Key Server](https://github.com/sdsu-its/key-server) to access
 credentials for various tools and services (DataBase, APIs, Email, etc.)
 
+Unit Testing is a feature in VIMS
+
 ### DB Config
 To setup they MySQL database for VIMS, run the following commands in your
 MySQL Database to setup the tables, you will need to first create the Database
@@ -42,6 +44,7 @@ respective timestamps.
 start page, the front-end pulls the quote of the day daily, or when first loaded.
 (A good source for quotes is [Brainy Quote](http://www.brainyquote.com/)).
 
+#### Both
 ```
 CREATE TABLE videoinv.users (
   `id`         INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
@@ -75,11 +78,19 @@ CREATE TABLE videoinv.quotes (
 );
 ```
 
+#### Staging/Testing
+You will also need to run the commands below to setup the testing environment
+__in addition to__ the commands listed above. The use of a separate database is encouraged as the Tests will create transaction records which will show up in the Transaction History Report.
+```
+INSERT INTO users (pub_id, first_name, last_name, supervisor, pin) VALUES (123456, 'Test', 'User', 1, '');
+INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (987654, 'Test Item', 'TI', '', 0);
+```
 
 ### KeyServer Setup
-You will need to create an applications in the key server.
-You will need to set the `KSPATH` and `KSKEY` environment variables to their corresponding values, so that the web-app can communicate with the Key Server
+You will need to create two applications in the key server. One for the production configuration, and an additional application for the staging configuration (_if they are different - they will likely be_).
+You will need to set the `KSPATH`, `KSKEY`, and `VIMS_APP` environment variables to their corresponding values, so that the web-app can communicate with the Key Server
 to retrieve the application configurations.
+`VIMS_APP` should be set to the name of the application you created in the KeyServer admin area for the environment.
 
 - `db-password` = Database Password
 - `db-url` = jdbc:mysql://db_host:3306/db_name
