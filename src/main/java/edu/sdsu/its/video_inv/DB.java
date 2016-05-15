@@ -225,9 +225,12 @@ public class DB {
 
         try {
             statement = connection.createStatement();
-            final String sql = "SELECT DISTINCT i.id AS id, i.name AS name, short_name, comments, checked_out\n" +
-                    "FROM macros m LEFT OUTER JOIN inventory i ON m.itemIDs RLIKE CONCAT('[[.[.]|, ]', i.id, '[ ,|[.].]]')\n" +
-                    "WHERE m.id = " + pubID + " OR i.pub_id = " + pubID + ";";
+            final String sql = "SELECT i.id as id, i.pub_id as pub_id, i.name as name, short_name, comments, checked_out " +
+                    "FROM macros m LEFT OUTER JOIN inventory i ON m.itemIDs RLIKE CONCAT('[[.[.]|, ]', i.id, '[ ,|[.].]]') " +
+                    "WHERE m.id = " + pubID + " " +
+                    "UNION ALL " +
+                    "SELECT * FROM inventory " +
+                    "WHERE pub_id = " + pubID + ";";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 

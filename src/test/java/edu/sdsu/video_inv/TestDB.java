@@ -2,6 +2,7 @@ package edu.sdsu.video_inv;
 
 import edu.sdsu.its.video_inv.DB;
 import edu.sdsu.its.video_inv.Models.Item;
+import edu.sdsu.its.video_inv.Models.Macro;
 import edu.sdsu.its.video_inv.Models.User;
 import edu.sdsu.its.video_inv.Param;
 import org.apache.log4j.Logger;
@@ -22,7 +23,8 @@ import static org.junit.Assert.fail;
 public class TestDB {
     final private static Logger LOGGER = Logger.getLogger(TestDB.class);
     final private static int TEST_USER_ID = 123456;
-    final private static int TEST_ITEM_ID = 987654;
+    final private static int TEST_ITEM_ID = 999901;
+    final private static int TEST_MACRO_ID = 999801;
 
     /**
      * Check if the KeyServer has access to the correct credentials
@@ -80,7 +82,7 @@ public class TestDB {
         LOGGER.debug("Found user with ID: " + TEST_USER_ID);
         assertTrue("User not Complete - Name not defined",
                 user.firstName != null && user.firstName.length() > 0 &&
-                user.lastName != null && user.lastName.length() > 0);
+                        user.lastName != null && user.lastName.length() > 0);
     }
 
     /**
@@ -88,12 +90,35 @@ public class TestDB {
      */
     @Test
     public void getItem() {
-        Item item = DB.getItem(TEST_ITEM_ID)[0];
-        assertTrue("Item not defined", item != null);
+        Item[] items = DB.getItem(TEST_ITEM_ID);
+        assertTrue("Item not defined", items != null && items.length > 0);
+        Item item = items[0];
         LOGGER.debug("Found item with ID: " + TEST_ITEM_ID);
         assertTrue("Item not Complete - Name Missing", item.name != null && item.name.length() > 0);
         assertTrue("Get user by DB_ID does not match PubBID", DB.getItemByDB(item.id).pubID == item.pubID);
     }
 
+    @Test
+    public void getItems() {
+        Item[] items = DB.getItem(TEST_MACRO_ID);
+        assertTrue("Macro not defined", items != null && items.length > 0);
+        LOGGER.debug(String.format("Macro Lookup returned %d items", items.length));
+        for (Item i : items) {
+            assertTrue("Item not defined", i != null);
+            assertTrue("Item not Complete - Name Missing", i.name != null && i.name.length() > 0);
+        }
+    }
+
+    @Test
+    public void getMacros() {
+        Macro[] macros = DB.getMacros();
+        assertTrue("No Macros Found", macros != null && macros.length > 0);
+        LOGGER.debug(String.format("%d macros found in DB", macros.length));
+        for (Macro m : macros) {
+            assertTrue("Macro not defined", m != null);
+            assertTrue("Macro not Complete - Name Missing", m.name != null && m.name.length() > 0);
+            assertTrue("Macro not Complete - Items Missing", m.items != null && m.items.length > 0);
+        }
+    }
 
 }

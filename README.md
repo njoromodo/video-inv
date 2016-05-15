@@ -95,7 +95,7 @@ INSERT INTO users (pub_id, first_name, last_name, supervisor, pin) VALUES (12345
 INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (999901, 'Test Item 1', 'TI #1', '', 0);
 INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (999902, 'Test Item 2', 'TI #2', '', 0);
 INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (999903, 'Test Item 3', 'TI #3', '', 0);
-INSERT INTO macros ((id, name, itemIDs) VALUES (999801, 'Test Macro #1', '[1, 2, 3]');
+INSERT INTO macros (id, name, itemIDs) VALUES (999801, 'Test Macro #1', '[1, 2, 3]');
 ```
 
 ### KeyServer Setup
