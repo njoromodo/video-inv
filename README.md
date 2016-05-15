@@ -8,7 +8,7 @@ these things.
 VIMS can track the current inventory of equipment, as well as who last checked
 out/in equipment and what comments they left.
 
-VIMS utilizes a DYMO Label printer to print both Inventory and User Identification
+VIMS utilizes a DYMO Label printer to print Inventory, Macro, and User Identification
 Labels on [Dymo LV-30332 Labels](http://amzn.com/B00004Z60O). A browser that
 supports the Dymo Framework (So far only Safari has been tested, Chrome does
 not support printing).
@@ -21,7 +21,8 @@ inventory and record check out/in transactions.
 VIMS uses [Key Server](https://github.com/sdsu-its/key-server) to access
 credentials for various tools and services (DataBase, APIs, Email, etc.)
 
-Unit Testing is a feature in VIMS
+Unit Testing is a feature in VIMS that allows most Classes and Methods of the
+WebApp's Backend to be tested.
 
 ### DB Config
 To setup they MySQL database for VIMS, run the following commands in your
@@ -30,7 +31,7 @@ and user to access the data, using your root credentials in the web-app is not
 recommended.
 
 You will also need to create the first user in the database, make sure that
-supervisor is set to 1 for that user to allow them to access the admin panel.
+supervisor is set to 1 for that user to allow them full access.
 
 #### Table Breakdown
 - __Users__ stores the users for the system, including administrators.
@@ -43,10 +44,13 @@ respective timestamps.
 - __Quotes__ To add a bit of excitement and variety, a quote is displayed on the
 start page, the front-end pulls the quote of the day daily, or when first loaded.
 (A good source for quotes is [Brainy Quote](http://www.brainyquote.com/)).
+- __Macros__ stores the Item Macros. Item Macros allow several items to be represented
+by a single id/barcode. This information, as well as the Macro's Name, which is used
+only to identify the Macro on the Admin Page, are saved in this table.
 
 #### Both
 ```
-CREATE TABLE videoinv.users (
+CREATE TABLE users (
   `id`         INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
   `pub_id`     INT(9),
   `first_name` TEXT,
@@ -54,7 +58,7 @@ CREATE TABLE videoinv.users (
   `supervisor` TINYINT(1),
   `pin`        TEXT
 );
-CREATE TABLE videoinv.inventory (
+CREATE TABLE inventory (
   `id`          INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
   `pub_id`      INT(8),
   `name`        TEXT,
@@ -62,7 +66,7 @@ CREATE TABLE videoinv.inventory (
   `comments`    TEXT,
   `checked_out` TINYINT(1) DEFAULT 0
 );
-CREATE TABLE videoinv.transactions (
+CREATE TABLE transactions (
   `id`             INT PRIMARY KEY AUTO_INCREMENT          NOT NULL,
   `owner`          INT,
   `out_components` TEXT,
@@ -71,10 +75,15 @@ CREATE TABLE videoinv.transactions (
   `in_time`        TIMESTAMP,
   FOREIGN KEY (`owner`) REFERENCES videoinv.users (`id`)
 );
-CREATE TABLE videoinv.quotes (
+CREATE TABLE quotes (
   `id`     INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
   `text`   TEXT,
   `author` TEXT
+);
+CREATE TABLE macros (
+  `id`      INT PRIMARY KEY NOT NULL,
+  `name`    TEXT,
+  `itemIDs` TEXT
 );
 ```
 
@@ -83,7 +92,10 @@ You will also need to run the commands below to setup the testing environment
 __in addition to__ the commands listed above. The use of a separate database is encouraged as the Tests will create transaction records which will show up in the Transaction History Report.
 ```
 INSERT INTO users (pub_id, first_name, last_name, supervisor, pin) VALUES (123456, 'Test', 'User', 1, '');
-INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (987654, 'Test Item', 'TI', '', 0);
+INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (999901, 'Test Item 1', 'TI #1', '', 0);
+INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (999902, 'Test Item 2', 'TI #2', '', 0);
+INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (999903, 'Test Item 3', 'TI #3', '', 0);
+INSERT INTO macros ((id, name, itemIDs) VALUES (999801, 'Test Macro #1', '[1, 2, 3]');
 ```
 
 ### KeyServer Setup
