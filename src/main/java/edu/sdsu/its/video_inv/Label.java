@@ -29,6 +29,69 @@ public class Label {
     }
 
     /**
+     * Generate Label XML for an item sticker for the JS Framework
+     *
+     * @param name {@link String} Short Name (If null, prints 'ITS Video')
+     * @param id   {@link int} Barcode ID (No Checksum)
+     * @return {@link String} Label XML
+     */
+    static String generateItemLabel(final String name, final int id) {
+        LOGGER.info("Generating Template for ID: " + id);
+
+        try {
+            File barcode = File.createTempFile(Integer.toString(id), ".png");
+            Barcode.generateBarcode("0" + Integer.toString(id), barcode);
+
+            byte[] encodedBarcode = Base64.encodeBase64(FileUtils.readFileToByteArray(barcode));
+            String encodedBarcodeString = new String(encodedBarcode, "UTF8");
+
+            String template = readFile("ITS Asset Tags.label");
+
+
+            return template.replace("{{short_name}}", (name != null && name.length() != 0) ? name : "ITS Video").replace("{{barcode}}", encodedBarcodeString);
+        } catch (IOException e) {
+            LOGGER.error("Problem Generating Label File", e);
+            return "";
+        }
+    }
+
+
+    /**
+     * Generate Label XML for a User Sticker for the JS Framework
+     *
+     * @param id {@link int} User ID (No Checksum)
+     * @return {@link String} Label XML
+     */
+    static String generateUserLabel(final int id) {
+        LOGGER.info("Generating User Template for ID: " + id);
+
+        try {
+            File barcode = File.createTempFile(Integer.toString(id), ".png");
+            Barcode.generateBarcode("0" + Integer.toString(id), barcode);
+
+            byte[] encodedBarcode = Base64.encodeBase64(FileUtils.readFileToByteArray(barcode));
+            String encodedBarcodeString = new String(encodedBarcode, "UTF8");
+
+            String template = readFile("User Tags.label");
+
+            return template.replace("{{barcode}}", encodedBarcodeString);
+        } catch (IOException e) {
+            LOGGER.error("Problem Generating Label File", e);
+            return "";
+        }
+    }
+
+    /**
+     * Generate Label XML for an Item Macro for the JS Framework
+     *
+     * @param id {@link int} Macro ID (No Checksum)
+     * @return {@link String} Label XML
+     */
+    static String generateMacroLabel(final int id) {
+        return generateItemLabel("Macro", id);
+    }
+
+    /**
      * Get Asset Tag Label XML
      *
      * @param pubID {@link String} Public Identifier
@@ -51,54 +114,8 @@ public class Label {
                     "}").build();
         }
 
-        String xml = Label.generateLabel(DB.getItem(itemID).shortName, itemID);
+        String xml = Label.generateItemLabel(DB.getItem(itemID)[0].shortName, itemID);
 
         return Response.status(Response.Status.OK).entity(xml).build();
-    }
-
-    /**
-     * Generate Label XML File for JS Framework
-     *
-     * @param name {@link String} Short Name (If null, prints 'ITS Video')
-     * @param id   {@link int} Barcode ID (No Checksum)
-     * @return {@link String} Label XML
-     */
-    public static String generateLabel(final String name, final int id) {
-        LOGGER.info("Generating Template for ID: " + id);
-
-        try {
-            File barcode = File.createTempFile(Integer.toString(id), ".png");
-            Barcode.generateBarcode("0" + Integer.toString(id), barcode);
-
-            byte[] encodedBarcode = Base64.encodeBase64(FileUtils.readFileToByteArray(barcode));
-            String encodedBarcodeString = new String(encodedBarcode, "UTF8");
-
-            String template = readFile("ITS Asset Tags.label");
-
-
-            return template.replace("{{short_name}}", (name != null && name.length() != 0) ? name : "ITS Video").replace("{{barcode}}", encodedBarcodeString);
-        } catch (IOException e) {
-            LOGGER.error("Problem Generating Label File", e);
-            return "";
-        }
-    }
-
-    public static String generateUserLabel(final int id) {
-        LOGGER.info("Generating User Template for ID: " + id);
-
-        try {
-            File barcode = File.createTempFile(Integer.toString(id), ".png");
-            Barcode.generateBarcode("0" + Integer.toString(id), barcode);
-
-            byte[] encodedBarcode = Base64.encodeBase64(FileUtils.readFileToByteArray(barcode));
-            String encodedBarcodeString = new String(encodedBarcode, "UTF8");
-
-            String template = readFile("User Tags.label");
-
-            return template.replace("{{barcode}}", encodedBarcodeString);
-        } catch (IOException e) {
-            LOGGER.error("Problem Generating Label File", e);
-            return "";
-        }
     }
 }

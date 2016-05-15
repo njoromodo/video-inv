@@ -45,7 +45,7 @@ public class CheckIn {
                     "  \"message\": \"invalid ID Length\",\n" +
                     "}").build();
         }
-        final Item item = DB.getItem(itemID);
+        final Item item = DB.getItem(itemID)[0];
         if (!item.checked_out) {
             return Response.status(Response.Status.NOT_FOUND).entity("{\n" +
                     "  \"message\": \"Designated item is not currently checked out\",\n" +

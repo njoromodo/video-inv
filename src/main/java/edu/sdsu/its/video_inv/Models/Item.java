@@ -37,7 +37,7 @@ public class Item {
     public void completeItem() {
         Item item = null;
         if (this.id == 0 && this.pubID != 0) {
-            item = DB.getItem(pubID);
+            item = DB.getItem(pubID)[0];
             this.id = item.id;
         } else if (this.id != 0) {
             item = DB.getItemByDB(this.id);
@@ -56,7 +56,7 @@ public class Item {
     @Override
     public String toString() {
         // Used by Transaction.toString()
-        if (this.id == 0) this.id = DB.getItem(this.pubID).id;
+        if (this.id == 0) this.id = DB.getItem(this.pubID)[0].id;
 
         return String.format("{\n" +
                 "  \"id\": %d,\n" +

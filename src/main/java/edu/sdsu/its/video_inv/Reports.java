@@ -46,7 +46,7 @@ public class Reports {
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getItemHistory(@QueryParam("id") final int itemID) {
-        Item item = DB.getItem(itemID);
+        Item item = DB.getItem(itemID)[0];
         Transaction[] history = DB.getHistory(item);
         LOGGER.debug(String.format("Item History for %s(%d) returned %d transactions", item.name, item.id, history.length));
         return Response.status(Response.Status.OK).entity(GSON.toJson(history)).build();

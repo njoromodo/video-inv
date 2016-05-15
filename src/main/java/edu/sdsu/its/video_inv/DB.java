@@ -2,6 +2,7 @@ package edu.sdsu.its.video_inv;
 
 import com.google.gson.Gson;
 import edu.sdsu.its.video_inv.Models.Item;
+import edu.sdsu.its.video_inv.Models.Macro;
 import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
 import org.apache.log4j.Logger;
@@ -9,6 +10,7 @@ import org.apache.log4j.Logger;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -213,26 +215,35 @@ public class DB {
      * Get inventory item by its public id (Not the same as their DB ID).
      *
      * @param pubID {@link int} Item's Public ID
-     * @return {@link Item} Inventory Item
+     * @return {@link Item[]} Inventory Item
      */
-    public static Item getItem(final int pubID) {
+    public static Item[] getItem(final int pubID) {
         Connection connection = getConnection();
         Statement statement = null;
-        Item item = null;
+        Item[] items = null;
+        List<Item> itemList = new ArrayList<>();
 
         try {
             statement = connection.createStatement();
-            final String sql = "SELECT * FROM inventory WHERE pub_id = " + pubID + ";";
+            final String sql = "SELECT DISTINCT i.id AS id, i.name AS name, short_name, comments, checked_out\n" +
+                    "FROM macros m LEFT OUTER JOIN inventory i ON m.itemIDs RLIKE CONCAT('[[.[.]|, ]', i.id, '[ ,|[.].]]')\n" +
+                    "WHERE m.id = " + pubID + " OR i.pub_id = " + pubID + ";";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
-            if (resultSet.next()) {
-                item = new Item(resultSet.getInt("id"),
+            while (resultSet.next()) {
+                Item item = new Item(resultSet.getInt("id"),
                         pubID,
                         resultSet.getString("name"),
                         resultSet.getString("short_name"),
                         resultSet.getString("comments") != null ? resultSet.getString("comments") : "",
                         resultSet.getBoolean("checked_out"));
+                itemList.add(item);
+            }
+
+            items = new Item[itemList.size()];
+            for (int i = 0; i < itemList.size(); i++) {
+                items[i] = itemList.get(i);
             }
 
             resultSet.close();
@@ -249,7 +260,7 @@ public class DB {
             }
         }
 
-        return item;
+        return items;
     }
 
     /**
@@ -293,6 +304,47 @@ public class DB {
         }
 
         return item;
+    }
+
+    public static Macro[] getMacros() {
+        Connection connection = getConnection();
+        Statement statement = null;
+        List<Macro> macroList = new ArrayList<>();
+        Macro[] result = null;
+
+        try {
+            statement = connection.createStatement();
+            final String sql = "SELECT * FROM macros;";
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                Macro macro = new Macro(resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("itemIDs"));
+                macroList.add(macro);
+            }
+
+            resultSet.close();
+
+            result = new Macro[macroList.size()];
+            for (int m = 0; m < result.length; m++) {
+                result[m] = macroList.get(m);
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Problem querying DB for Macros", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -686,6 +738,27 @@ public class DB {
      */
     public static void addItem(final Item item) {
         final String sql = "INSERT INTO inventory(pub_id, name, short_name) VALUES (" + item.pubID + ", '" + sanitize(item.name) + "', '" + sanitize(item.shortName) + "');";
+        executeStatement(sql);
+    }
+
+    /**
+     * Add a new Macro to the DB
+     *
+     * @param macro {@link Macro} Macro to Create
+     */
+    public static void createMacro(final Macro macro) {
+        final String sql = "INSERT INTO macros (id, name, itemIDs) VALUES (" + macro.id + ", '" + macro.name + "', '" + Arrays.toString(macro.items) + "');\n";
+        executeStatement(sql);
+    }
+
+    /**
+     * Update a Macro.
+     * The ID must be defined for the update to be successful.
+     *
+     * @param macro {@link Macro} Macro with updated values. The ID cannot be changed.
+     */
+    public static void updateMacro(final Macro macro) {
+        final String sql = "UPDATE macros SET name='" + macro.name + "', itemIDs = '" + Arrays.toString(macro.items) + "' WHERE id = " + macro.id + ";";
         executeStatement(sql);
     }
 

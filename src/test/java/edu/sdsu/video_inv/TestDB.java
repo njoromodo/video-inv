@@ -88,7 +88,7 @@ public class TestDB {
      */
     @Test
     public void getItem() {
-        Item item = DB.getItem(TEST_ITEM_ID);
+        Item item = DB.getItem(TEST_ITEM_ID)[0];
         assertTrue("Item not defined", item != null);
         LOGGER.debug("Found item with ID: " + TEST_ITEM_ID);
         assertTrue("Item not Complete - Name Missing", item.name != null && item.name.length() > 0);

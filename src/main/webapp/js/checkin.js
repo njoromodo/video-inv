@@ -123,22 +123,36 @@ function doLoadTransaction(json) {
     }
 }
 
-function doAddItem(item) {
-    if (items.indexOf(item.id) != -1) {
-        if (checkedIn.indexOf(item.id) != -1) {
-            document.getElementById("error").style.visibility = "hidden";
-            console.log("Item already checked in. Skipping!")
-        } else {
-            checkedIn[checkedIn.length] = item.id;
-            document.getElementById("error").style.visibility = "hidden";
-            var row = document.getElementById("i-" + item.id);
-            row.cells[2].innerHTML = '<span class="in"><i class="fa fa-check"></i>&nbsp; In</span>';
-        }
-    } else {
-        document.getElementById("error").innerHTML = "That item is not part of this checkout!";
+function doAddItem(addItems) {
+    if (addItems == null || addItems.length == 0) {
+        document.getElementById("error").innerHTML = "Invalid Item ID!";
         document.getElementById("error").style.visibility = "visible";
+        const itemID = document.getElementById("input-itemID");
+        itemID.value = "";
+        itemID.select();
 
         notifyChime.play();
+    } else {
+        for (var i = 0; i < addItems.length; i++) {
+            var obj = addItems[i];
+
+            if (items.indexOf(obj.id) != -1) {
+                if (checkedIn.indexOf(obj.id) != -1) {
+                    document.getElementById("error").style.visibility = "hidden";
+                    console.log("Item already checked in. Skipping!")
+                } else {
+                    checkedIn[checkedIn.length] = obj.id;
+                    document.getElementById("error").style.visibility = "hidden";
+                    var row = document.getElementById("i-" + obj.id);
+                    row.cells[2].innerHTML = '<span class="in"><i class="fa fa-check"></i>&nbsp; In</span>';
+                }
+            } else {
+                document.getElementById("error").innerHTML = "That item is not part of this checkout!";
+                document.getElementById("error").style.visibility = "visible";
+
+                notifyChime.play();
+            }
+        }
     }
 }
 

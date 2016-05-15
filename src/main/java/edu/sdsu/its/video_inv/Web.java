@@ -93,9 +93,9 @@ public class Web {
                     "  \"message\": \"invalid ID Length\",\n" +
                     "}").build();
         }
-        Item item = DB.getItem(itemID);
-        if (item != null) {
-            return Response.status(Response.Status.OK).entity(GSON.toJson(item)).build();
+        Item[] items = DB.getItem(itemID);
+        if (items != null) {
+            return Response.status(Response.Status.OK).entity(GSON.toJson(items)).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity("{\n" +
                     "  \"message\": \"item does not exist\",\n" +

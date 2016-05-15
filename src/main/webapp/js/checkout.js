@@ -77,7 +77,7 @@ function addItem() {
  */
 function doAddItem(item) {
     const itemsTable = document.getElementById("items");
-    if (item == null) {
+    if (item == null || item.length == 0) {
         document.getElementById("error").innerHTML = "Invalid Item ID!";
         document.getElementById("error").style.visibility = "visible";
         const itemID = document.getElementById("input-itemID");
@@ -85,38 +85,41 @@ function doAddItem(item) {
         itemID.select();
 
         notifyChime.play();
-    } else if (item != null && items.indexOf(item.id) == -1 && !item.checked_out) {
-        document.getElementById("error").style.visibility = "hidden"; // Hide the Error Message
+    } else {
+        for (var i = 0; i < item.length; i++) {
+            var obj = item[i];
+            if (items.indexOf(obj.id) == -1 && !obj.checked_out) {
+                document.getElementById("error").style.visibility = "hidden"; // Hide the Error Message
 
-        items[items.length] = item.id; // Add itemID of list of Items in Check Out Batch
+                items[items.length] = obj.id; // Add itemID of list of Items in Check Out Batch
 
-        var row = itemsTable.insertRow(-1);
+                var row = itemsTable.insertRow(-1);
 
-        row.id = "i-" + item.id;
+                row.id = "i-" + obj.id;
 
-        row.insertCell(0).innerHTML = item.name;                        //Name
+                row.insertCell(0).innerHTML = obj.name;                        //Name
 
-        row.insertCell(1).innerHTML = '<div id="' + row.id + '-com-div" class="comments" style="display: none"></div>' +
-            '<textarea title="Comments" name="comments" class="comments" id="' + row.id + '-com-ta">' + item.comments + '</textarea></td>';   //Comments
+                row.insertCell(1).innerHTML = '<div id="' + row.id + '-com-div" class="comments" style="display: none"></div>' +
+                    '<textarea title="Comments" name="comments" class="comments" id="' + row.id + '-com-ta">' + obj.comments + '</textarea></td>';   //Comments
 
-        const removeButton = row.insertCell(2);                         //Remove
-        removeButton.innerHTML = '<i class="fa fa-trash-o"></i>';
-        removeButton.className = "delete";
-        removeButton.onclick = function () {
-            removeItem(row.id)
-        };
+                var removeButton = row.insertCell(2);                         //Remove
+                removeButton.innerHTML = '<i class="fa fa-trash-o" onclick="removeItem(' + row.id + ');"></i>';
+                removeButton.className = "delete";
 
-        document.getElementById("complete_button").disabled = false;
+                document.getElementById("complete_button").disabled = false;
 
-    } else if (item != null && items.indexOf(parseInt(item.id)) > -1) {
-        console.log("Item already in list, skipping")
-    } else if (item.checked_out) {
-        document.getElementById("error").innerHTML = "That item is currently Checked Out";
-        document.getElementById("error").style.visibility = "visible";
-        itemID.value = "";
-        itemID.select();
+            } else if (item != null && items.indexOf(parseInt(item.id)) > -1) {
+                console.log("Item already in list, skipping")
+            } else if (item.checked_out) {
+                console.log("Item Already Checked Out.");
+                document.getElementById("error").innerHTML = "That item is currently Checked Out";
+                document.getElementById("error").style.visibility = "visible";
+                itemID.value = "";
+                itemID.select();
 
-        notifyChime.play();
+                notifyChime.play();
+            }
+        }
     }
 }
 

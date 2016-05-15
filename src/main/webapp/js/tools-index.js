@@ -20,3 +20,7 @@ function users() {
 function inventory() {
     window.top.location = "inventory.html";
 }
+
+function macros() {
+    window.top.location = "macros.html";
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Item Macro Configuration</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/tools.css">
+
+    <script type="application/javascript" src="../js/common.js"></script>
+    <script type="application/javascript" src="../js/tools-macros.js"></script>
+    <script src="../js/dymo.js" type="text/javascript" charset="UTF-8"></script>
+</head>
+<body>
+<ol class="breadcrumb">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="index.html">Admin Tools</a></li>
+    <li class="active">Item Macros</li>
+</ol>
+<h1>Macros</h1>
+<div id="list">
+    <table class="macros" id="macros">
+        <tr class="header">
+            <th>Macro ID</th>
+            <th>Name</th>
+            <th>Items</th>
+            <th class="button">Edit</th>
+            <th class="button">Reprint Label</th>
+        </tr>
+    </table>
+    <button class="btn btn-default add" type="button" onclick="showCreate()">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+        &nbsp; Create New Macro
+    </button>
+</div>
+<div id="create" style="display: none">
+    <table>
+        <tr>
+            <td class="pageSubHead">Create New Macro</td>
+        </tr>
+        <tr>
+            <td>
+                <form action="#" onsubmit="createMacro(); return false;" id="createForm">
+                    <table id="createMacro">
+                        <tr>
+                            <td>
+                                Name:
+                            </td>
+                            <td>
+                                <input class="form-control" title="Name" type="text" id="macro_name" required>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div class="panel panel-default" style="width: 75%; margin: auto;">
+                                    <!-- Default panel contents -->
+                                    <div class="panel-heading">Macro Items</div>
+                                    <!-- Table -->
+                                    <table class="table table-condensed" id="items">
+                                        <tr>
+                                            <th>Include</th>
+                                            <th>Item Name  <i>[Short Name]</i></th>
+                                            <th>Public ID</th>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                            </td>
+                        </tr>
+                    </table>
+                    <button class="btn btn-default" type="button" title="Back"
+                            onclick="showView(); return false;">
+                        <i class="fa fa-chevron-left"></i>
+                        &nbsp; Back to Macro List
+                    </button>
+
+                    <button class="btn btn-default" type="submit" title="Submit"
+                            onclick="return confirm('Are you sure?')">
+                        <span id="createFormAction">Create</span> Macro
+                    </button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<!-- BootStrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+        integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+        crossorigin="anonymous"></script>
+</body>
+</html>
