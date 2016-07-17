@@ -236,7 +236,7 @@ public class DB {
 
             while (resultSet.next()) {
                 Item item = new Item(resultSet.getInt("id"),
-                        pubID,
+                        resultSet.getInt("pub_id"),
                         resultSet.getString("name"),
                         resultSet.getString("short_name"),
                         resultSet.getString("comments") != null ? resultSet.getString("comments") : "",

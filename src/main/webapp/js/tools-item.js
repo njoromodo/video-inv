@@ -118,11 +118,16 @@ function getItemByID() {
         if (xmlHttp.readyState == 4) {
             var response = xmlHttp;
             console.log("Status: " + response.status);
+            var responseJSON;
 
             if (response.status == 200) {
-                var item = JSON.parse(xmlHttp.responseText);
-                console.log(item);
+                responseJSON = JSON.parse(xmlHttp.responseText);
+                console.log(responseJSON);
 
+            }
+
+            if (responseJSON != null && responseJSON.length == 1) {
+                var item = responseJSON[0];
                 currentItemID = item.pubID;
                 doShowItem(item);
                 document.getElementById("itemID").value = "";
@@ -132,9 +137,7 @@ function getItemByID() {
             else {
                 document.getElementById("itemID").value = "";
                 document.getElementById("error").style.display = "";
-                document.getElementById("item-name").style.visibility = 'hidden';
-                document.getElementById("comments").style.visibility = 'hidden';
-                document.getElementById("reprintButton").style.visibility = 'hidden';
+                document.getElementById("item-panel").style.visibility = 'hidden';
 
             }
         }
@@ -151,14 +154,14 @@ function getItemByID() {
  */
 function doShowItem(json) {
     var itemName = document.getElementById("item-name");
+    var itemShort = document.getElementById("item-short");
     var itemComments = document.getElementById("comments");
-    var reprintButton = document.getElementById("reprintButton");
 
     itemName.innerHTML = json.name;
+    if (json.shortName != null && json.shortName.length > 0) {
+        itemShort.innerHTML = "[" + json.shortName + "]";
+    }
     itemComments.innerHTML = json.comments;
 
-    itemName.style.visibility = 'visible';
-    itemComments.style.visibility = 'visible';
-    reprintButton.style.visibility = 'visible';
-
+    document.getElementById("item-panel").style.visibility = 'visible';
 }

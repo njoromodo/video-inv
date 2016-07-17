@@ -31,18 +31,20 @@
     </tr>
     <tr>
         <td>
-            <div id="item-name" style="visibility: hidden">Name</div>
-            <div id="comments" style="visibility: hidden">Comment</div>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <form action="#" onsubmit="reprint(); return false;">
-                <button class="btn btn-default" type="submit" title="Reprint Label" id="reprintButton"
-                        onclick="return confirm('Are you sure?')" style="margin-bottom: 5em; visibility: hidden;">
-                    Reprint Label
-                </button>
-            </form>
+            <div class="panel panel-default item-panel" id="item-panel" style="visibility: hidden">
+                <div class="panel-body">
+                    <div><span id="item-name">Name</span> <span id="item-short"></span></div>
+                    <div id="comments">Comment</div>
+
+                    <form action="#" onsubmit="reprint(); return false;">
+                        <button class="btn btn-default" type="submit" title="Reprint Label" id="reprintButton"
+                                onclick="return confirm('Are you sure?')">
+                            Reprint Label
+                        </button>
+                    </form>
+                </div>
+            </div>
+
         </td>
     </tr>
     <tr>
@@ -52,7 +54,8 @@
                     <tr>
                         <td align="left">
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Search By Item ID..." style="width: 100%" id="itemID">
+                                <input type="text" class="form-control" placeholder="Search By Item ID..."
+                                       style="width: 100%" id="itemID">
                                 <span class="input-group-btn">
                                     <button class="btn btn-default" type="submit"><i class="fa fa-search"></i>&nbsp; Search</button>
                                 </span>

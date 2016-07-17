@@ -112,3 +112,17 @@ tr.buttonBar td {
 td, th {
     padding: .5em;
 }
+
+div.item-panel {
+    width: 100%;
+    max-width: 250px;
+    margin: auto auto 2em;
+}
+
+div.item-panel form {
+    margin-top: 1.25em;
+}
+
+#item-short {
+    font-style: italic;
+}
