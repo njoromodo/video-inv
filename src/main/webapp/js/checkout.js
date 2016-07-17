@@ -6,6 +6,7 @@
 var items = [];
 var owner_id = JSON.parse(getCookie("current_user")).pubID;
 var supervisor_id = 0;
+var supervisor = null;
 
 const notifyChime = new Audio("error.mp3");
 
@@ -103,7 +104,7 @@ function doAddItem(item) {
                     '<textarea title="Comments" name="comments" class="comments" id="' + row.id + '-com-ta">' + obj.comments + '</textarea></td>';   //Comments
 
                 var removeButton = row.insertCell(2);                         //Remove
-                removeButton.innerHTML = '<i class="fa fa-trash-o" onclick="removeItem(' + row.id + ');"></i>';
+                removeButton.innerHTML = '<i class="fa fa-trash-o" onclick="removeItem(\'' + row.id + '\');"></i>';
                 removeButton.className = "delete";
 
                 document.getElementById("complete_button").disabled = false;
@@ -187,8 +188,8 @@ function back_to_add() {
  * Show Supervisor Pin Entry Form
  */
 function show_supervisor_login() {
-    if (supervisor_id !== 0) {
-        doSupervisorLogin()
+    if (supervisor_id != 0) {
+        doSupervisorLogin(supervisor);
     } else {
         document.getElementById("item-entry").style.display = "none";
         document.getElementById("confirm-buttons").style.display = "none";
@@ -211,14 +212,11 @@ function checkSup() {
 
         xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState == 4) {
-                var response = xmlHttp;
-                var user = null;
-
-                if (response.status == 200) {
-                    user = JSON.parse(xmlHttp.responseText);
-                    console.log(user);
+                if (xmlHttp.status == 200) {
+                    supervisor = JSON.parse(xmlHttp.responseText);
+                    console.log(supervisor);
                 }
-                doSupervisorLogin(user);
+                doSupervisorLogin(supervisor);
 
             }
         };
