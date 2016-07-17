@@ -34,10 +34,13 @@ function removeItem(rowID) {
     const row = document.getElementById(rowID);
     row.parentNode.removeChild(row);
 
-    // Remove from items DB
+    // Remove from items Array
     var itemID = rowID.replace("i-", "");
     var index = items.indexOf(parseInt(itemID)); // Row ID are 'i-' + the item id
-    items = items.slice(index + 1, 1)
+    if (index > -1) {
+        items.splice(index, 1);
+    }
+
 }
 
 /**
