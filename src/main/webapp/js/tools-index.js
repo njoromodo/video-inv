@@ -4,7 +4,7 @@
  * Created by tpaulus on 3/21/16.
  */
 
-var user_id = JSON.parse(getCookie("current_user")).pubID;
+var user_id = Cookies.getJSON("current_user").pubID;
 if (user_id == null) {
     window.top.location = "../403.html";
 }

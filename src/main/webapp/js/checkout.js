@@ -4,7 +4,7 @@
  * Created by tpaulus on 2/15/16.
  */
 var items = [];
-var owner_id = JSON.parse(getCookie("current_user")).pubID;
+var owner_id = Cookies.getJSON("current_user").pubID;
 var supervisor_id = 0;
 var supervisor = null;
 
@@ -13,7 +13,7 @@ const notifyChime = new Audio("error.mp3");
 document.onkeypress = function () {
     const inputBox = document.getElementById("input-itemID");
 
-    if (document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+    if (document.activeElement.tagName != "INPUT" && document.activeElement.tagName != "TEXTAREA") {
         var value = inputBox.value;
         inputBox.select();
         inputBox.value = value;
@@ -48,8 +48,8 @@ function removeItem(rowID) {
  *
  */
 function addItem() {
-    const inputBox = document.getElementById("input-itemID");
-    var itemID = inputBox.value;
+    var inputBox = $('#input-itemID');
+    var itemID = inputBox.val();
 
     if (itemID !== null && itemID !== "") {
         var xmlHttp = new XMLHttpRequest();
@@ -71,7 +71,7 @@ function addItem() {
         xmlHttp.send();
     }
 
-    inputBox.value = "";
+    inputBox.val('');
 }
 
 /**
@@ -82,9 +82,9 @@ function addItem() {
 function doAddItem(item) {
     const itemsTable = document.getElementById("items");
     if (item == null || item.length == 0) {
-        document.getElementById("error").innerHTML = "Invalid Item ID!";
+        $("#error").text("Invalid Item ID!");
         document.getElementById("error").style.visibility = "visible";
-        const itemID = document.getElementById("input-itemID");
+        const itemID = $("#input-itemID");
         itemID.value = "";
         itemID.select();
 
@@ -116,7 +116,7 @@ function doAddItem(item) {
                 console.log("Item already in list, skipping")
             } else if (item.checked_out) {
                 console.log("Item Already Checked Out.");
-                document.getElementById("error").innerHTML = "That item is currently Checked Out";
+                $("#error").text("That item is currently Checked Out");
                 document.getElementById("error").style.visibility = "visible";
                 itemID.value = "";
                 itemID.select();
@@ -132,10 +132,10 @@ function doAddItem(item) {
  * Hides the add items buttons/forms.
  */
 function complete_checkout() {
-    document.getElementById("add-items-buttons").style.display = "none"; // Hide Add Buttons
-    document.getElementsByClassName("pageSubHead").item(0).innerHTML = "Please make sure all items you are taking out are included below.";
+    $("#add-items-buttons").hide(); // Hide Add Buttons
+    $(".pageSubHead").text("Please make sure all items you are taking out are included below.");
 
-    document.getElementById("confirm-buttons").style.display = ""; // Show Conf. Buttons
+    $("#confirm-buttons").show(); // Show Conf. Buttons
 
     var textAreas = document.getElementsByTagName("textarea");
 
@@ -161,9 +161,9 @@ function complete_checkout() {
  * Revels the add items tools. Restores the edit tools.
  */
 function back_to_add() {
-    document.getElementById("add-items-buttons").style.display = ""; // Show Add Buttons
-    document.getElementById("confirm-buttons").style.display = "none"; // Hide Conf. Buttons
-    document.getElementById("super-confirm-buttons").style.display = "none"; // Hide Supervisor Buttons
+    $("#add-items-buttons").show(); // Show Add Buttons
+    $("#confirm-buttons").hide(); // Hide Conf. Buttons
+    $("#super-confirm-buttons").hide(); // Hide Supervisor Buttons
 
     document.getElementsByClassName("pageHead").item(0).innerHTML = "Equipment Check Out";
     document.getElementsByClassName("pageSubHead").item(0).innerHTML = "Scan Items or enter IDs below to add to checkout";
@@ -194,10 +194,10 @@ function show_supervisor_login() {
     if (supervisor_id != 0) {
         doSupervisorLogin(supervisor);
     } else {
-        document.getElementById("item-entry").style.display = "none";
-        document.getElementById("confirm-buttons").style.display = "none";
+        $("#item-entry").hide();
+        $("#confirm-buttons").hide();
 
-        document.getElementById("supervisor_pin").style.display = "";
+        $("#supervisor_pin").show();
     }
 }
 
@@ -205,8 +205,7 @@ function show_supervisor_login() {
  * Check if the Supervisor's PIN is valid
  */
 function checkSup() {
-    const inputBox = document.getElementById("supervisor_pin-i");
-    var supPin = inputBox.value;
+    var supPin = $("#supervisor_pin-i").val();
 
     if (supPin !== null && supPin !== "") {
         var json = '{"pin": ' + supPin + '}';
@@ -242,11 +241,11 @@ function doSupervisorLogin(user) {
 
         supervisor_id = user.pubID;
 
-        document.getElementById("supervisor_pin").style.display = "none";
-        document.getElementById("confirm-buttons").style.display = "none";
+        $("#supervisor_pin").hide();
+        $("#confirm-buttons").hide();
 
-        document.getElementById("item-entry").style.display = "";
-        document.getElementById("super-confirm-buttons").style.display = "";
+        $("#item-entry").show();
+        $("#super-confirm-buttons").show();
 
         document.getElementsByClassName("pageHead").item(0).innerHTML = "Supervisor Check";
         document.getElementsByClassName("pageSubHead").item(0).innerHTML = "Please ensure that all items and notable comments have been included in the list below.<br>" +
@@ -255,7 +254,7 @@ function doSupervisorLogin(user) {
         // Credentials Invalid
 
         document.getElementById("badCred").style.visibility = "visible";
-        document.getElementById("supervisor_pin-i").value = "";
+        $("#supervisor_pin-i").val("");
     }
 }
 
@@ -272,7 +271,7 @@ function finish() {
 
     for (var i = 0; i < items.length; i++) {
         var itemID = items[i];
-        var itemComments = document.getElementById("i-" + itemID + "-com-div").innerHTML;
+        var itemComments = $("#i-" + itemID + "-com-div").text();
 
         var itemJSON = "{\n";
         itemJSON += ("\"id\": " + itemID + ", \n");
@@ -316,9 +315,9 @@ function doFinish(status) {
         statusText = "error";
     }
 
-    setCookie("conf_status", statusText, null);
-    setCookie("action", "out", null);
-    setCookie("count", items.length, null);
+    Cookies.set("conf_status", statusText);
+    Cookies.set("action", "out");
+    Cookies.set("count", items.length);
 
     window.location = "conf.html";
 }

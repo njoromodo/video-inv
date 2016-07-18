@@ -1,4 +1,4 @@
-var user_id = JSON.parse(getCookie("current_user")).pubID;
+var user_id = Cookies.getJSON("current_user").pubID;
 if (user_id == null) {
     window.top.location = "../403.html";
 }
@@ -47,14 +47,14 @@ function doLoadUsers(json) {
 
 
 function showCreate() {
-    document.getElementById("list").style.display = "none";
-    document.getElementById("create").style.display = "";
+    $("#list").hide();
+    $("#create").show();
 
 }
 
 function showView() {
-    document.getElementById("list").style.display = "";
-    document.getElementById("create").style.display = "none";
+    $("#list").show();
+    $("#create").hide();
 
     var table = document.getElementById("users");
     var tableRows = document.getElementsByClassName('user');
@@ -70,10 +70,10 @@ function showView() {
  * Create a User in the DB
  */
 function createUser() {
-    var fname = document.getElementById("user_first").value;
-    var lname = document.getElementById("user_last").value;
-    var sup = document.getElementById("supervisor").value;
-    var pin = document.getElementById("pin").value;
+    var fname = $("#user_first").val();
+    var lname = $("#user_last").val();
+    var sup = $("#supervisor").val();
+    var pin = $("#pin").val();
 
     var json = '{' +
         '"firstName": ' + fname + ',' +

@@ -1,6 +1,6 @@
 var items = [];
 var checkedIn = [];
-var owner_id = JSON.parse(getCookie("current_user")).pubID;
+var owner_id = Cookies.getJSON("current_user").pubID;
 var supervisor_id = 0;
 var supervisor = null;
 
@@ -28,9 +28,9 @@ if (owner_id == null) {
  * @param itemID itemID to add, if null, fecth it from input
  */
 function addItem(itemID) {
-    var inputBox = document.getElementById("input-itemID");
+    var inputBox = $('#input-itemID');
     if (itemID == null) {
-        itemID = inputBox.value;
+        itemID = inputBox.val();
     }
 
     if (itemID !== null && itemID !== "") {
@@ -85,7 +85,7 @@ function addItem(itemID) {
 
     }
 
-    inputBox.value = "";
+    inputBox.val('');
 }
 
 function doLoadTransaction(json) {
@@ -113,7 +113,7 @@ function doLoadTransaction(json) {
             status.className = "status";
 
             document.getElementById("complete_button").disabled = false;
-            document.getElementById("instructions").innerHTML = "Now, scan every item that you checked out to check it back in.";
+            $('#instructions').text("Now, scan every item that you checked out to check it back in.");
         }
     } else {
         document.getElementById("error").style.visibility = "visible";
@@ -127,7 +127,7 @@ function doLoadTransaction(json) {
 
 function doAddItem(addItems) {
     if (addItems == null || addItems.length == 0) {
-        document.getElementById("error").innerHTML = "Invalid Item ID!";
+        $("#error").text("Invalid Item ID!");
         document.getElementById("error").style.visibility = "visible";
         const itemID = document.getElementById("input-itemID");
         itemID.value = "";
@@ -170,10 +170,10 @@ function complete_checkin() {
         }
     }
 
-    document.getElementById("add-items-buttons").style.display = "none"; // Hide Add Buttons
-    document.getElementsByClassName("pageSubHead").item(0).innerHTML = "Please make sure all items you are checking in are included below.";
+   $("#add-items-buttons").hide(); // Hide Add Buttons
+   $(".pageSubHead").text("Please make sure all items you are checking in are included below.");
 
-    document.getElementById("confirm-buttons").style.display = ""; // Show Conf. Buttons
+    $("#confirm-buttons").show(); // Show Conf. Buttons
 
     var textAreas = document.getElementsByTagName("textarea");
 
@@ -199,12 +199,12 @@ function complete_checkin() {
  * Revels the add items tools. Restores the edit tools.
  */
 function back_to_add() {
-    document.getElementById("add-items-buttons").style.display = ""; // Show Add Buttons
-    document.getElementById("confirm-buttons").style.display = "none"; // Hide Conf. Buttons
-    document.getElementById("super-confirm-buttons").style.display = "none"; // Hide Supervisor Buttons
+    $("#add-items-buttons").show(); // Show Add Buttons
+    $("#confirm-buttons").hide(); // Hide Conf. Buttons
+    $("#super-confirm-buttons").hide(); // Hide Supervisor Buttons
 
-    document.getElementsByClassName("pageHead").item(0).innerHTML = "Equipment Check Out";
-    document.getElementsByClassName("pageSubHead").item(0).innerHTML = "Scan Items or enter IDs below to add to check in";
+    $(".pageHead").text("Equipment Check Out");
+    $(".pageSubHead").text("Scan Items or enter IDs below to add to check in");
 
     var divs = document.getElementsByTagName("div");
 
@@ -232,10 +232,10 @@ function show_supervisor_login() {
     if (supervisor_id != 0) {
         doSupervisorLogin(supervisor)
     } else {
-        document.getElementById("item-entry").style.display = "none";
-        document.getElementById("confirm-buttons").style.display = "none";
+        $("#item-entry").hide();
+        $("#confirm-buttons").hide();
 
-        document.getElementById("supervisor_pin").style.display = "";
+        $("#supervisor_pin").show();
     }
 }
 
@@ -243,8 +243,7 @@ function show_supervisor_login() {
  * Check if the Supervisor's PIN is valid
  */
 function checkSup() {
-    const inputBox = document.getElementById("supervisor_pin-i");
-    var supPin = inputBox.value;
+    var supPin = $("#supervisor_pin-i").val();
 
     if (supPin !== null && supPin !== "") {
         var json = '{"pin": ' + supPin + '}';
@@ -280,11 +279,11 @@ function doSupervisorLogin(user) {
 
         supervisor_id = user.pubID;
 
-        document.getElementById("supervisor_pin").style.display = "none";
-        document.getElementById("confirm-buttons").style.display = "none";
+        $("#supervisor_pin").hide();
+        $("#confirm-buttons").hide();
 
-        document.getElementById("item-entry").style.display = "";
-        document.getElementById("super-confirm-buttons").style.display = "";
+        $("#item-entry").show();
+        $("#super-confirm-buttons").show();
 
         document.getElementsByClassName("pageHead").item(0).innerHTML = "Supervisor Check";
         document.getElementsByClassName("pageSubHead").item(0).innerHTML = "Please ensure that all items and notable comments have been included in the list below.<br>" +
@@ -351,9 +350,9 @@ function doFinish(status) {
     } else {
         statusText = "error";
     }
-    setCookie("conf_status", statusText, null);
-    setCookie("action", "in", null);
-    setCookie("count", items.length, null);
+    Cookies.set("conf_status", statusText);
+    Cookies.set("action", "in");
+    Cookies.set("count", items.length);
 
     window.location = "conf.html";
 }

@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/index.css">
 
-    <script type="application/javascript" src="js/common.js"></script>
 </head>
 <body>
 <table id="success">
@@ -59,15 +58,18 @@
     </tr>
 </table>
 
-</body>
+<script type="application/javascript" src="js/common.js"></script>
+<script src="js/js.cookie.js" type="application/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
 <script type="application/javascript">
     setTimeout(function () {
         window.location = "index.html"
     }, 10000);
 
-    if (getCookie("conf_status") == "ok") {
-        var numItems = getCookie("count");
-        if (getCookie("action") == "out") {
+    if (Cookies.get("conf_status") == "ok") {
+        var numItems = Cookies.get("count");
+        if (Cookies.get("action") == "out") {
             document.getElementById("action").innerHTML = "Check Out";
             document.getElementById("numItemsO").innerHTML = numItems;
             if (numItems > 1) {
@@ -91,9 +93,10 @@
         document.getElementById("error").style.display = "";
     }
 
-    deleteCookie("current_user");
-    deleteCookie("conf_status");
-    deleteCookie("action");
-    deleteCookie("count");
+    Cookies.remove("current_user");
+    Cookies.remove("conf_status");
+    Cookies.remove("action");
+    Cookies.remove("count");
 </script>
+</body>
 </html>

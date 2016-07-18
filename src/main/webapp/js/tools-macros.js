@@ -50,7 +50,7 @@ function doLoadMacros(json) {
             var macroItem = macro.items[i];
             itemList += macroItem + ", ";
         }
-        itemList = itemList.slice(0,-2);
+        itemList = itemList.slice(0, -2);
         row.insertCell(2).innerHTML = itemList;
 
         var editButton = row.insertCell(3);
@@ -94,13 +94,13 @@ function doLoadItems(json) {
 }
 
 function showCreate() {
-    document.getElementById('list').style.display = 'none';
-    document.getElementById('create').style.display = '';
+    $('#list').hide();
+    $('#create').show();
 }
 
 function showView() {
-    document.getElementById('list').style.display = '';
-    document.getElementById('create').style.display = 'none';
+    $('#list').show();
+    $('#create').hide();
 
     var table = document.getElementById("macros");
     var tableRows = document.getElementsByClassName('macro');
@@ -122,16 +122,17 @@ function editMacro(macroID) {
         document.getElementById("item-" + macroItem).checked = true;
     }
 
-    document.getElementById("createFormAction").innerHTML = "Edit";
+    $("#createFormAction").text("Edit");
     showCreate();
 }
 
 function createMacro() {
+    var macroName = $("#macro_name");
     var json = '{' +
-        '"name": "' + document.getElementById("macro_name").value + '",' +
+        '"name": "' + macroName.val() + '",' +
         '"items": [';
 
-    var items = document.getElementsByClassName("macro-include");
+    var items = $(".macro-include");
     for (var i = 0; i < items.length; i++) {
         var item = items[i];
         var item_id = item.id.replace("item-", "");
@@ -169,11 +170,11 @@ function createMacro() {
     xmlHttp.setRequestHeader("Content-type", "application/json");
     xmlHttp.send(json);
 
-    document.getElementById('macro_name').value = '';
-    for (var j = 0; j < document.getElementsByClassName("macro-include").length; j++) {
-        document.getElementsByClassName("macro-include")[j].checked = false;
+    macroName.val('');
+    for (var j = 0; j < items.length; j++) {
+        items[j].checked = false;
     }
-    document.getElementById("createFormAction").innerHTML = "Create";
+    $("#createFormAction").text("Create");
     editMacroID = null;
 }
 

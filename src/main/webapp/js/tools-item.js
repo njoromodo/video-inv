@@ -2,7 +2,7 @@
  * Item Utilities Functions
  */
 
-var user_id = JSON.parse(getCookie("current_user")).pubID;
+var user_id = Cookies.getJSON("current_user").pubID;
 if (user_id == null) {
     window.top.location = "../403.html";
 }
@@ -13,7 +13,7 @@ document.onkeypress = function () {
     /**
      * Directs all key input into the Item ID field if it is not in a Text Area
      */
-    const inputBox = document.getElementById("itemID");
+    var inputBox = $("#itemID");
 
     if (document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
         var value = inputBox.value;
@@ -26,22 +26,22 @@ document.onkeypress = function () {
  * Show Create Item Form
  */
 function showCreate() {
-    document.getElementById("view").style.display = "none";
-    document.getElementById("create").style.display = "";
+    $("#view").hide();
+    $("#create").show();
 }
 /**
  * Show View Item Form
  */
 function showView() {
-    document.getElementById("view").style.display = "";
-    document.getElementById("create").style.display = "none";
+    $("#view").show();
+    $("#create").hide();
 }
 /**
  * Create new Item in DB
  */
 function addItem() {
-    var name = document.getElementById("itemName").value;
-    var short = document.getElementById("itemShortName").value;
+    var name = $("#itemName").val();
+    var short = $("#itemShortName").val();
     var xmlHttp = new XMLHttpRequest();
 
     var json = '{' +
@@ -111,7 +111,7 @@ function reprint() {
  * Get an Item by ID
  */
 function getItemByID() {
-    var itemID = document.getElementById("itemID").value;
+    var itemID = $("#itemID").val();
     var xmlHttp = new XMLHttpRequest();
 
     xmlHttp.onreadystatechange = function () {
@@ -130,13 +130,13 @@ function getItemByID() {
                 var item = responseJSON[0];
                 currentItemID = item.pubID;
                 doShowItem(item);
-                document.getElementById("itemID").value = "";
-                document.getElementById("error").style.display = "none";
+                $("#itemID").val('');
+                $("#error").hide();
             }
 
             else {
-                document.getElementById("itemID").value = "";
-                document.getElementById("error").style.display = "";
+                $("#itemID").val('');
+                $("#error").show();
                 document.getElementById("item-panel").style.visibility = 'hidden';
 
             }
@@ -153,15 +153,15 @@ function getItemByID() {
  * @param json Item JSON
  */
 function doShowItem(json) {
-    var itemName = document.getElementById("item-name");
-    var itemShort = document.getElementById("item-short");
-    var itemComments = document.getElementById("comments");
+    var itemName = $("#item-name");
+    var itemShort = $("#item-short");
+    var itemComments = $("#comments");
 
-    itemName.innerHTML = json.name;
+    itemName.text(json.name);
     if (json.shortName != null && json.shortName.length > 0) {
-        itemShort.innerHTML = "[" + json.shortName + "]";
+        itemShort.text("[" + json.shortName + "]");
     }
-    itemComments.innerHTML = json.comments;
+    itemComments.text(json.comments);
 
     document.getElementById("item-panel").style.visibility = 'visible';
 }

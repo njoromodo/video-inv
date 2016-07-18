@@ -5,10 +5,10 @@
  */
 
 function backToList() {
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("itemHist").style.display = "none";
-    document.getElementById("transHist").style.display = "none";
-    document.getElementById("item-list").style.display = "";
+    $("#loading").hide();
+    $("#itemHist").hide();
+    $("#transHist").hide();
+    $("#item-list").show();
 }
 
 function loadItems() {
@@ -71,8 +71,8 @@ function showHist(itemID) {
 }
 
 function doShowHist(json, itemID) {
-    document.getElementById("bc-itemID").innerHTML = itemID;
-    document.getElementById("h-itemID").innerHTML = itemID;
+    $("#bc-itemID").text(itemID);
+    $("#h-itemID").text(itemID);
     var table = document.getElementById("transList");
     for (var t = 0; t < json.length; t++) {
         var transaction = json[t];
@@ -115,8 +115,8 @@ function doShowHist(json, itemID) {
         row.insertCell(4).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showTransaction(' + transaction.id + ');"><i class="fa fa-file-text-o" aria-hidden="true"></i> &nbsp; View Transaction</button>';
     }
 
-    document.getElementById("item-list").style.display = "none";
-    document.getElementById("itemHist").style.display = "";
+    $("#item-list").hide();
+    $("#itemHist").show();
 }
 
 function showTransaction(transID) {
@@ -139,15 +139,15 @@ function showTransaction(transID) {
 }
 
 function doShowTransaction(json, transID) {
-    document.getElementById("bc-transID").innerHTML = transID;
-    document.getElementById("h-transID").innerHTML = transID;
-    
+    $("#bc-transID").text(transID);
+    $("#h-transID").text(transID);
+
     var table = document.getElementById("transaction");
     var transactionItems = json.out_components.items;
 
     getUser(json.ownerPubID);
     getSupervisor(json.out_components.supervisorID, json.in_components.supervisorID);
-    
+
     for (var ti = 0; ti < transactionItems.length; ti++) {
         var transactionItem = transactionItems[ti];
         var row = table.insertRow();
@@ -172,8 +172,8 @@ function doShowTransaction(json, transID) {
         }
     }
 
-    document.getElementById("itemHist").style.display = "none";
-    document.getElementById("transHist").style.display = "";
+    $("#itemHist").hide();
+    $("#transHist").show();
 }
 
 function getUser(userID) {
@@ -188,7 +188,7 @@ function getUser(userID) {
             if (response.status == 200) {
                 user = JSON.parse(xmlHttp.responseText);
                 console.log(user);
-                document.getElementById("h-owner").innerHTML = user.firstName + " " + user.lastName;
+                $("#h-owner").text(user.firstName + " " + user.lastName);
             }
         }
     };
@@ -209,7 +209,7 @@ function getSupervisor(outID, inID) {
             if (response.status == 200) {
                 user = JSON.parse(xmlHttp.responseText);
                 console.log(user);
-                document.getElementById("h-o-sup").innerHTML = user.firstName + " " + user.lastName;
+                $("#h-o-sup").text(user.firstName + " " + user.lastName);
             }
         }
     };
@@ -228,7 +228,7 @@ function getSupervisor(outID, inID) {
             if (response.status == 200) {
                 user = JSON.parse(xmlHttp2.responseText);
                 console.log(user);
-                document.getElementById("h-i-sup").innerHTML = user.firstName + " " + user.lastName;
+                $("#h-i-sup").text(user.firstName + " " + user.lastName);
             }
         }
     };

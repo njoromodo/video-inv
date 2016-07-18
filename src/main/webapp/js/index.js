@@ -17,7 +17,7 @@ function tools() {
 }
 
 function login() {
-    getUser(document.getElementById("userID").value);
+    getUser($("#userID").val());
 }
 
 /**
@@ -38,7 +38,7 @@ function getUser(id) {
                 console.log(user);
             }
             doLogin(user);
-            setCookie("current_user", xmlHttp.responseText);
+            Cookies.set("current_user", JSON.parse(xmlHttp.responseText));
         }
     };
 
@@ -55,15 +55,15 @@ function doLogin(user) {
         // Login Valid
 
         userID = user.pubID;
-        document.getElementById("login").style.display = "none";
-        document.getElementById("options").style.display = "";
+        $("#login").hide();
+        $("#options").show();
 
         if (user.supervisor) {
-            document.getElementById("toolsB").style.display = "";
+            $("#toolsB").show();
         }
     } else {
         document.getElementById("badCred").style.visibility = "visible";
-        document.getElementById("userID").value = "";
+        $("#userID").val("");
     }
 
 }
@@ -71,8 +71,8 @@ function doLogin(user) {
  * Retrieve the Daily quote from the server
  */
 function loadQuote() {
-    var quoteText = getCookie("quoteText");
-    var quoteAuthor = getCookie("quoteAuthor");
+    var quoteText = Cookies.get("quoteText");
+    var quoteAuthor = Cookies.get("quoteAuthor");
     if (quoteText == null || quoteText == "" || quoteAuthor == null || quoteAuthor == "") {
         var xmlHttp = new XMLHttpRequest();
 
@@ -88,8 +88,8 @@ function loadQuote() {
                     var qText = quote.text;
                     var qAuthor = quote.author;
 
-                    setCookie("quoteText", qText, getMidnight());
-                    setCookie("quoteAuthor", qAuthor, getMidnight());
+                    Cookies.set("quoteText", qText, {expires: 1});
+                    Cookies.set("quoteAuthor", qAuthor, {expires: 1});
 
                     setQuote(qText, qAuthor);
                 }
@@ -100,7 +100,7 @@ function loadQuote() {
         xmlHttp.send();
     }
     else {
-        setQuote(getCookie("quoteText"), getCookie("quoteAuthor"));
+        setQuote(Cookies.get("quoteText"), Cookies.get("quoteAuthor"));
     }
 }
 /**
@@ -109,5 +109,5 @@ function loadQuote() {
  * @param author Quote Author
  */
 function setQuote(text, author) {
-    document.getElementById("quote").innerHTML = text + "<br>~" + author;
+    $('#quote').html(text + "<br>~" + author)
 }
