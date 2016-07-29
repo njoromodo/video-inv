@@ -1,5 +1,5 @@
 group 'edu.sdsu.its.video_inv'
-version '1.0'
+version ''
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.5'
@@ -29,6 +29,10 @@ dependencies {
 
     compile 'commons-io:commons-io:2.4'
     compile 'org.apache.commons:commons-lang3:3.4'
+
+    // Session Tokens & Passwords
+    compile group: 'org.jasypt', name: 'jasypt', version: '1.9.2'
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
 
     providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 
