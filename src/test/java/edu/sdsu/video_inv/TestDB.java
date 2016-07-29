@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 public class TestDB {
     final private static Logger LOGGER = Logger.getLogger(TestDB.class);
     final private static int TEST_USER_ID = 123456;
-    final private static int TEST_ITEM_ID = 999901;
+    final private static int TEST_ITEM_ID = 987654;
     final private static int TEST_MACRO_ID = 999801;
 
     /**
@@ -90,18 +90,18 @@ public class TestDB {
      */
     @Test
     public void getItem() {
-        Item[] items = DB.getItem(TEST_ITEM_ID);
-        assertTrue("Item not defined", items != null && items.length > 0);
+        Item[] items = DB.getItem("i.pub_id = " + TEST_ITEM_ID);
+        assertTrue("Item not defined", items.length > 0);
         Item item = items[0];
         LOGGER.debug("Found item with ID: " + TEST_ITEM_ID);
         assertTrue("Item not Complete - Name Missing", item.name != null && item.name.length() > 0);
-        assertTrue("Get user by DB_ID does not match PubBID", DB.getItemByDB(item.id).pubID == item.pubID);
+        assertTrue("Get item by DB_ID does not match PubBID", DB.getItem("i.id = " + item.id)[0].pubID == item.pubID);
     }
 
     @Test
     public void getItems() {
-        Item[] items = DB.getItem(TEST_MACRO_ID);
-        assertTrue("Macro not defined", items != null && items.length > 0);
+        Item[] items = DB.getItem("i.pub_id = " + TEST_MACRO_ID + " OR m.id = " + TEST_MACRO_ID);
+        assertTrue("Macro not defined", items.length > 0);
         LOGGER.debug(String.format("Macro Lookup returned %d items", items.length));
         for (Item i : items) {
             assertTrue("Item not defined", i != null);

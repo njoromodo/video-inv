@@ -114,7 +114,7 @@ public class Label {
                     "}").build();
         }
 
-        String xml = Label.generateItemLabel(DB.getItem(itemID)[0].shortName, itemID);
+        String xml = Label.generateItemLabel(DB.getItem("i.pub_id = " + itemID)[0].shortName, itemID);
 
         return Response.status(Response.Status.OK).entity(xml).build();
     }

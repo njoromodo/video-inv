@@ -30,7 +30,11 @@
             <div class="panel panel-default item-panel" id="item-panel" style="visibility: hidden">
                 <div class="panel-body">
                     <div><span id="item-name">Name</span> <span id="item-short"></span></div>
-                    <div id="comments">Comment</div>
+                    <div id="category">Category</div>
+                    <div id="comments"><br>
+                        Comments:
+                        Comment
+                    </div>
 
                     <form action="#" onsubmit="reprint(); return false;">
                         <button class="btn btn-default" type="submit" title="Reprint Label" id="reprintButton"
@@ -104,6 +108,7 @@
                         </td>
                         <td>
                             <input class="form-control" title="Item Name" type="text" id="itemShortName" maxlength="9">
+                            <p class="help-block">Leave blank for Default "ITS Video".</p>
                         </td>
                     </tr>
                     <tr>

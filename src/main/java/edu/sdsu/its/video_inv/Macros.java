@@ -87,7 +87,7 @@ public class Macros {
                 id = 100000 + rnd.nextInt(900000);
 
                 for (Macro m : macros) if (m.id == id) exists = true;
-                if (DB.getItem(id) != null) exists = true;
+                if (DB.getItem("i.pub_id = " + id)[0] != null) exists = true;
             }
             LOGGER.debug("Creating Macro with ID: " + id);
             macro.id = id;

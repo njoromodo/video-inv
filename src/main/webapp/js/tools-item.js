@@ -155,13 +155,15 @@ function getItemByID() {
 function doShowItem(json) {
     var itemName = $("#item-name");
     var itemShort = $("#item-short");
+    var itemCategory = $('#category');
     var itemComments = $("#comments");
 
     itemName.text(json.name);
     if (json.shortName != null && json.shortName.length > 0) {
         itemShort.text("[" + json.shortName + "]");
     }
-    itemComments.text(json.comments);
+    itemCategory.text(json.category.name != null ? json.category.name : "");
+    itemComments.html(json.comments != null && json.comments.length > 0 ? "<br>Comments:" + json.comments : "");
 
     document.getElementById("item-panel").style.visibility = 'visible';
 }

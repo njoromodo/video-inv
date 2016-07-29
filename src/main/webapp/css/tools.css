@@ -69,6 +69,11 @@ input {
     margin-left: .5em;
 }
 
+#category {
+    font-weight: bold;
+    font-variant: small-caps;
+}
+
 #comments {
     padding-top: 1em;
     font-style: italic;

@@ -1,10 +1,7 @@
 package edu.sdsu.its.video_inv;
 
 import com.google.gson.Gson;
-import edu.sdsu.its.video_inv.Models.Item;
-import edu.sdsu.its.video_inv.Models.Macro;
-import edu.sdsu.its.video_inv.Models.Transaction;
-import edu.sdsu.its.video_inv.Models.User;
+import edu.sdsu.its.video_inv.Models.*;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
@@ -209,104 +206,6 @@ public class DB {
         }
 
         return user;
-    }
-
-    /**
-     * Get inventory item by its public id (Not the same as their DB ID).
-     *
-     * @param pubID {@link int} Item's Public ID
-     * @return {@link Item[]} Inventory Item
-     */
-    public static Item[] getItem(final int pubID) {
-        Connection connection = getConnection();
-        Statement statement = null;
-        Item[] items = null;
-        List<Item> itemList = new ArrayList<>();
-
-        try {
-            statement = connection.createStatement();
-            final String sql = "SELECT i.id as id, i.pub_id as pub_id, i.name as name, short_name, comments, checked_out " +
-                    "FROM macros m LEFT OUTER JOIN inventory i ON m.itemIDs RLIKE CONCAT('[[.[.]|, ]', i.id, '[ ,|[.].]]') " +
-                    "WHERE m.id = " + pubID + " " +
-                    "UNION ALL " +
-                    "SELECT * FROM inventory " +
-                    "WHERE pub_id = " + pubID + ";";
-            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
-            ResultSet resultSet = statement.executeQuery(sql);
-
-            while (resultSet.next()) {
-                Item item = new Item(resultSet.getInt("id"),
-                        resultSet.getInt("pub_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("short_name"),
-                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "",
-                        resultSet.getBoolean("checked_out"));
-                itemList.add(item);
-            }
-
-            items = new Item[itemList.size()];
-            for (int i = 0; i < itemList.size(); i++) {
-                items[i] = itemList.get(i);
-            }
-
-            resultSet.close();
-        } catch (SQLException e) {
-            LOGGER.error("Problem querying DB for Inventory Item by pubID", e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                    connection.close();
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Closing Statement", e);
-                }
-            }
-        }
-
-        return items;
-    }
-
-    /**
-     * Get inventory item by its database id (Not the same as their Public ID).
-     *
-     * @param dbID {@link int} Item's DataBase ID
-     * @return {@link Item} Inventory Item
-     */
-    public static Item getItemByDB(final int dbID) {
-        Connection connection = getConnection();
-        Statement statement = null;
-        Item item = null;
-
-        try {
-            statement = connection.createStatement();
-            final String sql = "SELECT * FROM inventory WHERE id = " + dbID + ";";
-            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
-            ResultSet resultSet = statement.executeQuery(sql);
-
-            if (resultSet.next()) {
-                item = new Item(dbID,
-                        resultSet.getInt("pub_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("short_name"),
-                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "",
-                        resultSet.getBoolean("checked_out"));
-            }
-
-            resultSet.close();
-        } catch (SQLException e) {
-            LOGGER.error("Problem querying DB for Inventory Item by dbID", e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                    connection.close();
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Closing Statement", e);
-                }
-            }
-        }
-
-        return item;
     }
 
     public static Macro[] getMacros() {
@@ -566,6 +465,92 @@ public class DB {
         }
 
         return quote;
+    }
+
+    public static Item[] getItem(String restriction) {
+        Connection connection = getConnection();
+        Statement statement = null;
+        List<Item> items = new ArrayList<>();
+
+        try {
+            statement = connection.createStatement();
+            //language=SQL
+            if (restriction == null || restriction.length() == 0) {
+                restriction = "TRUE";
+            }
+
+            final String sql = "SELECT DISTINCT\n" +
+                    "  i.id        AS id,\n" +
+                    "  pub_id,\n" +
+                    "  i.name      AS name,\n" +
+                    "  i.category  AS categoryID,\n" +
+                    "  cat.name    AS category_name,\n" +
+                    "  short_name,\n" +
+                    "  comments,\n" +
+                    "  checked_out,\n" +
+                    "  t1.time AS last_transaction_time,\n" +
+                    "  t1.id as last_transaction_id\n" +
+                    "FROM inventory i\n" +
+                    "  LEFT JOIN macros m ON m.itemIDs RLIKE CONCAT('[[.[.]|, ]', i.id, '[ ,|[.].]]')\n" +
+                    "  LEFT JOIN transactions t1 ON t1.item_id = i.id\n" +
+                    "  LEFT OUTER JOIN transactions t2 ON t2.item_id = i.id\n" +
+                    "                                     AND (t1.time < t2.time)\n" +
+                    "  LEFT JOIN categories cat ON i.category = cat.id\n" +
+                    "\n" +
+                    "WHERE t2.id IS NULL\n" +
+                    "AND (" + restriction + ");";
+
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                Item item = new Item(resultSet.getInt("id"),
+                        resultSet.getInt("pub_id"),
+                        new Category(resultSet.getInt("categoryID"), resultSet.getString("category_name")),
+                        resultSet.getString("name"),
+                        resultSet.getString("short_name"),
+                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "",
+                        resultSet.getBoolean("checked_out"));
+
+                Timestamp transactionDate;
+
+                try {
+                    transactionDate = resultSet.getTimestamp("ts");
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Parsing Timestamp", e);
+                    transactionDate = null;
+                }
+
+                if (transactionDate != null) {
+                    SimpleDateFormat ft = new SimpleDateFormat("E. MMMM dd hh:mm a");
+                    item.lastTransactionDate = ft.format(transactionDate);
+                } else {
+                    item.lastTransactionDate = "None";
+                }
+
+                String last_transaction_id = resultSet.getString("last_transaction_id");
+                item.lastTransactionID = last_transaction_id != null ? last_transaction_id : "";
+
+                items.add(item);
+            }
+            LOGGER.debug(String.format("Retrieved %d items from the DB", items.size()));
+
+            resultSet.close();
+
+        } catch (SQLException e) {
+            LOGGER.warn("Problem retrieving items from DB", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+        return items.toArray(new Item[]{});
     }
 
     /**

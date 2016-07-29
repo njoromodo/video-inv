@@ -30,7 +30,7 @@ public class Reports {
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getInventory() {
-        Item[] inventory = DB.getInventory();
+        Item[] inventory = DB.getItem(null);
         LOGGER.debug(String.format("Inventory Request returned %d items", inventory.length));
         return Response.status(Response.Status.OK).entity(GSON.toJson(inventory)).build();
     }
@@ -46,7 +46,7 @@ public class Reports {
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getItemHistory(@QueryParam("id") final int itemID) {
-        Item item = DB.getItem(itemID)[0];
+        Item item = DB.getItem("i.pub_id = " + itemID)[0];
         Transaction[] history = DB.getHistory(item);
         LOGGER.debug(String.format("Item History for %s(%d) returned %d transactions", item.name, item.id, history.length));
         return Response.status(Response.Status.OK).entity(GSON.toJson(history)).build();

@@ -93,8 +93,8 @@ public class Web {
                     "  \"message\": \"invalid ID Length\",\n" +
                     "}").build();
         }
-        Item[] items = DB.getItem(itemID);
-        if (items != null) {
+        Item[] items = DB.getItem("i.pub_id = " + itemID + " OR m.id = " + itemID);
+        if (items.length > 0) {
             return Response.status(Response.Status.OK).entity(GSON.toJson(items)).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity("{\n" +
@@ -142,7 +142,7 @@ public class Web {
         do {
             Random rnd = new Random();
             id = 100000 + rnd.nextInt(900000);
-        } while (DB.getItem(id) != null); // Generate 6 Digit ID, and check that it doesn't already exist
+        } while (DB.getItem("i.pub_id = " + id + " OR m.id = " + id)[0] != null); // Generate 6 Digit ID, and check that it doesn't already exist
 
         item.pubID = id;
 
