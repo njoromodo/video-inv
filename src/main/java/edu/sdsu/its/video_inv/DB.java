@@ -3,6 +3,7 @@ package edu.sdsu.its.video_inv;
 import com.google.gson.Gson;
 import edu.sdsu.its.video_inv.Models.*;
 import org.apache.log4j.Logger;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -20,7 +21,10 @@ public class DB {
     private static final String db_url = Param.getParam("db-url");
     private static final String db_user = Param.getParam("db-user");
     private static final String db_password = Param.getParam("db-password");
+
     private static final Logger LOGGER = Logger.getLogger(DB.class);
+    private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
+
 
     public static Connection getConnection() {
         Connection connection = null;
@@ -67,11 +71,15 @@ public class DB {
         }.start();
     }
 
+
+    // ====================== Users ======================
+
     /**
      * Get User Object by their public ID (Not the same as their DB ID).
      *
      * @param pubID {@link int} User's Public ID
      * @return {@link User} User Object
+     * @deprecated
      */
     public static User getUser(final int pubID) {
         Connection connection = getConnection();
@@ -120,18 +128,21 @@ public class DB {
     }
 
     /**
-     * Get User Object by their public ID (Not the same as their DB ID).
+     * Get an Array of Users who match the specified criteria.
+     * id is the Internal Identifier
+     * pub_id is the Public Identifier
      *
-     * @param restriction {@link String} Restriction on the Search, as a WHERE SQL Statement
-     * @return {@link User} User Object
+     * @param restriction {@link String} Restriction on the Search, as a WHERE SQL Statement, the WHERE is already included
+     * @return {@link User[]} Array of User Objects
      */
-    public static User[] getAllUsers(final String restriction) {
+    public static User[] getUser(String restriction) {
         Connection connection = getConnection();
         Statement statement = null;
-        List<User> userList = new ArrayList<>();
+        List<User> users = new ArrayList<>();
 
         try {
             statement = connection.createStatement();
+            restriction = restriction == null ? "" : " WHERE " + restriction;
             final String sql = "SELECT * FROM users " + restriction + " ORDER BY last_name ASC;";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
@@ -142,9 +153,10 @@ public class DB {
                         resultSet.getString("first_name"),
                         resultSet.getString("last_name"),
                         resultSet.getBoolean("supervisor"));
-                userList.add(user);
+                users.add(user);
             }
 
+            LOGGER.debug(String.format("Retrieved %d users from DB", users.size()));
             resultSet.close();
         } catch (SQLException e) {
             LOGGER.error("Problem querying DB for User by PubID", e);
@@ -159,11 +171,7 @@ public class DB {
             }
         }
 
-        User[] userArr = new User[userList.size()];
-        for (int u = 0; u < userList.size(); u++) {
-            userArr[u] = userList.get(u);
-        }
-        return userArr;
+        return users.toArray(new User[]{});
     }
 
     /**
@@ -172,7 +180,7 @@ public class DB {
      * @param pin {@link String} Pin Hash
      * @return {@link User} User
      */
-    public static User getUser(final String pin) {
+    public static User getUserFromPIN(final String pin) {
         Connection connection = getConnection();
         Statement statement = null;
         User user = null;
@@ -208,46 +216,59 @@ public class DB {
         return user;
     }
 
-    public static Macro[] getMacros() {
-        Connection connection = getConnection();
-        Statement statement = null;
-        List<Macro> macroList = new ArrayList<>();
-        Macro[] result = null;
+    /**
+     * Add a new VIMS User to the DB
+     *
+     * @param user    {@link User} User to Create
+     * @param pinHash {@link String} User's Pin Hash
+     * @deprecated
+     */
+    public static void createUser(final User user, final String pinHash) {
+        final String sql = "INSERT INTO users(pub_id, first_name, last_name, supervisor, pin) VALUES (" + user.pubID +
+                ", '" + sanitize(user.firstName) + "', '" + sanitize(user.lastName) + "', " + (user.supervisor ? 1 : 0) + "," +
+                "'" + pinHash + "');";
+        executeStatement(sql);
+    }
 
-        try {
-            statement = connection.createStatement();
-            final String sql = "SELECT * FROM macros;";
-            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
-            ResultSet resultSet = statement.executeQuery(sql);
+    /**
+     * Add a new VIMS User to the DB
+     *
+     * @param user {@link User} User to Create
+     */
+    public static void createUser(final User user) {
+        user.setPin(PASSWORD_ENCRYPTOR.encryptPassword(user.getPin()));
+        final String sql = "INSERT INTO users(pub_id, first_name, last_name, supervisor, pin) VALUES (" + user.pubID +
+                ", '" + sanitize(user.firstName) + "', '" + sanitize(user.lastName) + "', " + (user.supervisor ? 1 : 0) + "," +
+                "'" + user.getPin() + "');";
+        executeStatement(sql);
+    }
 
-            while (resultSet.next()) {
-                Macro macro = new Macro(resultSet.getInt("id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("itemIDs"));
-                macroList.add(macro);
-            }
-
-            resultSet.close();
-
-            result = new Macro[macroList.size()];
-            for (int m = 0; m < result.length; m++) {
-                result[m] = macroList.get(m);
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Problem querying DB for Macros", e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                    connection.close();
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Closing Statement", e);
-                }
-            }
+    /**
+     * Update a User in the DB, all fields that are not null will be update.
+     * Updates are based off of the User's ID (Internal)
+     *
+     * @param user {@link User} Updated User
+     */
+    public static void updateUser(final User user) {
+        String values = "";
+        if (user.pubID != 0) values += "pub_id=" + user.pubID + ",";
+        if (user.firstName != null && user.firstName.length() > 0)
+            values += "first_name='" + sanitize(user.firstName) + "',";
+        if (user.lastName != null && user.lastName.length() > 0)
+            values += "last_name='" + sanitize(user.lastName) + "',";
+        if (user.supervisor != null) values += "supervisor=" + (user.supervisor ? 1 : 0) + ",";
+        if (user.getPin() != null && user.getPin().length() > 0) {
+            user.setPin(PASSWORD_ENCRYPTOR.encryptPassword(user.getPin()));
+            values += "pin='" + user.getPin() + "',";
         }
 
-        return result;
+        //language=SQL
+        final String sql = "UPDATE users SET " + values.substring(0, values.length() - 1) + " WHERE id=" + user.dbID + ";";
+        // The last character of the values string is removed, since it is a comma and would cause a SQL exception if not removed.
+        executeStatement(sql);
     }
+
+    // ====================== Transactions ======================
 
     /**
      * Retrieve a Transaction by an Item in the Transaction and the direction of the transaction
@@ -391,6 +412,32 @@ public class DB {
     }
 
     /**
+     * Add a Transaction record to the DB
+     *
+     * @param transaction {@link Transaction} Transaction to Save
+     */
+    public static void addTransaction(final Transaction transaction) {
+        final String sql = "INSERT INTO transactions (owner, out_components, out_time) VALUES (\n" +
+                "  (SELECT id\n" +
+                "   FROM users\n" +
+                "   WHERE pub_id = " + transaction.ownerID + "),\n" +
+                "  '" + transaction.out_components.toString() + "', now()\n" +
+                ");";
+        executeStatement(sql);
+    }
+
+    public static void updateTransaction(final Transaction transaction) {
+        // fixme
+        final String sql = "UPDATE transactions\n" +
+                "SET in_components = '" + transaction.in_components.toString() + "',\n" +
+                "  in_time = now()\n" +
+                "WHERE id = " + transaction.id + ";";
+        executeStatement(sql);
+    }
+
+    // ====================== Quotes ======================
+
+    /**
      * Get the total number of Quotes in the DB.
      * This method assumes that the quotes are have a sequential unique ID!
      *
@@ -466,6 +513,8 @@ public class DB {
 
         return quote;
     }
+
+    // ====================== Items ======================
 
     public static Item[] getItem(String restriction) {
         Connection connection = getConnection();
@@ -554,82 +603,39 @@ public class DB {
     }
 
     /**
-     * Retrieve all Items from the Inventory
+     * Update Item Comments.
+     * Item comments are saved both together with the item in the Transaction record, as well as with the Item.
      *
-     * @return {@link Item[]} All Items
+     * @param item {@link Item} Item to Update with Updated Comments
      */
-    public static Item[] getInventory() {
-        Connection connection = getConnection();
-        Statement statement = null;
-        Item[] items = null;
-        List<Item> ilist = new ArrayList<>();
-
-
-        try {
-            statement = connection.createStatement();
-            final String sql = "SELECT i.id AS id, name, pub_id, short_name, comments, checked_out, t1.out_time AS out_time, t1.in_time AS in_time\n" +
-                    "FROM inventory i\n" +
-                    "LEFT JOIN transactions t1 ON t1.out_components REGEXP CONCAT('\"id\": ', i.id, ',')\n" +
-                    "LEFT OUTER JOIN transactions t2 ON t2.out_components REGEXP CONCAT('\"id\": ', i.id, ',')\n" +
-                    "  AND (t1.id < t2.id )\n" +
-                    "WHERE t2.id IS NULL;\n";
-            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
-            ResultSet resultSet = statement.executeQuery(sql);
-
-            while (resultSet.next()) {
-                Item item = new Item(resultSet.getInt("id"),
-                        resultSet.getInt("pub_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("short_name"),
-                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "",
-                        resultSet.getBoolean("checked_out"));
-
-                Timestamp out;
-                Timestamp in;
-
-                try {
-                    out = resultSet.getTimestamp("out_time");
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Parsing Timestamp", e);
-                    out = null;
-                }
-                try {
-                    in = resultSet.getTimestamp("in_time");
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Parsing Timestamp", e);
-                    in = null;
-                }
-
-                if (in != null || out != null) {
-                    SimpleDateFormat ft = new SimpleDateFormat("E. MMMM dd hh:mm a");
-                    item.lastTransactionDate = ft.format(in != null ? in : out);
-                } else {
-                    item.lastTransactionDate = "None";
-                }
-
-                ilist.add(item);
-            }
-
-            resultSet.close();
-
-            items = new Item[ilist.size()];
-            for (int i = 0; i < items.length; i++) {
-                items[i] = ilist.get(i);
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Problem querying DB for Inventory Item by dbID", e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                    connection.close();
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Closing Statement", e);
-                }
-            }
+    public static void updateComments(final Item item) {
+        final String sql;
+        if (item.id != 0) {
+            sql = "UPDATE inventory\n" +
+                    "SET comments = '" + sanitize(item.comments) + "'\n" +
+                    "WHERE id = " + item.id + ";";
+        } else {
+            sql = "UPDATE inventory\n" +
+                    "SET comments = '" + sanitize(item.comments) + "'\n" +
+                    "WHERE pub_id = " + item.pubID + ";";
         }
 
-        return items;
+        executeStatement(sql);
+    }
+
+    public static void updateItemStatus(final Item item) {
+        final String sql;
+        if (item.id != 0) {
+            sql = "UPDATE inventory\n" +
+                    "SET checked_out = " + (item.checked_out ? 1 : 0) + "\n" +
+                    "WHERE id = " + item.id + ";";
+        } else {
+            sql = "UPDATE inventory\n" +
+                    "SET checked_out = " + (item.checked_out ? 1 : 0) + "\n" +
+                    "WHERE pub_id = " + item.pubID + ";";
+        }
+
+        executeStatement(sql);
     }
 
     /**
@@ -729,6 +735,49 @@ public class DB {
         executeStatement(sql);
     }
 
+//    ====================== Macros ======================
+
+    public static Macro[] getMacros() {
+        Connection connection = getConnection();
+        Statement statement = null;
+        List<Macro> macroList = new ArrayList<>();
+        Macro[] result = null;
+
+        try {
+            statement = connection.createStatement();
+            final String sql = "SELECT * FROM macros;";
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                Macro macro = new Macro(resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("itemIDs"));
+                macroList.add(macro);
+            }
+
+            resultSet.close();
+
+            result = new Macro[macroList.size()];
+            for (int m = 0; m < result.length; m++) {
+                result[m] = macroList.get(m);
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Problem querying DB for Macros", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+        return result;
+    }
+
     /**
      * Add a new Macro to the DB
      *
@@ -747,79 +796,6 @@ public class DB {
      */
     public static void updateMacro(final Macro macro) {
         final String sql = "UPDATE macros SET name='" + macro.name + "', itemIDs = '" + Arrays.toString(macro.items) + "' WHERE id = " + macro.id + ";";
-        executeStatement(sql);
-    }
-
-    /**
-     * Add a new VIMS User to the DB
-     *
-     * @param user    {@link User} User to Create
-     * @param pinHash {@link String} User's Pin Hash
-     */
-    public static void addUser(final User user, final String pinHash) {
-        final String sql = "INSERT INTO users(pub_id, first_name, last_name, supervisor, pin) VALUES (" + user.pubID +
-                ", '" + sanitize(user.firstName) + "', '" + sanitize(user.lastName) + "', " + (user.supervisor ? 1 : 0) + "," +
-                "'" + pinHash + "');";
-        executeStatement(sql);
-    }
-
-    /**
-     * Add a Transaction record to the DB
-     *
-     * @param transaction {@link Transaction} Transaction to Save
-     */
-    public static void addTransaction(final Transaction transaction) {
-        final String sql = "INSERT INTO transactions (owner, out_components, out_time) VALUES (\n" +
-                "  (SELECT id\n" +
-                "   FROM users\n" +
-                "   WHERE pub_id = " + transaction.ownerID + "),\n" +
-                "  '" + transaction.out_components.toString() + "', now()\n" +
-                ");";
-        executeStatement(sql);
-    }
-
-    public static void updateTransaction(final Transaction transaction) {
-        // fixme
-        final String sql = "UPDATE transactions\n" +
-                "SET in_components = '" + transaction.in_components.toString() + "',\n" +
-                "  in_time = now()\n" +
-                "WHERE id = " + transaction.id + ";";
-        executeStatement(sql);
-    }
-
-    /**
-     * Update Item Comments.
-     * Item comments are saved both together with the item in the Transaction record, as well as with the Item.
-     *
-     * @param item {@link Item} Item to Update with Updated Comments
-     */
-    public static void updateComments(final Item item) {
-        final String sql;
-        if (item.id != 0) {
-            sql = "UPDATE inventory\n" +
-                    "SET comments = '" + sanitize(item.comments) + "'\n" +
-                    "WHERE id = " + item.id + ";";
-        } else {
-            sql = "UPDATE inventory\n" +
-                    "SET comments = '" + sanitize(item.comments) + "'\n" +
-                    "WHERE pub_id = " + item.pubID + ";";
-        }
-
-        executeStatement(sql);
-    }
-
-    public static void updateItemStatus(final Item item) {
-        final String sql;
-        if (item.id != 0) {
-            sql = "UPDATE inventory\n" +
-                    "SET checked_out = " + (item.checked_out ? 1 : 0) + "\n" +
-                    "WHERE id = " + item.id + ";";
-        } else {
-            sql = "UPDATE inventory\n" +
-                    "SET checked_out = " + (item.checked_out ? 1 : 0) + "\n" +
-                    "WHERE pub_id = " + item.pubID + ";";
-        }
-
         executeStatement(sql);
     }
 

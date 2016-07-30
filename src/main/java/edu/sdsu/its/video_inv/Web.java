@@ -66,7 +66,7 @@ public class Web {
     public Response getAllUsers() {
         LOGGER.info("Recieved GET Request to ALLUSERS");
 
-        User[] users = DB.getAllUsers("");
+        User[] users = DB.getUser("");
         return Response.status(Response.Status.OK).entity(GSON.toJson(users)).build();
 
     }
@@ -115,7 +115,7 @@ public class Web {
     @Produces(MediaType.APPLICATION_JSON)
     public Response verifyPin(final String payload) {
         User user = GSON.fromJson(payload, User.class);
-        user = DB.getUser(hash(user.pin));
+        user = DB.getUserFromPIN(hash(user.getPin()));
 
         if (user != null) {
             return Response.status(Response.Status.OK).entity(GSON.toJson(user)).build();
@@ -171,7 +171,7 @@ public class Web {
         } while (DB.getUser(id) != null); // Generate 6 Digit ID, and check that it doesn't already exist
         user.pubID = id;
 
-        DB.addUser(user, hash(user.pin));
+        DB.createUser(user, hash(user.getPin()));
 
         return Response.status(Response.Status.CREATED).entity(GSON.toJson(user)).build();
     }
