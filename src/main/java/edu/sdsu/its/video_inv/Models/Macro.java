@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO JavaDoc
+ * Macros represent a group of multiple Items and are returned as a JSON Array of itemIDs.
  *
  * @author Tom Paulus
  *         Created on 5/11/16.

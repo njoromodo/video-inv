@@ -3,7 +3,6 @@ package edu.sdsu.its.video_inv;
 import org.krysalis.barcode4j.impl.upcean.UPCEBean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 
-import javax.ws.rs.Path;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,17 +16,15 @@ import java.io.OutputStream;
  * @author Tom Paulus
  *         Created on 2/25/16.
  */
-@Path("barcode")
 public class Barcode {
     /**
      * Generate a Barcode with the Provided base Code
      *
      * @param code       {@link Integer} Base Code (7 Digits)
      * @param outputFile {@link File} Output File for the Barcode, Type PNG
-     * @return {@link Integer} Full Barcode Value, including Checksum
      * @throws IOException Thrown if there are problems writing to the file
      */
-    public static void generateBarcode(final String code, final File outputFile) throws IOException {
+    static void generateBarcode(final String code, final File outputFile) throws IOException {
         // Create the barcode bean
         UPCEBean bean = new UPCEBean();
         final int dpi = 600;

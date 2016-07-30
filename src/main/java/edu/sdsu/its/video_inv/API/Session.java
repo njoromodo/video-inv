@@ -109,7 +109,7 @@ public class Session {
         final String tokenUsername = key[2];
         LOGGER.debug("Token Username: " + tokenUsername);
 
-        final User user = DB.getUser(tokenUsername);
+        final User user = DB.getUser("i.pub_id = " + tokenUsername)[0];
         if (user != null) {
             LOGGER.info(String.format("Token for User (\"%s\") is valid!", tokenUsername));
             return user;
