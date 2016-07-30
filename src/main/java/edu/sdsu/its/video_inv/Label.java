@@ -20,7 +20,9 @@ import java.util.Scanner;
  */
 @Path("/")
 public class Label {
-    public static final Logger LOGGER = Logger.getLogger(Label.class);
+    private static final Logger LOGGER = Logger.getLogger(Label.class);
+    private static final String USER_LABEL_HEAD = "VIMS UID";
+    private static final String ITEM_LABEL_SHORT_DEFAULT = "ITS Video";
 
     private static String readFile(final String path) {
         InputStream inputStream = Label.class.getClassLoader().getResourceAsStream(path);
@@ -29,13 +31,13 @@ public class Label {
     }
 
     /**
-     * Generate Label XML for an item sticker for the JS Framework
+     * Generate Label XML for an sticker for the JS Framework
      *
-     * @param name {@link String} Short Name (If null, prints 'ITS Video')
+     * @param name {@link String} Header (Short Name) (If null, prints ITEM_LABEL_SHORT_DEFAULT)
      * @param id   {@link int} Barcode ID (No Checksum)
      * @return {@link String} Label XML
      */
-    static String generateItemLabel(final String name, final int id) {
+    public static String generateLabel(final String name, final int id) {
         LOGGER.info("Generating Template for ID: " + id);
 
         try {
@@ -48,7 +50,7 @@ public class Label {
             String template = readFile("ITS Asset Tags.label");
 
 
-            return template.replace("{{short_name}}", (name != null && name.length() != 0) ? name : "ITS Video").replace("{{barcode}}", encodedBarcodeString);
+            return template.replace("{{short_name}}", (name != null && name.length() != 0) ? name : ITEM_LABEL_SHORT_DEFAULT).replace("{{barcode}}", encodedBarcodeString);
         } catch (IOException e) {
             LOGGER.error("Problem Generating Label File", e);
             return "";
@@ -62,23 +64,9 @@ public class Label {
      * @param id {@link int} User ID (No Checksum)
      * @return {@link String} Label XML
      */
-    static String generateUserLabel(final int id) {
+    public static String generateUserLabel(final int id) {
         LOGGER.info("Generating User Template for ID: " + id);
-
-        try {
-            File barcode = File.createTempFile(Integer.toString(id), ".png");
-            Barcode.generateBarcode("0" + Integer.toString(id), barcode);
-
-            byte[] encodedBarcode = Base64.encodeBase64(FileUtils.readFileToByteArray(barcode));
-            String encodedBarcodeString = new String(encodedBarcode, "UTF8");
-
-            String template = readFile("User Tags.label");
-
-            return template.replace("{{barcode}}", encodedBarcodeString);
-        } catch (IOException e) {
-            LOGGER.error("Problem Generating Label File", e);
-            return "";
-        }
+        return generateLabel(USER_LABEL_HEAD, id);
     }
 
     /**
@@ -87,8 +75,9 @@ public class Label {
      * @param id {@link int} Macro ID (No Checksum)
      * @return {@link String} Label XML
      */
-    static String generateMacroLabel(final int id) {
-        return generateItemLabel("Macro", id);
+    public static String generateMacroLabel(final int id) {
+        LOGGER.info("Generating Macro Template for ID: " + id);
+        return generateLabel("Macro", id);
     }
 
     /**
@@ -114,7 +103,7 @@ public class Label {
                     "}").build();
         }
 
-        String xml = Label.generateItemLabel(DB.getItem("i.pub_id = " + itemID)[0].shortName, itemID);
+        String xml = Label.generateLabel(DB.getItem("i.pub_id = " + itemID)[0].shortName, itemID);
 
         return Response.status(Response.Status.OK).entity(xml).build();
     }
