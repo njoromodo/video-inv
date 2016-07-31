@@ -1,6 +1,7 @@
 package edu.sdsu.its.video_inv;
 
 import com.google.gson.Gson;
+import edu.sdsu.its.video_inv.API.Quote;
 import edu.sdsu.its.video_inv.Models.*;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
