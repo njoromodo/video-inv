@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Random;
 
 /**
  * User Endpoints (List, Create, Update, and Label)
@@ -94,7 +95,6 @@ public class Users {
         if (user == null || user.pubID != 0) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
-
         if (!user.supervisor) {
             return Response.status(Response.Status.FORBIDDEN).entity(mGson.toJson(new SimpleMessage("Error", "You are not allowed to do that."))).build();
         }
@@ -103,6 +103,14 @@ public class Users {
         LOGGER.debug("POST Payload: " + payload);
 
         User createUser = mGson.fromJson(payload, User.class);
+        int id;
+        do {
+            Random rnd = new Random();
+            id = 100000 + rnd.nextInt(900000);
+        }
+        while (DB.getUser("pub_id = " + id).length > 0); // Generate 6 Digit ID, and check that it doesn't already exist
+        user.pubID = id;
+
         DB.createUser(createUser);
 
         return Response.status(Response.Status.CREATED).entity(mGson.toJson(new SimpleMessage("User Created Successfully"))).build();
@@ -136,7 +144,11 @@ public class Users {
         if (DB.getUser("pub_id = " + user.pubID + " OR id = " + user.dbID).length == 0)
             return Response.status(Response.Status.NOT_FOUND).entity(mGson.toJson(new SimpleMessage("Error", "User does not exist"))).build();
         if (updateUser.dbID == 0) {
-            updateUser.dbID = DB.getUser("pub_id = " + user.pubID)[0].dbID;
+            int id = formatID(updateUser.pubID);
+            if (intLength(id) != 6)
+                return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "Invalid ID Length"))).build();
+
+            updateUser.dbID = DB.getUser("pub_id = " + id)[0].dbID;
         }
 
         DB.updateUser(updateUser);
