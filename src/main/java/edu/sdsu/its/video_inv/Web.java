@@ -146,7 +146,7 @@ public class Web {
 
         item.pubID = id;
 
-        DB.addItem(item);
+        DB.createItem(item);
 
         return Response.status(Response.Status.CREATED).entity(GSON.toJson(item)).build();
     }

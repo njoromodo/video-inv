@@ -1,6 +1,7 @@
-package edu.sdsu.its.video_inv;
+package edu.sdsu.its.video_inv.API;
 
 import com.google.gson.Gson;
+import edu.sdsu.its.video_inv.DB;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.Consumes;

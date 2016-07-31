@@ -731,8 +731,44 @@ public class DB {
      *
      * @param item {@link Item} Item to Create
      */
-    public static void addItem(final Item item) {
-        final String sql = "INSERT INTO inventory(pub_id, name, short_name) VALUES (" + item.pubID + ", '" + sanitize(item.name) + "', '" + sanitize(item.shortName) + "');";
+    public static void createItem(final Item item) {
+        final String sql = "INSERT INTO inventory(pub_id, name, short_name) VALUES (" + item.pubID + ", '" +
+                sanitize(item.name) + "', '" + sanitize(item.shortName) + "');";
+        executeStatement(sql);
+    }
+
+    /**
+     * Update an Inventory Item.
+     * All fields that are not null will be updated. A valid Item ID (Internal) needs to be supplied.
+     *
+     * @param item {@link Item} Updated Item
+     */
+    public static void updateItem(final Item item) {
+        String values = "";
+        if (item.pubID != 0) values += "pub_id = " + item.pubID + ",";
+        if (item.category != null) values += "category = " + item.category.id + ",";
+        if (item.name != null) values += "name = '" + item.name + "',";
+        if (item.shortName != null) values += "short_name = '" + item.shortName + "',";
+        if (item.comments != null) values += "comments = '" + item.comments + "',";
+
+        //language=SQL
+        final String sql = "UPDATE inventory SET " + values.substring(0, values.length() - 1) + " WHERE id=" + item.id + ";";
+        // The last character of the values string is removed, since it is a comma and would cause a SQL exception if not removed.
+        executeStatement(sql);
+    }
+
+    /**
+     * Delete an Item from the Inventory. This is only possible if the item has never been checked out or in.
+     * This action is NOT reversible.
+     * The Item must have an Internal ID defined.
+     *
+     * @param item {@link Item} Item to Delete
+     */
+    public static void deleteItem(final Item item) {
+        LOGGER.warn("Deleting Item with ID: " + item.id);
+
+        //language=SQL
+        final String sql = "DELETE * FROM inventory WHERE id = " + item.id + ";";
         executeStatement(sql);
     }
 
