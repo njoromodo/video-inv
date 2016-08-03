@@ -836,6 +836,96 @@ public class DB {
         executeStatement(sql);
     }
 
+//    ====================== Categories ======================
+
+    public static Category[] getCategory(Integer id) {
+        Connection connection = getConnection();
+        Statement statement = null;
+        List<Category> categories = new ArrayList<>();
+
+        String restriction;
+        if (id != null) restriction = "id = " + id;
+        else restriction = "TRUE";
+
+        try {
+            statement = connection.createStatement();
+            final String sql = "SELECT * FROM categories WHERE " + restriction + ";";
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                Category category = new Category(resultSet.getInt("id"),
+                        resultSet.getString("name"));
+                categories.add(category);
+            }
+
+            resultSet.close();
+
+        } catch (SQLException e) {
+            LOGGER.error("Problem querying DB for Categories", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+        return categories.toArray(new Category[]{});
+    }
+
+    public static Category createCategory(Category category) {
+        //language=SQL
+        String sql = "INSERT INTO categories (`id`, `name`) VALUES (" + category.id + ", '" + category.name + "');";
+
+        Connection connection = getConnection();
+        Statement statement = null;
+
+        try {
+            statement = connection.createStatement();
+            final String query = "SELECT * FROM categories WHERE id=LAST_INSERT_ID();";
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql + query));
+            ResultSet resultSet = statement.executeQuery(query);
+
+            if (resultSet.next()) {
+                category.id = resultSet.getInt("id");
+            }
+
+            resultSet.close();
+
+        } catch (SQLException e) {
+            LOGGER.error("Problem creating new Item in DB", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+        return category;
+    }
+
+    public static void updateCategory(final Category category) {
+        //language=SQL
+        String sql = "UPDATE categories SET name = '" + category.name + "' WHERE id=" + category.id + ";";
+        executeStatement(sql);
+    }
+
+    public static void deleteCategory(final Category category) {
+        LOGGER.warn(String.format("Deleting Category #%d (%s)", category.id, category.name));
+
+        //language=SQL
+        String sql = "DELETE * FROM categories WHERE id = " + category.id + ";";
+        executeStatement(sql);
+    }
+
     private static String sanitize(final String s) {
         return s.replace("'", "");
     }

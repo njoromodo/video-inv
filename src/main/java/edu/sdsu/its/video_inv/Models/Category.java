@@ -1,7 +1,8 @@
 package edu.sdsu.its.video_inv.Models;
 
 /**
- * TODO JavaDoc
+ * Models an Item Category.
+ * Items can have at most one category.
  *
  * @author Tom Paulus
  *         Created on 7/27/16.
