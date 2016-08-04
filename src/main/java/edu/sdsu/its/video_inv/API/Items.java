@@ -90,6 +90,8 @@ public class Items {
         if (user == null || user.pubID != 0) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
+        if (payload == null || payload.length() == 0)
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity(gson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
         LOGGER.info("Recieved Request to Create Item");
         LOGGER.debug("Item Payload: " + payload);
 
@@ -129,6 +131,8 @@ public class Items {
         if (user == null || user.pubID != 0) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
+        if (payload == null || payload.length() == 0)
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity(gson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
         LOGGER.info("Recieved Request to Update Item");
         LOGGER.debug("Item Payload: " + payload);
 
@@ -171,6 +175,8 @@ public class Items {
         if (user == null || user.pubID != 0) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
+        if (payload == null || payload.length() == 0)
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity(gson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
         LOGGER.info("Recieved Request to Delete Item");
         LOGGER.debug("Item Payload: " + payload);
 

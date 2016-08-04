@@ -98,6 +98,8 @@ public class Users {
         if (!user.supervisor) {
             return Response.status(Response.Status.FORBIDDEN).entity(mGson.toJson(new SimpleMessage("Error", "You are not allowed to do that."))).build();
         }
+        if (payload == null || payload.length() == 0)
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity(mGson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
 
         LOGGER.info("Recieved Request to create new Item");
         LOGGER.debug("POST Payload: " + payload);
@@ -133,10 +135,11 @@ public class Users {
         if (user == null || user.pubID != 0) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
-
         if (!user.supervisor) {
             return Response.status(Response.Status.FORBIDDEN).entity(mGson.toJson(new SimpleMessage("Error", "You are not allowed to do that."))).build();
         }
+        if (payload == null || payload.length() == 0)
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity(mGson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
 
         User updateUser = mGson.fromJson(payload, User.class);
         if (updateUser.dbID == 0 && updateUser.pubID == 0)

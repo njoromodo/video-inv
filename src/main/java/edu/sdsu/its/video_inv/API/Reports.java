@@ -48,7 +48,7 @@ public class Reports {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getItemHistory(@QueryParam("id") final int itemID) {
         Item item = DB.getItem("i.pub_id = " + itemID)[0];
-        Transaction[] history = DB.getHistory(item);
+        Transaction[] history = DB.getTransaction("t.item_id = " + itemID);
         LOGGER.debug(String.format("Item History for %s(%d) returned %d transactions", item.name, item.id, history.length));
         return Response.status(Response.Status.OK).entity(GSON.toJson(history)).build();
     }
@@ -58,7 +58,7 @@ public class Reports {
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTransaction(@QueryParam("id") final int transactionID) {
-        Transaction transaction = DB.getTransactionByID(transactionID);
-        return Response.status(Response.Status.OK).entity(GSON.toJson(transaction)).build();
+        Transaction[] transactions = DB.getTransaction("t.id = " + transactionID);
+        return Response.status(Response.Status.OK).entity(GSON.toJson(transactions)).build();
     }
 }

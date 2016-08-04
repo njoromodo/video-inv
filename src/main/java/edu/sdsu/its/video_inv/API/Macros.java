@@ -73,6 +73,8 @@ public class Macros {
         if (user == null || user.pubID != 0) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
+        if (payload == null || payload.length() == 0)
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity(gson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
         LOGGER.info("Recieved Request to Create Macro");
         LOGGER.debug("Item Payload: " + payload);
 
@@ -119,6 +121,8 @@ public class Macros {
         if (user == null || user.pubID != 0) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
+        if (payload == null || payload.length() == 0)
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity(gson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
         LOGGER.info("Recieved Request to Update Macro");
         LOGGER.debug("Item Payload: " + payload);
 
@@ -158,6 +162,8 @@ public class Macros {
         if (user == null || user.pubID != 0) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
+        if (payload == null || payload.length() == 0)
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity(gson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
         LOGGER.info("Recieved Request to Update Macro");
         LOGGER.debug("Item Payload: " + payload);
 
