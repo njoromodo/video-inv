@@ -774,15 +774,23 @@ public class DB {
 
 //    ====================== Macros ======================
 
-    public static Macro[] getMacros() {
+    /**
+     * Retrieve all macros from the DB that meet a specific restriction.
+     * If the restriction is null or an empty string, all macros will be returned.
+     *
+     * @param restriction {@link String} SQL WHERE string, excluding WHERE Operator
+     * @return {@link Macro[]} Array of Macros matching restriction
+     */
+    public static Macro[] getMacro(String restriction) {
         Connection connection = getConnection();
         Statement statement = null;
-        List<Macro> macroList = new ArrayList<>();
-        Macro[] result = null;
+        List<Macro> macros = new ArrayList<>();
+
+        if (restriction == null || restriction.length() == 0) restriction = "TRUE";
 
         try {
             statement = connection.createStatement();
-            final String sql = "SELECT * FROM macros;";
+            final String sql = "SELECT * FROM macros WHERE " + restriction + ";";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
@@ -790,15 +798,12 @@ public class DB {
                 Macro macro = new Macro(resultSet.getInt("id"),
                         resultSet.getString("name"),
                         resultSet.getString("itemIDs"));
-                macroList.add(macro);
+                macros.add(macro);
             }
 
             resultSet.close();
+            LOGGER.debug(String.format("Retrieved %d macros from DB", macros.size()));
 
-            result = new Macro[macroList.size()];
-            for (int m = 0; m < result.length; m++) {
-                result[m] = macroList.get(m);
-            }
         } catch (SQLException e) {
             LOGGER.error("Problem querying DB for Macros", e);
         } finally {
@@ -812,7 +817,7 @@ public class DB {
             }
         }
 
-        return result;
+        return macros.toArray(new Macro[]{});
     }
 
     /**
@@ -821,6 +826,7 @@ public class DB {
      * @param macro {@link Macro} Macro to Create
      */
     public static void createMacro(final Macro macro) {
+        //language=SQL
         final String sql = "INSERT INTO macros (id, name, itemIDs) VALUES (" + macro.id + ", '" + macro.name + "', '" + Arrays.toString(macro.items) + "');\n";
         executeStatement(sql);
     }
@@ -832,7 +838,21 @@ public class DB {
      * @param macro {@link Macro} Macro with updated values. The ID cannot be changed.
      */
     public static void updateMacro(final Macro macro) {
+        //language=SQL
         final String sql = "UPDATE macros SET name='" + macro.name + "', itemIDs = '" + Arrays.toString(macro.items) + "' WHERE id = " + macro.id + ";";
+        executeStatement(sql);
+    }
+
+    /**
+     * Delete a Macro. This action is non-revertible.
+     * The Macro must have an ID defined.
+     *
+     * @param macro {@link Macro} Macro to delete
+     */
+    public static void deleteMacro(final Macro macro) {
+        LOGGER.warn("Deleting Macro with ID: " + macro.id);
+        //language=SQL
+        final String sql = "DELETE * FROM macros WHERE id=" + macro.id + ";";
         executeStatement(sql);
     }
 

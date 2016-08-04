@@ -25,9 +25,6 @@ public class Macro {
                 .split(",")) {
             list.add(Integer.parseInt(i));
         }
-        this.items = new Integer[list.size()];
-        for (int i = 0; i < this.items.length; i++) {
-            this.items[i] = list.get(i);
-        }
+        this.items = list.toArray(new Integer[]{});
     }
 }

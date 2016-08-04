@@ -44,7 +44,7 @@ public class Macros {
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
     public Response listMacros() {
-        Macro[] list = DB.getMacros();
+        Macro[] list = DB.getMacro(null);
         LOGGER.info(String.format("Request for Macros List returned %d items", list.length));
 
         Gson gson = new Gson();
@@ -77,7 +77,7 @@ public class Macros {
             status = Response.status(Response.Status.ACCEPTED);
         } else {
             // Create Macro
-            Macro[] macros = DB.getMacros();
+            Macro[] macros = DB.getMacro(null);
             int id = 0;
             boolean exists = false;
 
