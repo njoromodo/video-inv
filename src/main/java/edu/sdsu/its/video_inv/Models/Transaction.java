@@ -10,46 +10,36 @@ import java.util.List;
  *         Created on 2/23/16.
  */
 public class Transaction {
-    public int id;
-    public int ownerID;
-    public int ownerPubID;
-    public Component out_components;
-    public Component in_components;
-    public Timestamp out_time;
-    public Timestamp in_time;
+    public String id;
+    public User owner;
+    public User supervisor;
+    public Timestamp time;
+    public boolean direction; // 0 for our; 1 for in
+    public List<Component> components;
 
-    public Transaction(int id, int ownerID, int ownerPubID, Component out_components, Component in_components, Timestamp out_time, Timestamp in_time) {
+    public Transaction(String id, User owner, User supervisor, Timestamp time, boolean direction) {
         this.id = id;
-        this.ownerID = ownerID;
-        this.ownerPubID = ownerPubID;
-        this.out_components = out_components;
-        this.in_components = in_components;
-        this.out_time = out_time;
-        this.in_time = in_time;
+        this.owner = owner;
+        this.supervisor = supervisor;
+        this.time = time;
+        this.direction = direction;
     }
 
+
     public static class Component {
-        public int supervisorID;
-        public List<Item> items;
+       public int id;
+        public int pubID;
+        public Category category;
 
-        @Override
-        public String toString() {
-            // Used by DB.addTransaction()
-            String transactionJSON = "{\n" +
-                    "\"supervisorID\": " + supervisorID + ",\n" +
-                    "\"items\": [";
+        public String name;
+        public String comments;
 
-            for (int i = 0; i < items.size(); i++) {
-                transactionJSON += items.get(i).toString();
-                if (i != (items.size() - 1)) {  // Omit the Comma in the last item
-                    transactionJSON += ",\n";
-                } else {
-                    transactionJSON += "\n";
-                }
-            }
-            transactionJSON += "]}";
-
-            return transactionJSON;
+        public Component(int id, int pubID, Category category, String name, String comments) {
+            this.id = id;
+            this.pubID = pubID;
+            this.category = category;
+            this.name = name;
+            this.comments = comments;
         }
     }
 }

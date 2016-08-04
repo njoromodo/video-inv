@@ -1,6 +1,5 @@
 package edu.sdsu.its.video_inv;
 
-import com.google.gson.Gson;
 import edu.sdsu.its.video_inv.API.Quote;
 import edu.sdsu.its.video_inv.Models.*;
 import org.apache.log4j.Logger;
@@ -8,9 +7,7 @@ import org.jasypt.util.password.StrongPasswordEncryptor;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Communicate with Inventory DB
@@ -272,66 +269,89 @@ public class DB {
     // ====================== Transactions ======================
 
     /**
-     * Retrieve a Transaction by an Item in the Transaction and the direction of the transaction
+     * Retreive All, or a specific transaction(s) based on a SQL Restriction statement.
      *
-     * @param item {@link Item} Item in the Transaction
-     * @return {@link Transaction} Transaction Record with designated Item
+     * @param restriction {@link String} SQL WHERE condition, Excluding WHERE Operator
+     * @return {@link Transaction[]} Transactions meeting the specified restriction
      */
-    public static Transaction getTransactionByItem(final Item item) {
+    public static Transaction[] getTransaction(String restriction) {
         Connection connection = getConnection();
         Statement statement = null;
-        Transaction transaction = null;
+        Map<String, Transaction> transactions = new HashMap<>();
 
         try {
             statement = connection.createStatement();
-            final String sql = "SELECT\n" +
-                    "  transactions.id AS id,\n" +
-                    "  owner,\n" +
-                    "  out_components,\n" +
-                    "  in_components,\n" +
-                    "  out_time,\n" +
-                    "  in_time,\n" +
-                    "  pub_id          AS owner_pubID\n" +
-                    "FROM transactions\n" +
-                    "  JOIN users ON transactions.owner = users.id\n" +
-                    "WHERE INSTR(out_components, '\"id\": " + item.id + "')\n" +
-                    "ORDER BY id DESC\n" +
-                    "LIMIT 1;\n";
+            if (restriction == null || restriction.length() == 0) restriction = "TRUE";
 
+            //langauge=SQL
+            final String sql = "SELECT\n" +
+                    "  t.id         AS `transaction_id`,\n" +
+                    "  u.id         AS `owner_db_id`,\n" +
+                    "  u.pub_id     AS `owner_pub_id`,\n" +
+                    "  u.first_name AS `owner_first_name`,\n" +
+                    "  u.last_name  AS `owner_last_name`,\n" +
+                    "  u.supervisor AS `owner_user_level`,\n" +
+                    "  s.id         AS `supervisor_db_id`,\n" +
+                    "  s.pub_id     AS `supervisor_pub_id`,\n" +
+                    "  s.first_name AS `supervisor_first_name`,\n" +
+                    "  s.last_name  AS `supervisor_last_name`,\n" +
+                    "  s.supervisor AS `supervisor_user_level`,\n" +
+                    "  t.time       AS `transaction_time`,\n" +
+                    "  t.direction  AS `transaction_direction`,\n" +
+                    "  i.id         AS `component_id`,\n" +
+                    "  i.pub_id     AS `component_pub_id`,\n" +
+                    "  i.category   AS `component_cat_id`,\n" +
+                    "  c.name       AS `component_cat_name`,\n" +
+                    "  i.name       AS `component_name`,\n" +
+                    "  i.comments   AS `component_condition`\n" +
+                    "FROM transactions t\n" +
+                    "  LEFT OUTER JOIN inventory i ON t.item_id = i.id\n" +
+                    "  LEFT OUTER JOIN categories c ON i.category = c.id\n" +
+                    "  LEFT OUTER JOIN users u ON t.owner = u.id\n" +
+                    "  LEFT OUTER JOIN users s ON t.supervisor = s.id" +
+                    "WHERE " + restriction + ";";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
-            if (resultSet.next()) {
-                final Gson gson = new Gson();
-                Transaction.Component outComponents = gson.fromJson(resultSet.getString("out_components"), Transaction.Component.class);
-                Transaction.Component inComponents = gson.fromJson(resultSet.getString("in_components"), Transaction.Component.class);
-
-                outComponents.items.forEach(Item::completeItem);
-                if (inComponents != null) inComponents.items.forEach(Item::completeItem);
-
-                Timestamp out;
-                Timestamp in;
-
-                try {
-                    out = resultSet.getTimestamp("out_time");
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Parsing Timestamp", e);
-                    out = null;
+            while (resultSet.next()) {
+                String transaction_id = resultSet.getString("transaction_id");
+                if (!transactions.containsKey(transaction_id)) {
+                    // Add the transaction shell if it does not yet exist in the MAP
+                    Transaction transaction = new Transaction(
+                            transaction_id,
+                            new User(
+                                    resultSet.getInt("owner_db_id"),
+                                    resultSet.getInt("owner_pub_id"),
+                                    resultSet.getString("owner_first_name"),
+                                    resultSet.getString("owner_last_name"),
+                                    resultSet.getBoolean("owner_user_level")
+                            ),
+                            new User(
+                                    resultSet.getInt("supervisor_pub_id"),
+                                    resultSet.getInt("supervisor_pub_id"),
+                                    resultSet.getString("supervisor_first_name"),
+                                    resultSet.getString("supervisor_last_name"),
+                                    resultSet.getBoolean("supervisor_user_level")
+                            ),
+                            resultSet.getTimestamp("transaction_time"),
+                            resultSet.getBoolean("transaction_direction")
+                    );
+                    transactions.put(transaction_id, transaction);
                 }
-                try {
-                    in = resultSet.getTimestamp("in_time");
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Parsing Timestamp", e);
-                    in = null;
-                }
 
-                transaction = new Transaction(resultSet.getInt("id"),
-                        resultSet.getInt("owner"),
-                        resultSet.getInt("owner_pubID"),
-                        outComponents,
-                        inComponents,
-                        out,
-                        in);
+                // Now add the component(s) to the transaction
+                Transaction.Component component = new Transaction.Component(
+                        resultSet.getInt("component_id"),
+                        resultSet.getInt("component_pub_id"),
+                        new Category(
+                                resultSet.getInt("component_cat_id"),
+                                resultSet.getString("component_cat_name")
+                        ),
+                        resultSet.getString("component_name"),
+                        resultSet.getString("component_condition")
+                );
+
+                transactions.get(transaction_id).components.add(component);
             }
 
             resultSet.close();
@@ -348,68 +368,7 @@ public class DB {
             }
         }
 
-        return transaction;
-    }
-
-    /**
-     * Retrieve a Transaction by its ID
-     *
-     * @param transactionID {@link int} TransactionID
-     * @return {@link Transaction} Transaction Record with designated Item
-     */
-    public static Transaction getTransactionByID(final int transactionID) {
-        Connection connection = getConnection();
-        Statement statement = null;
-        Transaction transaction = null;
-
-        try {
-            statement = connection.createStatement();
-            final String sql = "SELECT\n" +
-                    "  transactions.id AS id,\n" +
-                    "  owner,\n" +
-                    "  out_components,\n" +
-                    "  in_components,\n" +
-                    "  out_time,\n" +
-                    "  in_time,\n" +
-                    "  pub_id          AS owner_pubID\n" +
-                    "FROM transactions\n" +
-                    "  JOIN users ON transactions.owner = users.id\n" +
-                    "WHERE transactions.id = " + transactionID + ";";
-            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
-            ResultSet resultSet = statement.executeQuery(sql);
-
-            if (resultSet.next()) {
-                final Gson gson = new Gson();
-                Transaction.Component outComponents = gson.fromJson(resultSet.getString("out_components"), Transaction.Component.class);
-                Transaction.Component inComponents = gson.fromJson(resultSet.getString("in_components"), Transaction.Component.class);
-
-                outComponents.items.forEach(Item::completeItem);
-                if (inComponents != null) inComponents.items.forEach(Item::completeItem);
-
-                transaction = new Transaction(resultSet.getInt("id"),
-                        resultSet.getInt("owner"),
-                        resultSet.getInt("owner_pubID"),
-                        outComponents,
-                        inComponents,
-                        resultSet.getTimestamp("out_time"),
-                        resultSet.getTimestamp("in_time"));
-            }
-
-            resultSet.close();
-        } catch (SQLException e) {
-            LOGGER.error("Problem querying DB for Transaction Record by Item", e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                    connection.close();
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Closing Statement", e);
-                }
-            }
-        }
-
-        return transaction;
+        return transactions.values().toArray(new Transaction[]{});
     }
 
     /**
@@ -417,23 +376,37 @@ public class DB {
      *
      * @param transaction {@link Transaction} Transaction to Save
      */
-    public static void addTransaction(final Transaction transaction) {
-        final String sql = "INSERT INTO transactions (owner, out_components, out_time) VALUES (\n" +
-                "  (SELECT id\n" +
-                "   FROM users\n" +
-                "   WHERE pub_id = " + transaction.ownerID + "),\n" +
-                "  '" + transaction.out_components.toString() + "', now()\n" +
-                ");";
-        executeStatement(sql);
-    }
+    public static void createTransaction(final Transaction transaction) {
+        Statement statement = null;
+        Connection connection = null;
 
-    public static void updateTransaction(final Transaction transaction) {
-        // fixme
-        final String sql = "UPDATE transactions\n" +
-                "SET in_components = '" + transaction.in_components.toString() + "',\n" +
-                "  in_time = now()\n" +
-                "WHERE id = " + transaction.id + ";";
-        executeStatement(sql);
+        //language=SQL
+        final String template = "INSERT INTO transactions VALUES ('%s', %d, %d, NOW(), %d, '%s', %d)";
+
+        try {
+            connection = getConnection();
+            connection.setAutoCommit(false);
+            statement = connection.createStatement();
+
+            for (Transaction.Component component : transaction.components) {
+                statement.addBatch(String.format(template, transaction.id, component.id, transaction.owner.dbID, transaction.supervisor.dbID, component.comments, transaction.direction ? 1 : 0));
+            }
+
+            statement.executeBatch();
+        } catch (Exception e) {
+            LOGGER.warn("Problem Creating New Transaction Record", e);
+        } finally {
+
+            if (statement != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
     }
 
     // ====================== Quotes ======================
@@ -444,6 +417,7 @@ public class DB {
      *
      * @return {@link int} Number of Quotes in the DB
      */
+
     public static int getNumQuotes() {
         Connection connection = getConnection();
         Statement statement = null;
@@ -524,11 +498,9 @@ public class DB {
 
         try {
             statement = connection.createStatement();
-            //language=SQL
-            if (restriction == null || restriction.length() == 0) {
-                restriction = "TRUE";
-            }
+            if (restriction == null || restriction.length() == 0) restriction = "TRUE";
 
+            //language=SQL
             final String sql = "SELECT DISTINCT\n" +
                     "  i.id        AS id,\n" +
                     "  pub_id,\n" +
@@ -637,93 +609,6 @@ public class DB {
         }
 
         executeStatement(sql);
-    }
-
-    /**
-     * Get Transaction History for a given item
-     *
-     * @param item {@link Item} Item
-     * @return {@link Transaction[]} Transaction History for Item
-     */
-    public static Transaction[] getHistory(final Item item) {
-        Connection connection = getConnection();
-        Statement statement = null;
-        Transaction[] transactions = null;
-        List<Transaction> tlist = new ArrayList<>();
-
-
-        try {
-            statement = connection.createStatement();
-            final String sql = "SELECT\n" +
-                    "  transactions.id AS id,\n" +
-                    "  owner,\n" +
-                    "  out_components,\n" +
-                    "  in_components,\n" +
-                    "  out_time,\n" +
-                    "  in_time,\n" +
-                    "  pub_id          AS owner_pubID\n" +
-                    "FROM transactions\n" +
-                    "  JOIN users ON transactions.owner = users.id\n" +
-                    "WHERE INSTR(out_components, '\"id\": " + item.id + "')\n" +
-                    "ORDER BY out_time, in_time DESC;";
-            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
-            ResultSet resultSet = statement.executeQuery(sql);
-
-            while (resultSet.next()) {
-                final Gson gson = new Gson();
-                Transaction.Component outComponents = gson.fromJson(resultSet.getString("out_components"), Transaction.Component.class);
-                Transaction.Component inComponents = gson.fromJson(resultSet.getString("in_components"), Transaction.Component.class);
-
-                outComponents.items.forEach(Item::completeItem);
-                if (inComponents != null) inComponents.items.forEach(Item::completeItem);
-
-                Timestamp out;
-                Timestamp in;
-
-                try {
-                    out = resultSet.getTimestamp("out_time");
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Parsing Timestamp", e);
-                    out = null;
-                }
-                try {
-                    in = resultSet.getTimestamp("in_time");
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Parsing Timestamp", e);
-                    in = null;
-                }
-
-                Transaction transaction = new Transaction(resultSet.getInt("id"),
-                        resultSet.getInt("owner"),
-                        resultSet.getInt("owner_pubID"),
-                        outComponents,
-                        inComponents,
-                        out,
-                        in);
-
-                tlist.add(transaction);
-            }
-
-            resultSet.close();
-
-            transactions = new Transaction[tlist.size()];
-            for (int i = 0; i < transactions.length; i++) {
-                transactions[i] = tlist.get(i);
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Problem querying DB for Transaction History for Item with DB-ID: " + item.id, e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                    connection.close();
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Closing Statement", e);
-                }
-            }
-        }
-
-        return transactions;
     }
 
     /**
