@@ -442,7 +442,7 @@ public class DB {
                 Timestamp transactionDate;
 
                 try {
-                    transactionDate = resultSet.getTimestamp("ts");
+                    transactionDate = resultSet.getTimestamp("last_transaction_time");
                 } catch (SQLException e) {
                     LOGGER.warn("Problem Parsing Timestamp", e);
                     transactionDate = null;

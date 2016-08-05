@@ -34,19 +34,15 @@ You will also need to create the first user in the database, make sure that
 supervisor is set to 1 for that user to allow them full access.
 
 #### Table Breakdown
-- __Users__ stores the users for the system, including administrators.
-- __Inventory__ stores all items that should be available for checkout, as well as
-the last comment associated with the item, and its current status (in/out). Short
-Name is used to print a short description at the top of the Inventory Sticker,
-instead of the default text.
-- __Transactions__ stores int inbound and outbound transactions as well as the
-respective timestamps.
-- __Quotes__ To add a bit of excitement and variety, a quote is displayed on the
-start page, the front-end pulls the quote of the day daily, or when first loaded.
-(A good source for quotes is [Brainy Quote](http://www.brainyquote.com/)).
-- __Macros__ stores the Item Macros. Item Macros allow several items to be represented
-by a single id/barcode. This information, as well as the Macro's Name, which is used
-only to identify the Macro on the Admin Page, are saved in this table.
+Tables            | Function/Description
+----------------- | --------------------------------------------------------
+users             | Stores the users for the system, including administrators.
+inventory         | Stores all items that should be available for checkout, as well as the last comment associated with the item, and its current status (in/out). Short Name is used to print a short description at the top of the Inventory Sticker, instead of the default text.
+categories        | Stores Item Categories which are used by the Front End to identify items that have been added to the transaction and mark the checklist item as completed.
+transactions      | Stores int inbound and outbound transactions as well as the respective timestamps, conditions, owner and supervisor.
+quotes            | To add a bit of excitement and variety, a quote is displayed on the start page, the front-end pulls the quote of the day daily, or when first loaded. (A good source for quotes is [Brainy Quote](http://www.brainyquote.com/)).
+macros            | Stores the Item Macros. Item Macros allow several items to be represented by a single id/barcode. This information, as well as the Macro's Name, which is used only to identify the Macro on the Admin Page, are saved in this table.
+
 
 #### Both
 ```
@@ -58,22 +54,31 @@ CREATE TABLE users (
   `supervisor` TINYINT(1),
   `pin`        TEXT
 );
+CREATE TABLE categories (
+  `id`   INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  `name` TEXT
+);
 CREATE TABLE inventory (
   `id`          INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
   `pub_id`      INT(8),
+  `category`    INT(3),
   `name`        TEXT,
   `short_name`  TEXT,
   `comments`    TEXT,
-  `checked_out` TINYINT(1) DEFAULT 0
+  `checked_out` TINYINT(1) DEFAULT 0,
+  FOREIGN KEY (`category`) REFERENCES categories (`id`)
 );
 CREATE TABLE transactions (
-  `id`             INT PRIMARY KEY AUTO_INCREMENT          NOT NULL,
-  `owner`          INT,
-  `out_components` TEXT,
-  `in_components`  TEXT,
-  `out_time`       TIMESTAMP DEFAULT CURRENT_TIMESTAMP     NOT NULL,
-  `in_time`        TIMESTAMP,
-  FOREIGN KEY (`owner`) REFERENCES videoinv.users (`id`)
+  `id`         VARCHAR(32)                             NOT NULL,
+  `item_id`    INT,
+  `owner`      INT,
+  `time`       TIMESTAMP DEFAULT CURRENT_TIMESTAMP     NOT NULL,
+  `supervisor` INT,
+  `condition`  TEXT,
+  `direction`  TINYINT(1), # 0 for Out, 1 for IN
+  FOREIGN KEY (`item_id`) REFERENCES inventory (`id`),
+  FOREIGN KEY (`owner`) REFERENCES users (`id`),
+  FOREIGN KEY (`supervisor`) REFERENCES users (`id`)
 );
 CREATE TABLE quotes (
   `id`     INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
@@ -107,4 +112,8 @@ to retrieve the application configurations.
 - `db-password` = Database Password
 - `db-url` = jdbc:mysql://db_host:3306/db_name
  * *replace db_host, db_name and possibly the port with your MySQL server info*
--	`db-user` = Database Username
+- `db-user` = Database Username
+- `project_token` = Unique Project Identifier for Session Tokens, If changed, all tokens will become invalid.
+- `token_cypher` = Token Encryption Cypher. If changed, all tokens will become invalid.
+- `token_ttl` = Token Longevity (How long will a user stay logged in) in Milliseconds
+    + Reccomended Value: 86400000 -> 24 Hours
