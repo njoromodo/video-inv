@@ -40,7 +40,7 @@ public class Session {
         // Leave Blank, Used by Jersey for API Endpoint.
     }
 
-    public Session(User user) {
+    Session(User user) {
         if (!ENCRYPTOR.isInitialized()) initializeEncryptor();
         final long millis = System.currentTimeMillis();
         String key = UUID.randomUUID().toString().toUpperCase() +
@@ -77,7 +77,7 @@ public class Session {
      * @param token {@link String} Base64 Encoded Token
      * @return {@link User} User associated with Token. Null if invalid.
      */
-    public static User validate(final String token) {
+    static User validate(final String token) {
         if (!ENCRYPTOR.isInitialized()) initializeEncryptor();
         LOGGER.debug(String.format("Validating Token: \"%s\"", token));
         final String decodedToken = new String(Base64.decodeBase64(token.getBytes()));
@@ -124,11 +124,11 @@ public class Session {
         ENCRYPTOR.setPassword(TOKEN_CYPHER);
     }
 
-    public String getToken() {
+    String getToken() {
         return this.token;
     }
 
-    public long getExpires() {
+    long getExpires() {
         return expires;
     }
 }

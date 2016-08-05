@@ -172,60 +172,8 @@ public class DB {
         return users.toArray(new User[]{});
     }
 
-    /**
-     * Get User Information by Pin
-     *
-     * @param pin {@link String} Pin Hash
-     * @return {@link User} User
-     */
-    public static User getUserFromPIN(final String pin) {
-        Connection connection = getConnection();
-        Statement statement = null;
-        User user = null;
-
-        try {
-            statement = connection.createStatement();
-            final String sql = "SELECT * FROM users WHERE pin = '" + pin + "';";
-            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
-            ResultSet resultSet = statement.executeQuery(sql);
-
-            if (resultSet.next()) {
-                user = new User(resultSet.getInt("id"),
-                        resultSet.getInt("pub_ID"),
-                        resultSet.getString("first_name"),
-                        resultSet.getString("last_name"),
-                        resultSet.getBoolean("supervisor"));
-            }
-
-            resultSet.close();
-        } catch (SQLException e) {
-            LOGGER.error("Problem querying DB for User by Pin", e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                    connection.close();
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Closing Statement", e);
-                }
-            }
-        }
-
-        return user;
-    }
-
-    /**
-     * Add a new VIMS User to the DB
-     *
-     * @param user    {@link User} User to Create
-     * @param pinHash {@link String} User's Pin Hash
-     * @deprecated
-     */
-    public static void createUser(final User user, final String pinHash) {
-        final String sql = "INSERT INTO users(pub_id, first_name, last_name, supervisor, pin) VALUES (" + user.pubID +
-                ", '" + sanitize(user.firstName) + "', '" + sanitize(user.lastName) + "', " + (user.supervisor ? 1 : 0) + "," +
-                "'" + pinHash + "');";
-        executeStatement(sql);
+    public static boolean checkPin (User user, String pin) {
+        return PASSWORD_ENCRYPTOR.checkPassword(pin, user.getPin());
     }
 
     /**
@@ -380,16 +328,26 @@ public class DB {
         Statement statement = null;
         Connection connection = null;
 
-        //language=SQL
-        final String template = "INSERT INTO transactions VALUES ('%s', %d, %d, NOW(), %d, '%s', %d)";
-
         try {
             connection = getConnection();
             connection.setAutoCommit(false);
             statement = connection.createStatement();
 
             for (Transaction.Component component : transaction.components) {
-                statement.addBatch(String.format(template, transaction.id, component.id, transaction.owner.dbID, transaction.supervisor.dbID, component.comments, transaction.direction ? 1 : 0));
+                //language=SQL
+
+                // Create Transaction Record
+                statement.addBatch("INSERT INTO transactions VALUES ('" + sanitize(transaction.id) + "', " + component.id + ", " + transaction.owner.dbID + ", NOW(), " + transaction.supervisor.dbID + ", '" + sanitize(component.comments) + "', " + (transaction.direction ? 1 : 0) + ")");
+
+                // Update Item Comments
+                statement.addBatch("UPDATE inventory\n" +
+                        "SET comments = '" + sanitize(component.comments) + "'\n" +
+                        "WHERE id = " + component.id + ";");
+
+                // Update Item Status (Checked In/Out)
+                statement.addBatch("UPDATE inventory\n" +
+                        "SET checked_out = " + (transaction.direction ? 0 : 1) + "\n" +  // Direction: TRUE = IN & FALSE = OUT
+                        "WHERE id = " + component.id + ";");
             }
 
             statement.executeBatch();
@@ -573,42 +531,6 @@ public class DB {
         }
 
         return items.toArray(new Item[]{});
-    }
-
-    /**
-     * Update Item Comments.
-     * Item comments are saved both together with the item in the Transaction record, as well as with the Item.
-     *
-     * @param item {@link Item} Item to Update with Updated Comments
-     */
-    public static void updateComments(final Item item) {
-        final String sql;
-        if (item.id != 0) {
-            sql = "UPDATE inventory\n" +
-                    "SET comments = '" + sanitize(item.comments) + "'\n" +
-                    "WHERE id = " + item.id + ";";
-        } else {
-            sql = "UPDATE inventory\n" +
-                    "SET comments = '" + sanitize(item.comments) + "'\n" +
-                    "WHERE pub_id = " + item.pubID + ";";
-        }
-
-        executeStatement(sql);
-    }
-
-    public static void updateItemStatus(final Item item) {
-        final String sql;
-        if (item.id != 0) {
-            sql = "UPDATE inventory\n" +
-                    "SET checked_out = " + (item.checked_out ? 1 : 0) + "\n" +
-                    "WHERE id = " + item.id + ";";
-        } else {
-            sql = "UPDATE inventory\n" +
-                    "SET checked_out = " + (item.checked_out ? 1 : 0) + "\n" +
-                    "WHERE pub_id = " + item.pubID + ";";
-        }
-
-        executeStatement(sql);
     }
 
     /**
