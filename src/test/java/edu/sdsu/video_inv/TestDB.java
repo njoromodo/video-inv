@@ -77,7 +77,7 @@ public class TestDB {
      */
     @Test
     public void getUser() {
-        User user = DB.getUser(TEST_USER_ID);
+        User user = DB.getUser("pub_id = " + TEST_USER_ID)[0];
         assertTrue("User not defined", user != null);
         LOGGER.debug("Found user with ID: " + TEST_USER_ID);
         assertTrue("User not Complete - Name not defined",
@@ -111,8 +111,8 @@ public class TestDB {
 
     @Test
     public void getMacros() {
-        Macro[] macros = DB.getMacros();
-        assertTrue("No Macros Found", macros != null && macros.length > 0);
+        Macro[] macros = DB.getMacro(null);
+        assertTrue("No Macros Found", macros.length > 0);
         LOGGER.debug(String.format("%d macros found in DB", macros.length));
         for (Macro m : macros) {
             assertTrue("Macro not defined", m != null);
