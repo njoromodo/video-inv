@@ -73,59 +73,6 @@ public class DB {
     // ====================== Users ======================
 
     /**
-     * Get User Object by their public ID (Not the same as their DB ID).
-     *
-     * @param pubID {@link int} User's Public ID
-     * @return {@link User} User Object
-     * @deprecated
-     */
-    public static User getUser(final int pubID) {
-        Connection connection = getConnection();
-        Statement statement = null;
-        User user = null;
-
-        int uid;
-        if (pubID > Math.pow(10, 6)) {
-            // Supplied Checksum includes the checksum, we don't care about the checksum
-            uid = pubID / 10;
-        } else if (pubID > Math.pow(10, 5)) {
-            uid = pubID;
-        } else {
-            return null;
-        }
-
-        try {
-            statement = connection.createStatement();
-            final String sql = "SELECT * FROM users WHERE pub_id = " + uid + ";";
-            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
-            ResultSet resultSet = statement.executeQuery(sql);
-
-            if (resultSet.next()) {
-                user = new User(resultSet.getInt("id"),
-                        pubID,
-                        resultSet.getString("first_name"),
-                        resultSet.getString("last_name"),
-                        resultSet.getBoolean("supervisor"));
-            }
-
-            resultSet.close();
-        } catch (SQLException e) {
-            LOGGER.error("Problem querying DB for User by PubID", e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                    connection.close();
-                } catch (SQLException e) {
-                    LOGGER.warn("Problem Closing Statement", e);
-                }
-            }
-        }
-
-        return user;
-    }
-
-    /**
      * Get an Array of Users who match the specified criteria.
      * id is the Internal Identifier
      * pub_id is the Public Identifier

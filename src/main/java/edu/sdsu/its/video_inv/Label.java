@@ -18,7 +18,6 @@ import java.util.Scanner;
  * @author Tom Paulus
  *         Created on 2/26/16.
  */
-@Path("/")
 public class Label {
     private static final Logger LOGGER = Logger.getLogger(Label.class);
     private static final String USER_LABEL_HEAD = "VIMS UID";
@@ -78,33 +77,5 @@ public class Label {
     public static String generateMacroLabel(final int id) {
         LOGGER.info("Generating Macro Template for ID: " + id);
         return generateLabel("Macro", id);
-    }
-
-    /**
-     * Get Asset Tag Label XML
-     *
-     * @param pubID {@link String} Public Identifier
-     * @return {@link Response} Label XML
-     */
-    @Path("label")
-    @GET
-    @Consumes(MediaType.WILDCARD)
-    @Produces(MediaType.APPLICATION_XML)
-    public Response getLabel(@QueryParam("id") final String pubID) {
-        int itemID;
-        if (pubID.length() > 6) {
-            // Supplied Checksum includes the checksum, we don't care about the checksum
-            itemID = Integer.parseInt(pubID) / 10;
-        } else if (pubID.length() == 6) {
-            itemID = Integer.parseInt(pubID);
-        } else {
-            return Response.status(Response.Status.PRECONDITION_FAILED).entity("{\n" +
-                    "  \"message\": \"invalid ID Length\",\n" +
-                    "}").build();
-        }
-
-        String xml = Label.generateLabel(DB.getItem("i.pub_id = " + itemID)[0].shortName, itemID);
-
-        return Response.status(Response.Status.OK).entity(xml).build();
     }
 }
