@@ -26,9 +26,6 @@ public class TestDB {
     final private static int TEST_ITEM_ID = 987654;
     final private static int TEST_MACRO_ID = 999801;
 
-
-
-
     /**
      * Test DB Connection
      */
@@ -91,17 +88,4 @@ public class TestDB {
             assertTrue("Item not Complete - Name Missing", i.name != null && i.name.length() > 0);
         }
     }
-
-    @Test
-    public void getMacros() {
-        Macro[] macros = DB.getMacro(null);
-        assertTrue("No Macros Found", macros.length > 0);
-        LOGGER.debug(String.format("%d macros found in DB", macros.length));
-        for (Macro m : macros) {
-            assertTrue("Macro not defined", m != null);
-            assertTrue("Macro not Complete - Name Missing", m.name != null && m.name.length() > 0);
-            assertTrue("Macro not Complete - Items Missing", m.items != null && m.items.length > 0);
-        }
-    }
-
 }

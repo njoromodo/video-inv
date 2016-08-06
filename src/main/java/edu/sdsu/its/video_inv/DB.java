@@ -522,7 +522,7 @@ public class DB {
         LOGGER.warn("Deleting Item with ID: " + item.id);
 
         //language=SQL
-        final String sql = "DELETE * FROM inventory WHERE id = " + item.id + ";";
+        final String sql = "DELETE FROM inventory WHERE id = " + item.id + ";";
         executeStatement(sql);
     }
 
@@ -606,7 +606,7 @@ public class DB {
     public static void deleteMacro(final Macro macro) {
         LOGGER.warn("Deleting Macro with ID: " + macro.id);
         //language=SQL
-        final String sql = "DELETE * FROM macros WHERE id=" + macro.id + ";";
+        final String sql = "DELETE FROM macros WHERE id=" + macro.id + ";";
         executeStatement(sql);
     }
 
@@ -696,7 +696,7 @@ public class DB {
         LOGGER.warn(String.format("Deleting Category #%d (%s)", category.id, category.name));
 
         //language=SQL
-        String sql = "DELETE * FROM categories WHERE id = " + category.id + ";";
+        String sql = "DELETE FROM categories WHERE id = " + category.id + ";";
         executeStatement(sql);
     }
 
