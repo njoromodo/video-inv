@@ -42,8 +42,7 @@ public class Macro {
 
         Macro macro = (Macro) o;
 
-        return id == macro.id;
-
+        return id == macro.id && name.equals(macro.name);
     }
 
     @Override

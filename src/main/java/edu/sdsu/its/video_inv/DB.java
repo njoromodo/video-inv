@@ -653,16 +653,19 @@ public class DB {
 
     public static Category createCategory(Category category) {
         //language=SQL
-        String sql = "INSERT INTO categories (`id`, `name`) VALUES (" + category.id + ", '" + category.name + "');";
+        final String statement_sql = "INSERT INTO categories (`id`, `name`) VALUES (" + category.id + ", '" + category.name + "');";
+        final String query_sql = "SELECT * FROM categories WHERE id=LAST_INSERT_ID();";
 
         Connection connection = getConnection();
         Statement statement = null;
 
         try {
             statement = connection.createStatement();
-            final String query = "SELECT * FROM categories WHERE id=LAST_INSERT_ID();";
-            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql + query));
-            ResultSet resultSet = statement.executeQuery(query);
+            LOGGER.info(String.format("Executing SQL Statement - \"%s\"", statement));
+            statement.execute(statement_sql);
+
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", query_sql));
+            ResultSet resultSet = statement.executeQuery(query_sql);
 
             if (resultSet.next()) {
                 category.id = resultSet.getInt("id");

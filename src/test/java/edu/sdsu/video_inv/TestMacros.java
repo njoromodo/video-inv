@@ -13,7 +13,8 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertTrue;
 
 /**
- * TODO JavaDoc
+ * Test Macros and their functionality.
+ * Macros represent multiple items with a single ID, which is useful for pre-packaged kits.
  *
  * @author Tom Paulus
  *         Created on 8/5/16.
