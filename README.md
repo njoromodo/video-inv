@@ -111,9 +111,9 @@ to retrieve the application configurations.
 
 - `db-password` = Database Password
 - `db-url` = jdbc:mysql://db_host:3306/db_name
- * *replace db_host, db_name and possibly the port with your MySQL server info*
+ + *replace db_host, db_name and possibly the port with your MySQL server info*
 - `db-user` = Database Username
 - `project_token` = Unique Project Identifier for Session Tokens, If changed, all tokens will become invalid.
 - `token_cypher` = Token Encryption Cypher. If changed, all tokens will become invalid.
 - `token_ttl` = Token Longevity (How long will a user stay logged in) in Milliseconds
-    + Reccomended Value: 86400000 -> 24 Hours
+    + Recommended Value: 86400000 -> 24 Hours

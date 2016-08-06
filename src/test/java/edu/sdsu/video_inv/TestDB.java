@@ -26,24 +26,7 @@ public class TestDB {
     final private static int TEST_ITEM_ID = 987654;
     final private static int TEST_MACRO_ID = 999801;
 
-    /**
-     * Check if the KeyServer has access to the correct credentials
-     */
-    @Test
-    public void checkParams() {
-        final String db_url = Param.getParam("db-url");
-        LOGGER.debug("KS.db-url = " + db_url);
-        assertTrue("URL is Empty", db_url != null && db_url.length() > 0);
-        assertTrue("Invalid URL", db_url.startsWith("jdbc:mysql://"));
 
-        final String db_user = Param.getParam("db-user");
-        LOGGER.debug("KS.db-user = " + db_user);
-        assertTrue("Username is Empty", db_user != null && db_user.length() > 0);
-
-        final String db_password = Param.getParam("db-password");
-        LOGGER.debug("KS.db-password = " + db_password);
-        assertTrue("Password is Empty", db_password != null && db_password.length() > 0);
-    }
 
 
     /**
