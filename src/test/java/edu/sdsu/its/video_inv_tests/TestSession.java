@@ -8,8 +8,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -36,8 +34,6 @@ public class TestSession {
         USER.setPin(TEST_USER_PIN);
         DB.createUser(USER);
         LOGGER.debug("Created new Test User: " + USER.toString());
-
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
 
         SESSION = new Session(USER);
         LOGGER.info("Created Session Token: " + SESSION.getToken());

@@ -9,8 +9,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.Assert.*;
 
 /**
@@ -47,7 +45,6 @@ public class TestItems {
         LOGGER.info("Creating Test Item #1");
         item1 = new Item(TEST_ITEM_1_PUBID, TEST_ITEM_1_NAME, TEST_ITEM_1_SHORT_NAME);
         DB.createItem(item1);
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
 
         item1.completeItem();
         LOGGER.debug("Created Test Item #1: " + item1.toString());
@@ -55,7 +52,7 @@ public class TestItems {
         LOGGER.info("Creating Test Item #2");
         item2 = new Item(TEST_ITEM_2_PUBID, TEST_ITEM_2_NAME, "");
         DB.createItem(item2);
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
+
         item2.completeItem();
         LOGGER.debug("Created Test Item #2: " + item2.toString());
 
@@ -68,8 +65,6 @@ public class TestItems {
         macro = new Macro(TEST_MACRO_ID, TEST_MACRO_NAME, new Integer[]{item1.id, item2.id});
         DB.createMacro(macro);
         LOGGER.debug("Created Test Macro: " + macro.toString());
-
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
     }
 
 
@@ -84,7 +79,7 @@ public class TestItems {
         item1.category.id = item2.category.id = null;
         DB.updateItem(item1);
         DB.updateItem(item2);
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
+
 
         DB.deleteCategory(category);
 
@@ -139,7 +134,6 @@ public class TestItems {
         item1.shortName = UPDATE_ITEM_1_SHORT_NAME;
         DB.updateItem(item1);
         LOGGER.debug("Updated Item: " + item1.toString());
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
 
         assertEquals(item1, DB.getItem("i.id = " + item1.id)[0]);
 
@@ -151,7 +145,6 @@ public class TestItems {
         item1.category = category;
         LOGGER.debug("Updated Item: " + item1.toString());
         DB.updateItem(item1);
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
 
         assertEquals(item1, DB.getItem("i.id = " + item1.id)[0]);
 
@@ -160,7 +153,6 @@ public class TestItems {
         item1.category.name = null;
         LOGGER.debug("Updated Item: " + item1.toString());
         DB.updateItem(item1);
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
 
         assertEquals(item1, DB.getItem("i.id = " + item1.id)[0]);
 

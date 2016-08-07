@@ -7,8 +7,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.Assert.*;
 
 /**
@@ -39,7 +37,7 @@ public class TestUsers {
         USER = new User(TEST_USER_ID, TEST_USER_FNAME, TEST_USER_LNAME, TEST_USER_ACCESS);
         USER.setPin(TEST_USER_PIN);
         DB.createUser(USER);
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
+
         USER.completeUser();
         LOGGER.debug("Created New User: " + USER.toString());
     }
@@ -83,7 +81,6 @@ public class TestUsers {
         USER.setPin(UPDATE_USER_PIN);
 
         DB.updateUser(USER);
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
         LOGGER.debug("Updated User: " + USER.toString());
 
         User[] fetched = DB.getUser("pub_id = " + USER.pubID);

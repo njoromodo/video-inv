@@ -42,44 +42,26 @@ public class DB {
      * @param sql {@link String} SQL Statement to Execute
      */
     private static void executeStatement(final String sql) {
-        executeStatement(sql, true);
-    }
+        Statement statement = null;
+        Connection connection = getConnection();
 
-    /**
-     * Execute a SQL Statement
-     *
-     * @param sql {@link String} SQL Statement to Execute
-     * @param daemon {@link boolean} Should the thread be a daemon
-     */
-    private static void executeStatement(final String sql, final boolean daemon){
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                Statement statement = null;
-                Connection connection = getConnection();
+        try {
+            statement = connection.createStatement();
+            LOGGER.info(String.format("Executing SQL Statement - \"%s\"", sql));
+            statement.execute(sql);
 
+        } catch (SQLException e) {
+            LOGGER.error("Problem Executing Statement \"" + sql + "\"", e);
+        } finally {
+            if (statement != null) {
                 try {
-                    statement = connection.createStatement();
-                    LOGGER.info(String.format("Executing SQL Statement - \"%s\"", sql));
-                    statement.execute(sql);
-
+                    statement.close();
+                    connection.close();
                 } catch (SQLException e) {
-                    LOGGER.error("Problem Executing Statement \"" + sql + "\"", e);
-                } finally {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                            connection.close();
-                        } catch (SQLException e) {
-                            LOGGER.warn("Problem Closing Statement", e);
-                        }
-                    }
+                    LOGGER.warn("Problem Closing Statement", e);
                 }
             }
-        };
-        thread.setDaemon(daemon);
-        if (daemon) LOGGER.info(String.format("Starting new Daemon Thread for SQL Statement - \"%s\"", sql));
-        thread.start();
+        }
     }
 
 

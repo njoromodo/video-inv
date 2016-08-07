@@ -8,7 +8,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
 
@@ -34,8 +33,6 @@ public class TestMacros {
         LOGGER.info(String.format("Creating new Macro (ID: %d; Name: %s; Items: %s)", TEST_MACRO_ID, TEST_MACRO_NAME, Arrays.toString(TEST_MACRO_ITEMS)));
         TEST_MACRO = new Macro(TEST_MACRO_ID, TEST_MACRO_NAME, TEST_MACRO_ITEMS);
         DB.createMacro(TEST_MACRO);
-
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
     }
 
     @AfterClass
@@ -67,9 +64,6 @@ public class TestMacros {
         LOGGER.debug("Updating Macro to... " + TEST_MACRO.toString());
         LOGGER.info("Updating Macro");
         DB.updateMacro(TEST_MACRO);
-
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
-
         assertTrue("Update Not Successful", TEST_MACRO.equals(DB.getMacro("id = " + TEST_MACRO.id)[0]));
 
     }

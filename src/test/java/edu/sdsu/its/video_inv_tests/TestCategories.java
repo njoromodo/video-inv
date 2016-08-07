@@ -7,8 +7,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -31,8 +29,6 @@ public class TestCategories {
         category = new Category(TEST_CATEGORY_NAME);
         LOGGER.debug("Created new Category: " + category.toString());
         category = DB.createCategory(category);
-
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
     }
 
     @AfterClass
@@ -63,8 +59,6 @@ public class TestCategories {
         category.name = UPDATE_CATEGORY_NAME;
         DB.updateCategory(category);
         LOGGER.debug("Updated Category: " + category.toString());
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
-
         assertEquals(category, DB.getCategory(category.id)[0]);
     }
 

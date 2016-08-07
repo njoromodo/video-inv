@@ -11,11 +11,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Test Transaction sna their related functionality.
@@ -47,14 +44,14 @@ public class TestTransactions {
         LOGGER.info("Creating New Test User");
         USER = new User(TEST_USER_ID, TEST_USER_FNAME, TEST_USER_LNAME, TEST_USER_ACCESS);
         DB.createUser(USER);
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
+
         USER.completeUser();
         LOGGER.debug("Created New User: " + USER.toString());
 
         LOGGER.info("Creating Test Item");
         ITEM = new Item(TEST_ITEM_PUBID, TEST_ITEM_NAME, "");
         DB.createItem(ITEM);
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
+
         ITEM.completeItem();
         LOGGER.debug("Created Test Item: " + ITEM.toString());
 
@@ -63,7 +60,7 @@ public class TestTransactions {
         componentList.add(new Transaction.Component(ITEM.id, ITEM.pubID, ITEM.category, ITEM.name, TEST_ITEM_CONDITION));
         TRANSACTION = new Transaction(TEST_TRANSACTION_ID, USER, USER, TEST_TRANSACTION_DIRECTION, componentList);
         DB.createTransaction(TRANSACTION);
-        TimeUnit.SECONDS.sleep(5); // Execute statements are executed asynchronously and can take a few seconds to execute
+
         LOGGER.debug("Created new Test Transaction: " + TRANSACTION.toString());
     }
 
@@ -71,8 +68,6 @@ public class TestTransactions {
     public static void tearDown() throws Exception {
         LOGGER.warn(String.format("Deleting Test Transaction (ID: %s)", TRANSACTION.id));
         DB.deleteTransaction(TRANSACTION);
-
-        TimeUnit.SECONDS.sleep(1); // Execute statements are executed asynchronously and can take a few seconds to execute
 
         LOGGER.warn(String.format("Deleting Test Item (ID: %d/%d)", ITEM.id, ITEM.pubID));
         DB.deleteItem(ITEM);
@@ -89,7 +84,7 @@ public class TestTransactions {
         LOGGER.debug(String.format("Found %d transactions", transactions.length));
 
         boolean test_transaction_found = false;
-        for (Transaction t: transactions) {
+        for (Transaction t : transactions) {
             assertNotNull(t);
             assertTrue("ID Not defined", t.id != null && t.id.length() > 0);
             assertTrue("Owner Not Defined", t.owner != null);
@@ -97,7 +92,7 @@ public class TestTransactions {
             assertTrue("Supervisor Not Defined", t.supervisor != null);
             assertNotNull("Direction not defined", t.direction);
 
-            for (Transaction.Component c: t.components) {
+            for (Transaction.Component c : t.components) {
                 assertNotNull(c);
                 assertNotNull(c.id);
                 assertTrue(c.name != null && c.name.length() > 0);
