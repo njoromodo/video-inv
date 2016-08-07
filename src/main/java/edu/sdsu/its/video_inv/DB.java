@@ -98,6 +98,7 @@ public class DB {
                         resultSet.getString("first_name"),
                         resultSet.getString("last_name"),
                         resultSet.getBoolean("supervisor"));
+                user.setPin(resultSet.getString("pin"));
                 users.add(user);
             }
 
@@ -158,6 +159,20 @@ public class DB {
         //language=SQL
         final String sql = "UPDATE users SET " + values.substring(0, values.length() - 1) + " WHERE id=" + user.dbID + ";";
         // The last character of the values string is removed, since it is a comma and would cause a SQL exception if not removed.
+        executeStatement(sql);
+    }
+
+    /**
+     * Delete a User from the DB.
+     * This can only be done if no transactions exist for the current user, either created or authorized
+     * Use with caution as this action cannot be reverted.
+     *
+     * @param user {@link User} User to delete
+     */
+    public static void deleteUser(final User user){
+        LOGGER.warn(String.format("Deleting User with ID: %d/%d", user.dbID, user.pubID));
+        //language=SQL
+        final String sql = "DELETE FROM users WHERE id = " + user.dbID + ";";
         executeStatement(sql);
     }
 

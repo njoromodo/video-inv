@@ -48,4 +48,33 @@ public class User {
     public void setPin(String pin) {
         this.pin = pin;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "dbID=" + dbID +
+                ", pubID=" + pubID +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", supervisor=" + supervisor +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        if (dbID != user.dbID && pubID != user.pubID) return false;
+        if (!firstName.equals(user.firstName)) return false;
+        if (!lastName.equals(user.lastName)) return false;
+        return supervisor != null ? supervisor.equals(user.supervisor) : user.supervisor == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return dbID;
+    }
 }
