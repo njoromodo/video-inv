@@ -59,6 +59,7 @@ public class Param {
      * @param parameterName {@link String } Parameter Name
      * @return {@link String} Parameter Value
      */
+    @SuppressWarnings("WeakerAccess")
     public static String getParam(final String applicationName, final String parameterName) {
         try {
             final URI uri = new URIBuilder()
@@ -102,9 +103,5 @@ public class Param {
         }
 
         return response;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(Param.getParam("Acuity", "ParScore Calendar"));
     }
 }

@@ -44,7 +44,7 @@ quotes            | To add a bit of excitement and variety, a quote is displayed
 macros            | Stores the Item Macros. Item Macros allow several items to be represented by a single id/barcode. This information, as well as the Macro's Name, which is used only to identify the Macro on the Admin Page, are saved in this table.
 
 
-#### Both
+#### DDL
 ```
 CREATE TABLE users (
   `id`         INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
@@ -90,17 +90,6 @@ CREATE TABLE macros (
   `name`    TEXT,
   `itemIDs` TEXT
 );
-```
-
-#### Staging/Testing
-You will also need to run the commands below to setup the testing environment
-__in addition to__ the commands listed above. The use of a separate database is encouraged as the Tests will create transaction records which will show up in the Transaction History Report.
-```
-INSERT INTO users (pub_id, first_name, last_name, supervisor, pin) VALUES (123456, 'Test', 'User', 1, '');
-INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (999901, 'Test Item 1', 'TI #1', '', 0);
-INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (999902, 'Test Item 2', 'TI #2', '', 0);
-INSERT INTO inventory (pub_id, name, short_name, comments, checked_out) VALUES (999903, 'Test Item 3', 'TI #3', '', 0);
-INSERT INTO macros (id, name, itemIDs) VALUES (999801, 'Test Macro #1', '[1, 2, 3]');
 ```
 
 ### KeyServer Setup
