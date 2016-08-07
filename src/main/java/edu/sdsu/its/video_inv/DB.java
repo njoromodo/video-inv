@@ -231,13 +231,13 @@ public class DB {
                     "  LEFT OUTER JOIN inventory i ON t.item_id = i.id\n" +
                     "  LEFT OUTER JOIN categories c ON i.category = c.id\n" +
                     "  LEFT OUTER JOIN users u ON t.owner = u.id\n" +
-                    "  LEFT OUTER JOIN users s ON t.supervisor = s.id" +
+                    "  LEFT OUTER JOIN users s ON t.supervisor = s.id\n" +
                     "WHERE " + restriction + ";";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()) {
-                String transaction_id = resultSet.getString("transaction_id");
+                String transaction_id = resultSet.getString("transaction_id").trim();
                 if (!transactions.containsKey(transaction_id)) {
                     // Add the transaction shell if it does not yet exist in the MAP
                     Transaction transaction = new Transaction(
@@ -274,7 +274,9 @@ public class DB {
                         resultSet.getString("component_condition")
                 );
 
-                transactions.get(transaction_id).components.add(component);
+                Transaction transaction = transactions.get(transaction_id);
+                transaction.components.add(component);
+                transactions.put(transaction_id, transaction);
             }
 
             resultSet.close();
@@ -312,19 +314,26 @@ public class DB {
                 //language=SQL
 
                 // Create Transaction Record
-                statement.addBatch("INSERT INTO transactions VALUES ('" + sanitize(transaction.id) + "', " + component.id + ", " + transaction.owner.dbID + ", NOW(), " + transaction.supervisor.dbID + ", '" + sanitize(component.comments) + "', " + (transaction.direction ? 1 : 0) + ")");
+                final String s1 = "INSERT INTO transactions VALUES ('" + sanitize(transaction.id) + "', " + component.id + ", " + transaction.owner.dbID + ", NOW(), " + transaction.supervisor.dbID + ", '" + sanitize(component.comments) + "', " + (transaction.direction ? 1 : 0) + ")";
+                LOGGER.info(String.format("Executing SQL Statement as Batch - \"%s\"", s1));
+                statement.addBatch(s1);
 
                 // Update Item Comments
-                statement.addBatch("UPDATE inventory\n" +
+                final String s2 = "UPDATE inventory\n" +
                         "SET comments = '" + sanitize(component.comments) + "'\n" +
-                        "WHERE id = " + component.id + ";");
+                        "WHERE id = " + component.id + ";";
+                LOGGER.info(String.format("Executing SQL Statement as Batch - \"%s\"", s2));
+                statement.addBatch(s2);
 
                 // Update Item Status (Checked In/Out)
-                statement.addBatch("UPDATE inventory\n" +
+                final String s3 = "UPDATE inventory\n" +
                         "SET checked_out = " + (transaction.direction ? 0 : 1) + "\n" +  // Direction: TRUE = IN & FALSE = OUT
-                        "WHERE id = " + component.id + ";");
+                        "WHERE id = " + component.id + ";";
+                LOGGER.info(String.format("Executing SQL Statement as Batch - \"%s\"", s3));
+                statement.addBatch(s3);
             }
 
+            LOGGER.info("Executing Batch");
             statement.executeBatch();
         } catch (Exception e) {
             LOGGER.warn("Problem Creating New Transaction Record", e);
@@ -340,6 +349,13 @@ public class DB {
                 }
             }
         }
+    }
+
+    public static void deleteTransaction(final Transaction transaction) {
+        LOGGER.warn(String.format("Deleting Transaction (ID: %s)", transaction.id));
+        //language=SQL
+        final String sql = "DELETE FROM transactions WHERE id = '" + transaction.id + "';";
+        executeStatement(sql);
     }
 
     // ====================== Quotes ======================
