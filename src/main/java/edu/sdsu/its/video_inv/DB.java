@@ -500,7 +500,7 @@ public class DB {
     public static void updateItem(final Item item) {
         String values = "";
         if (item.pubID != 0) values += "pub_id = " + item.pubID + ",";
-        if (item.category != null) values += "category = " + item.category.id + ",";
+        if (item.category != null) values += "category = " + (item.category.id != null ? item.category.id : "null") + ",";
         if (item.name != null) values += "name = '" + item.name + "',";
         if (item.shortName != null) values += "short_name = '" + item.shortName + "',";
         if (item.comments != null) values += "comments = '" + item.comments + "',";

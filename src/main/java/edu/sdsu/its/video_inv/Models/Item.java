@@ -11,7 +11,7 @@ import edu.sdsu.its.video_inv.DB;
 public class Item {
     public int id;
     public int pubID;
-    public Category category;
+    public Category category = new Category();
 
     public String name;
     public String shortName;
@@ -54,16 +54,48 @@ public class Item {
                 this.name = item.name;
             }
         }
+        if (this.comments == null) {
+            if (item == null) {
+                item = DB.getItem("id = " + this.id)[0];
+            }
+            if (item != null) {
+                this.comments = item.comments;
+            }
+        }
     }
 
     @Override
     public String toString() {
-        // Used by Transaction.toString()
-        if (this.id == 0) this.id = DB.getItem("i.pub_id = " + this.pubID)[0].id;
+        return "Item{" +
+                "id=" + id +
+                ", pubID=" + pubID +
+                ", category=" + category +
+                ", name='" + name + '\'' +
+                ", shortName='" + shortName + '\'' +
+                ", comments='" + comments + '\'' +
+                ", checked_out=" + checked_out +
+                ", lastTransactionDate='" + lastTransactionDate + '\'' +
+                ", lastTransactionID='" + lastTransactionID + '\'' +
+                '}';
+    }
 
-        return String.format("{\n" +
-                "  \"id\": %d,\n" +
-                "  \"comments\": \"%s\"\n" +
-                "}", this.id, this.comments);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Item item = (Item) o;
+
+        if (id != item.id) return false;
+        if (pubID != item.pubID) return false;
+        if (checked_out != item.checked_out) return false;
+        if (!name.equals(item.name)) return false;
+        if (shortName != null ? !shortName.equals(item.shortName) : item.shortName != null) return false;
+        return comments != null ? comments.equals(item.comments) : item.comments == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
     }
 }

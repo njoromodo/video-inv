@@ -8,8 +8,13 @@ package edu.sdsu.its.video_inv.Models;
  *         Created on 7/27/16.
  */
 public class Category {
-    public int id;
+    public Integer id;
     public String name;
+
+    public Category() {
+        id = null;
+        name = null;
+    }
 
     public Category(int id, String name) {
         this.id = id;
