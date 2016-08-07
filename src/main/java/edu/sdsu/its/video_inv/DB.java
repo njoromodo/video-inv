@@ -24,7 +24,7 @@ public class DB {
     private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
 
 
-    public static Connection getConnection() {
+    private static Connection getConnection() {
         Connection connection = null;
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -42,7 +42,17 @@ public class DB {
      * @param sql {@link String} SQL Statement to Execute
      */
     private static void executeStatement(final String sql) {
-        new Thread() {
+        executeStatement(sql, true);
+    }
+
+    /**
+     * Execute a SQL Statement
+     *
+     * @param sql {@link String} SQL Statement to Execute
+     * @param daemon {@link boolean} Should the thread be a daemon
+     */
+    private static void executeStatement(final String sql, final boolean daemon){
+        Thread thread = new Thread() {
             @Override
             public void run() {
                 Statement statement = null;
@@ -66,7 +76,10 @@ public class DB {
                     }
                 }
             }
-        }.start();
+        };
+        thread.setDaemon(daemon);
+        if (daemon) LOGGER.info(String.format("Starting new Daemon Thread for SQL Statement - \"%s\"", sql));
+        thread.start();
     }
 
 
@@ -120,7 +133,7 @@ public class DB {
         return users.toArray(new User[]{});
     }
 
-    public static boolean checkPin (User user, String pin) {
+    public static boolean checkPin(User user, String pin) {
         return PASSWORD_ENCRYPTOR.checkPassword(pin, user.getPin());
     }
 
@@ -169,17 +182,17 @@ public class DB {
      *
      * @param user {@link User} User to delete
      */
-    public static void deleteUser(final User user){
+    public static void deleteUser(final User user) {
         LOGGER.warn(String.format("Deleting User with ID: %d/%d", user.dbID, user.pubID));
         //language=SQL
-        final String sql = "DELETE FROM users WHERE id = " + user.dbID + ";";
+        final String sql = "DELETE FROM users WHERE id = " + user.dbID + " OR pub_id = " + user.pubID + ";";
         executeStatement(sql);
     }
 
     // ====================== Transactions ======================
 
     /**
-     * Retreive All, or a specific transaction(s) based on a SQL Restriction statement.
+     * Retrieve All, or a specific transaction(s) based on a SQL Restriction statement.
      *
      * @param restriction {@link String} SQL WHERE condition, Excluding WHERE Operator
      * @return {@link Transaction[]} Transactions meeting the specified restriction
@@ -515,7 +528,8 @@ public class DB {
     public static void updateItem(final Item item) {
         String values = "";
         if (item.pubID != 0) values += "pub_id = " + item.pubID + ",";
-        if (item.category != null) values += "category = " + (item.category.id != null ? item.category.id : "null") + ",";
+        if (item.category != null)
+            values += "category = " + (item.category.id != null ? item.category.id : "null") + ",";
         if (item.name != null) values += "name = '" + item.name + "',";
         if (item.shortName != null) values += "short_name = '" + item.shortName + "',";
         if (item.comments != null) values += "comments = '" + item.comments + "',";

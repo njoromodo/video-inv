@@ -23,9 +23,9 @@ public class TestSession {
     private static final Logger LOGGER = Logger.getLogger(TestSession.class);
 
     private static final int TEST_USER_ID = 999001;
-    private static final String TEST_USER_FNAME = "Test";
-    private static final String TEST_USER_LNAME = "User";
-    private static final String TEST_USER_PIN = "abcd";
+    private static final String TEST_USER_FNAME = "Session";
+    private static final String TEST_USER_LNAME = "Tester";
+    private static final String TEST_USER_PIN = "wxyz";
     private static User USER;
     private static Session SESSION;
 

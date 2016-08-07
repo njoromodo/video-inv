@@ -1,6 +1,7 @@
 package edu.sdsu.its.video_inv.Models;
 
 import com.google.gson.annotations.Expose;
+import edu.sdsu.its.video_inv.DB;
 
 /**
  * Models a User of the Inventory System
@@ -47,6 +48,41 @@ public class User {
 
     public void setPin(String pin) {
         this.pin = pin;
+    }
+
+    public void completeUser() {
+        User user = null;
+        if (this.dbID == 0 && this.pubID != 0) {
+            user = DB.getUser("pub_id = " + pubID)[0];
+            this.dbID = user.dbID;
+        } else if (this.dbID != 0) {
+            user = DB.getUser("id = " + this.dbID)[0];
+            this.pubID = user.pubID;
+        }
+        if (this.firstName == null) {
+            if (user == null) {
+                user = DB.getUser("id = " + this.dbID)[0];
+            }
+            if (user != null) {
+                this.firstName = user.firstName;
+            }
+        }
+        if (this.lastName == null) {
+            if (user == null) {
+                user = DB.getUser("id = " + this.dbID)[0];
+            }
+            if (user != null) {
+                this.lastName = user.lastName;
+            }
+        }
+        if (this.supervisor == null) {
+            if (user == null) {
+                user = DB.getUser("id = " + this.dbID)[0];
+            }
+            if (user != null) {
+                this.supervisor = user.supervisor;
+            }
+        }
     }
 
     @Override
