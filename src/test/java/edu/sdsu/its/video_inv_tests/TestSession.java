@@ -1,4 +1,4 @@
-package edu.sdsu.video_inv;
+package edu.sdsu.its.video_inv_tests;
 
 import edu.sdsu.its.video_inv.API.Session;
 import edu.sdsu.its.video_inv.DB;
