@@ -36,7 +36,7 @@ public class Categories {
                                   @QueryParam("id") final Integer catID) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         LOGGER.info(String.format("Recieved Request for Macros in DB Where ID=%d", catID));
@@ -64,7 +64,7 @@ public class Categories {
                                    final String payload) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (payload == null || payload.length() == 0)
@@ -100,7 +100,7 @@ public class Categories {
                                    final String payload) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (payload == null || payload.length() == 0)
@@ -137,7 +137,7 @@ public class Categories {
                                    final String payload) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (payload == null || payload.length() == 0)

@@ -40,7 +40,7 @@ public class Macros {
                              @QueryParam("id") final int macroID) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         LOGGER.info(String.format("Recieved Request to Get Macro(s) WHERE ID = %d", macroID));
@@ -70,7 +70,7 @@ public class Macros {
                                 final String payload) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (payload == null || payload.length() == 0)
@@ -118,7 +118,7 @@ public class Macros {
                                 final String payload) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (payload == null || payload.length() == 0)
@@ -159,7 +159,7 @@ public class Macros {
                                 final String payload) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (payload == null || payload.length() == 0)
@@ -197,7 +197,7 @@ public class Macros {
                                   @QueryParam("id") int macroID) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (macroID == 0) {

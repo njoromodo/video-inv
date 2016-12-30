@@ -46,7 +46,7 @@ public class Users {
                             @QueryParam("id") final int publicID,
                             @QueryParam("db-id") final int dbID) {
         User user = Session.validate(sessionToken);
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         LOGGER.info(String.format("Recieved Request for User in DB Where PublicID=%d OR dbID=%d", publicID, dbID));
@@ -92,7 +92,7 @@ public class Users {
     public Response createUser(@HeaderParam("session") final String sessionToken,
                                final String payload) {
         User user = Session.validate(sessionToken);
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (!user.supervisor) {
@@ -105,15 +105,17 @@ public class Users {
         LOGGER.debug("POST Payload: " + payload);
 
         User createUser = mGson.fromJson(payload, User.class);
-        int id;
-        do {
-            Random rnd = new Random();
-            id = 100000 + rnd.nextInt(900000);
-        }
-        while (DB.getUser("pub_id = " + id).length > 0); // Generate 6 Digit ID, and check that it doesn't already exist
-        user.pubID = id;
+//        int id;
+//        do {
+//            Random rnd = new Random();
+//            id = 100000 + rnd.nextInt(900000);
+//        }
+//        while (DB.getUser("pub_id = " + id).length > 0); // Generate 6 Digit ID, and check that it doesn't already exist
+//        user.username = id;
+//        DB.createUser(createUser);
 
-        DB.createUser(createUser);
+        // fixme - User Creation Setting the username
+        // Should be supplied by the creator
 
         return Response.status(Response.Status.CREATED).entity(mGson.toJson(new SimpleMessage("User Created Successfully"))).build();
     }
@@ -132,7 +134,7 @@ public class Users {
     public Response updateUser(@HeaderParam("session") final String sessionToken,
                                final String payload) {
         User user = Session.validate(sessionToken);
-        if (user == null || user.pubID != 0) {
+        if (user == null ) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (!user.supervisor) {
@@ -142,16 +144,15 @@ public class Users {
             return Response.status(Response.Status.PRECONDITION_FAILED).entity(mGson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
 
         User updateUser = mGson.fromJson(payload, User.class);
-        if (updateUser.dbID == 0 && updateUser.pubID == 0)
+        if (updateUser.dbID == 0 && updateUser.username == null)
             return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "No Identifier supplied"))).build();
-        if (DB.getUser("pub_id = " + user.pubID + " OR id = " + user.dbID).length == 0)
+        if (DB.getUser("pub_id = " + user.username + " OR id = " + user.dbID).length == 0)
             return Response.status(Response.Status.NOT_FOUND).entity(mGson.toJson(new SimpleMessage("Error", "User does not exist"))).build();
         if (updateUser.dbID == 0) {
-            int id = formatID(updateUser.pubID);
-            if (intLength(id) != 6)
-                return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "Invalid ID Length"))).build();
+            if (updateUser.username == null || updateUser.username.isEmpty())
+                return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "Invalid username"))).build();
 
-            updateUser.dbID = DB.getUser("pub_id = " + id)[0].dbID;
+            updateUser.dbID = DB.getUser("username = " + updateUser.username)[0].dbID;
         }
 
         DB.updateUser(updateUser);
@@ -174,7 +175,7 @@ public class Users {
     public Response getUserLabel(@HeaderParam("session") final String sessionToken,
                                  @QueryParam("id") int userID) {
         User user = Session.validate(sessionToken);
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
 

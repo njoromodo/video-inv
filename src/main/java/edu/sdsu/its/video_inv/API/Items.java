@@ -41,7 +41,7 @@ public class Items {
                             @QueryParam("db-id") final int dbID) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         LOGGER.info(String.format("Recieved Request for Item in DB Where PublicID=%d OR dbID=%d", publicID, dbID));
@@ -87,7 +87,7 @@ public class Items {
                                final String payload) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (payload == null || payload.length() == 0)
@@ -128,7 +128,7 @@ public class Items {
                                final String payload) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (payload == null || payload.length() == 0)
@@ -172,7 +172,7 @@ public class Items {
                                final String payload) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (payload == null || payload.length() == 0)
@@ -213,7 +213,7 @@ public class Items {
                                  @QueryParam("id") int itemID) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (itemID == 0) {

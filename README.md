@@ -48,11 +48,11 @@ macros            | Stores the Item Macros. Item Macros allow several items to b
 ```
 CREATE TABLE users (
   `id`         INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  `pub_id`     INT(9),
+  `username`   TEXT,
   `first_name` TEXT,
   `last_name`  TEXT,
   `supervisor` TINYINT(1),
-  `pin`        TEXT
+  `password`   TEXT
 );
 CREATE TABLE categories (
   `id`   INT PRIMARY KEY AUTO_INCREMENT NOT NULL,

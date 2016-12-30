@@ -45,7 +45,7 @@ public class Session {
         final long millis = System.currentTimeMillis();
         String key = UUID.randomUUID().toString().toUpperCase() +
                 "|" + PROJECT_TOKEN +
-                "|" + user.pubID +
+                "|" + user.username +
                 "|" + millis;
 
         this.token = new String(Base64.encodeBase64(ENCRYPTOR.encrypt(key).getBytes()));
@@ -109,7 +109,7 @@ public class Session {
         final String tokenUsername = key[2];
         LOGGER.debug("Token Username: " + tokenUsername);
 
-        final User user = DB.getUser("pub_id = " + tokenUsername)[0];
+        final User user = DB.getUser("username = '" + tokenUsername + "'")[0];
         if (user != null) {
             LOGGER.info(String.format("Token for User (\"%s\") is valid!", tokenUsername));
             return user;

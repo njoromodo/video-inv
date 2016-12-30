@@ -45,7 +45,7 @@ public class Transactions {
 
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (transactionID == null) transactionID = "";
@@ -77,7 +77,7 @@ public class Transactions {
                                       final String payload) {
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
-        if (user == null || user.pubID != 0) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (payload == null || payload.length() == 0)

@@ -20,19 +20,18 @@ import static org.junit.Assert.assertTrue;
 public class TestSession {
     private static final Logger LOGGER = Logger.getLogger(TestSession.class);
 
-    private static final int TEST_USER_ID = 999001;
+    private static final String TEST_USERNAME = "tester";
     private static final String TEST_USER_FNAME = "Session";
     private static final String TEST_USER_LNAME = "Tester";
-    private static final String TEST_USER_PIN = "wxyz";
+    private static final String TEST_USER_PASSWORD = "wxyz";
     private static User USER;
     private static Session SESSION;
 
     @BeforeClass
     public static void setUp() throws Exception {
         LOGGER.info("Creating new Test User");
-        USER = new User(TEST_USER_ID, TEST_USER_FNAME, TEST_USER_LNAME, true);
-        USER.setPin(TEST_USER_PIN);
-        DB.createUser(USER);
+        USER = new User(TEST_USERNAME, TEST_USER_FNAME, TEST_USER_LNAME, true);
+        assertTrue(DB.createUser(USER, TEST_USER_PASSWORD));
         LOGGER.debug("Created new Test User: " + USER.toString());
 
         SESSION = new Session(USER);
@@ -42,7 +41,7 @@ public class TestSession {
 
     @AfterClass
     public static void tearDown() throws Exception {
-        LOGGER.warn(String.format("Deleting Test User (ID: %d/%d)", USER.dbID, USER.pubID));
+        LOGGER.warn(String.format("Deleting Test User (ID: %d/%s)", USER.dbID, USER.username));
         DB.deleteUser(USER);
     }
 
@@ -52,9 +51,7 @@ public class TestSession {
     }
 
     @Test
-    public void validatePin() throws Exception {
-        User user = DB.getUser("pub_id = " + USER.pubID)[0];
-        assertEquals(USER, user);
-        assertTrue(DB.checkPin(user, TEST_USER_PIN));
+    public void login() throws Exception {
+        assertEquals(USER, DB.login(TEST_USERNAME, TEST_USER_PASSWORD));
     }
 }

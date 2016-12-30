@@ -23,7 +23,8 @@ import static org.junit.Assert.*;
 public class TestTransactions {
     private static final Logger LOGGER = Logger.getLogger(TestTransactions.class);
 
-    private static final int TEST_USER_ID = 999003;
+    private static final String TEST_USERNAME = "tester";
+    private static final String TEST_PASSWORD = "test";
     private static final String TEST_USER_FNAME = "Test";
     private static final String TEST_USER_LNAME = "User";
     private static final boolean TEST_USER_ACCESS = true;
@@ -42,8 +43,8 @@ public class TestTransactions {
     @BeforeClass
     public static void setUp() throws Exception {
         LOGGER.info("Creating New Test User");
-        USER = new User(TEST_USER_ID, TEST_USER_FNAME, TEST_USER_LNAME, TEST_USER_ACCESS);
-        DB.createUser(USER);
+        USER = new User(TEST_USERNAME, TEST_USER_FNAME, TEST_USER_LNAME, TEST_USER_ACCESS);
+        assertTrue(DB.createUser(USER, TEST_PASSWORD));
 
         USER.completeUser();
         LOGGER.debug("Created New User: " + USER.toString());
@@ -72,7 +73,7 @@ public class TestTransactions {
         LOGGER.warn(String.format("Deleting Test Item (ID: %d/%d)", ITEM.id, ITEM.pubID));
         DB.deleteItem(ITEM);
 
-        LOGGER.warn(String.format("Deleting Test User (ID: %d/%d)", USER.dbID, USER.pubID));
+        LOGGER.warn(String.format("Deleting Test User (ID: %d/%s)", USER.dbID, USER.username));
         DB.deleteUser(USER);
     }
 

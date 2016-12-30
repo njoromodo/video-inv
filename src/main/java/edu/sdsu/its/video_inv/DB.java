@@ -69,7 +69,7 @@ public class DB {
     /**
      * Get an Array of Users who match the specified criteria.
      * id is the Internal Identifier
-     * pub_id is the Public Identifier
+     * Username is the Public Identifier
      *
      * @param restriction {@link String} Restriction on the Search, as a WHERE SQL Statement, the WHERE is already included
      * @return {@link User[]} Array of User Objects
@@ -81,25 +81,24 @@ public class DB {
 
         try {
             statement = connection.createStatement();
-            restriction = restriction == null ? "" : " WHERE " + restriction;
+            restriction = restriction == null || restriction.isEmpty() ? "" : " WHERE " + restriction;
             final String sql = "SELECT * FROM users " + restriction + " ORDER BY last_name ASC;";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()) {
                 User user = new User(resultSet.getInt("id"),
-                        resultSet.getInt("pub_id"),
+                        resultSet.getString("username"),
                         resultSet.getString("first_name"),
                         resultSet.getString("last_name"),
                         resultSet.getBoolean("supervisor"));
-                user.setPin(resultSet.getString("pin"));
                 users.add(user);
             }
 
             LOGGER.debug(String.format("Retrieved %d users from DB", users.size()));
             resultSet.close();
         } catch (SQLException e) {
-            LOGGER.error("Problem querying DB for User by PubID", e);
+            LOGGER.error("Problem querying DB for Users", e);
         } finally {
             if (statement != null) {
                 try {
@@ -114,21 +113,66 @@ public class DB {
         return users.toArray(new User[]{});
     }
 
-    public static boolean checkPin(User user, String pin) {
-        return PASSWORD_ENCRYPTOR.checkPassword(pin, user.getPin());
+    /**
+     * Login a Provided User. The User is fected, and their saved password is compared to the supplied password.
+     *
+     * @param username {@link String} Username
+     * @param password {@link String} Password, plaintext
+     * @return {@link User} User if username exists and password valid, else null.
+     */
+    public static User login(String username, String password) {
+        Connection connection = getConnection();
+        Statement statement = null;
+        User user = null;
+        String passHash = "";
+
+        try {
+            statement = connection.createStatement();
+            final String sql = "SELECT * FROM users WHERE username='" + username.toLowerCase() + "';";
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            if (resultSet.next()) {
+                user = new User(resultSet.getInt("id"),
+                        resultSet.getString("username"),
+                        resultSet.getString("first_name"),
+                        resultSet.getString("last_name"),
+                        resultSet.getBoolean("supervisor"));
+
+                passHash = resultSet.getString("password");
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            LOGGER.error("Problem querying DB for User by Username", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+
+        return password != null && PASSWORD_ENCRYPTOR.checkPassword(password, passHash) ? user : null;
     }
 
     /**
      * Add a new VIMS User to the DB
      *
      * @param user {@link User} User to Create
+     * @return {@link boolean} If user was created successfully
      */
-    public static void createUser(final User user) {
-        user.setPin(PASSWORD_ENCRYPTOR.encryptPassword(user.getPin()));
-        final String sql = "INSERT INTO users(pub_id, first_name, last_name, supervisor, pin) VALUES (" + user.pubID +
-                ", '" + sanitize(user.firstName) + "', '" + sanitize(user.lastName) + "', " + (user.supervisor ? 1 : 0) + "," +
-                "'" + user.getPin() + "');";
+    public static boolean createUser(final User user, final String password) {
+        if (DB.getUser("username = '" + user.username.toLowerCase() + "'").length > 0) return false;
+
+        final String sql = "INSERT INTO users(username, first_name, last_name, supervisor, password) VALUES ( '" + sanitize(user.username.toLowerCase()) +
+                "', '" + sanitize(user.firstName) + "', '" + sanitize(user.lastName) + "', " + (user.supervisor ? 1 : 0) + "," +
+                "'" + PASSWORD_ENCRYPTOR.encryptPassword(password) + "');";
         executeStatement(sql);
+        return true;
     }
 
     /**
@@ -139,15 +183,14 @@ public class DB {
      */
     public static void updateUser(final User user) {
         String values = "";
-        if (user.pubID != 0) values += "pub_id=" + user.pubID + ",";
+        if (user.username != null) values += "username= '" + user.username.toLowerCase() + "',";
         if (user.firstName != null && user.firstName.length() > 0)
             values += "first_name='" + sanitize(user.firstName) + "',";
         if (user.lastName != null && user.lastName.length() > 0)
             values += "last_name='" + sanitize(user.lastName) + "',";
         if (user.supervisor != null) values += "supervisor=" + (user.supervisor ? 1 : 0) + ",";
-        if (user.getPin() != null && user.getPin().length() > 0) {
-            user.setPin(PASSWORD_ENCRYPTOR.encryptPassword(user.getPin()));
-            values += "pin='" + user.getPin() + "',";
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            values += "password='" + PASSWORD_ENCRYPTOR.encryptPassword(user.getPassword()) + "',";
         }
 
         //language=SQL
@@ -164,9 +207,9 @@ public class DB {
      * @param user {@link User} User to delete
      */
     public static void deleteUser(final User user) {
-        LOGGER.warn(String.format("Deleting User with ID: %d/%d", user.dbID, user.pubID));
+        LOGGER.warn(String.format("Deleting User with ID: %d/%s", user.dbID, user.username));
         //language=SQL
-        final String sql = "DELETE FROM users WHERE id = " + user.dbID + " OR pub_id = " + user.pubID + ";";
+        final String sql = "DELETE FROM users WHERE id = " + user.dbID + " OR username = '" + user.username + "';";
         executeStatement(sql);
     }
 
@@ -191,12 +234,12 @@ public class DB {
             final String sql = "SELECT\n" +
                     "  t.id         AS `transaction_id`,\n" +
                     "  u.id         AS `owner_db_id`,\n" +
-                    "  u.pub_id     AS `owner_pub_id`,\n" +
+                    "  u.username   AS `owner_username`,\n" +
                     "  u.first_name AS `owner_first_name`,\n" +
                     "  u.last_name  AS `owner_last_name`,\n" +
                     "  u.supervisor AS `owner_user_level`,\n" +
                     "  s.id         AS `supervisor_db_id`,\n" +
-                    "  s.pub_id     AS `supervisor_pub_id`,\n" +
+                    "  s.username   AS `supervisor_username`,\n" +
                     "  s.first_name AS `supervisor_first_name`,\n" +
                     "  s.last_name  AS `supervisor_last_name`,\n" +
                     "  s.supervisor AS `supervisor_user_level`,\n" +
@@ -225,14 +268,14 @@ public class DB {
                             transaction_id,
                             new User(
                                     resultSet.getInt("owner_db_id"),
-                                    resultSet.getInt("owner_pub_id"),
+                                    resultSet.getString("owner_username"),
                                     resultSet.getString("owner_first_name"),
                                     resultSet.getString("owner_last_name"),
                                     resultSet.getBoolean("owner_user_level")
                             ),
                             new User(
-                                    resultSet.getInt("supervisor_pub_id"),
-                                    resultSet.getInt("supervisor_pub_id"),
+                                    resultSet.getInt("supervisor_db_id"),
+                                    resultSet.getString("supervisor_username"),
                                     resultSet.getString("supervisor_first_name"),
                                     resultSet.getString("supervisor_last_name"),
                                     resultSet.getBoolean("supervisor_user_level")

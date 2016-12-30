@@ -14,7 +14,7 @@ public class User {
     public int dbID;
 
     @Expose
-    public int pubID;
+    public String username;
 
     @Expose
     public String firstName;
@@ -25,39 +25,39 @@ public class User {
     public Boolean supervisor;
 
     @Expose(serialize = false)
-    private String pin;
+    private String password;
 
-    public User(int dbID, int pubID, String firstName, String lastName, boolean supervisor) {
+    public User(int dbID, String username, String firstName, String lastName, boolean supervisor) {
         this.dbID = dbID;
-        this.pubID = pubID;
+        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.supervisor = supervisor;
     }
 
-    public User(int pubID, String firstName, String lastName, boolean supervisor) {
-        this.pubID = pubID;
+    public User(String username, String firstName, String lastName, boolean supervisor) {
+        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.supervisor = supervisor;
     }
 
-    public String getPin() {
-        return pin;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPin(String pin) {
-        this.pin = pin;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void completeUser() {
         User user = null;
-        if (this.dbID == 0 && this.pubID != 0) {
-            user = DB.getUser("pub_id = " + pubID)[0];
+        if (this.dbID == 0 && this.username.length() != 0) {
+            user = DB.getUser("username = '" + username + "'")[0];
             this.dbID = user.dbID;
         } else if (this.dbID != 0) {
             user = DB.getUser("id = " + this.dbID)[0];
-            this.pubID = user.pubID;
+            this.username = user.username;
         }
         if (this.firstName == null) {
             if (user == null) {
@@ -89,7 +89,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "dbID=" + dbID +
-                ", pubID=" + pubID +
+                ", username='" + username + '\''+
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", supervisor=" + supervisor +
@@ -103,7 +103,7 @@ public class User {
 
         User user = (User) o;
 
-        if (dbID != user.dbID && pubID != user.pubID) return false;
+        if (dbID != user.dbID && !username.equals(user.username)) return false;
         if (!firstName.equals(user.firstName)) return false;
         if (!lastName.equals(user.lastName)) return false;
         return supervisor != null ? supervisor.equals(user.supervisor) : user.supervisor == null;
@@ -112,5 +112,9 @@ public class User {
     @Override
     public int hashCode() {
         return dbID;
+    }
+
+    public User login() {
+        return DB.login(this.username, this.password);
     }
 }
