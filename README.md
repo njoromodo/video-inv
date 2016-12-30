@@ -92,11 +92,10 @@ CREATE TABLE macros (
 );
 ```
 
-### KeyServer Setup
-You will need to create two applications in the key server. One for the production configuration, and an additional application for the staging configuration (_if they are different - they will likely be_).
-You will need to set the `KSPATH`, `KSKEY`, and `VIMS_APP` environment variables to their corresponding values, so that the web-app can communicate with the Key Server
-to retrieve the application configurations.
-`VIMS_APP` should be set to the name of the application you created in the KeyServer admin area for the environment.
+### Vault Setup
+You will need to create two secrets in the vault, one that will have the information for your production system, the other with your testing configuration. Information on how to setup Vault and AppRoles can be found at: https://sdsu-its.gitbooks.io/vault/content/
+
+The name of the app that you want to use needs to be set as the `VIMS_APP` environment variable. You will also need to set the `VAULT_ADDR`, `VAULT_ROLE` and `VAULT_SECRET` environment variables to their corresponding values.
 
 - `db-password` = Database Password
 - `db-url` = jdbc:mysql://db_host:3306/db_name

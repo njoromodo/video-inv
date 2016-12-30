@@ -16,10 +16,6 @@ import java.util.*;
  *         Created on 2/23/16.
  */
 public class DB {
-    private static final String db_url = Param.getParam("db-url");
-    private static final String db_user = Param.getParam("db-user");
-    private static final String db_password = Param.getParam("db-password");
-
     private static final Logger LOGGER = Logger.getLogger(DB.class);
     private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
 
@@ -28,7 +24,10 @@ public class DB {
         Connection connection = null;
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
-            connection = DriverManager.getConnection(db_url, db_user, db_password);
+            connection = DriverManager.getConnection(
+                    Vault.getParam("db-url"),
+                    Vault.getParam("db-user"),
+                    Vault.getParam("db-password"));
         } catch (Exception e) {
             LOGGER.fatal("Problem Initializing DB Connection", e);
         }
