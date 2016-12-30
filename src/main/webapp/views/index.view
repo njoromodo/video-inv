@@ -1,0 +1,20 @@
+<div class="page-header">
+    <h1>ITS Video Inventory Manager</h1>
+</div>
+<p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML
+    and CSS.</p>
+<p>Use the sticky footer with a fixed navbar if need be, too.</p>
+
+<br>
+<br>
+<div class="jumbotron">
+    <h3>TODOs</h3>
+    <ul>
+        <li>Home Page Content</li>
+        <li>Staff Welcome Page Content Loading JS</li>
+        <li>Update/Replace Update Info option for Staff Member</li>
+        <li>Start Work on Check Out/In Pages and how clients will login there</li>
+        <li>How will clients be handled by the frontend? Backend?</li>
+        <li>Alert on Login Modal incomplete (Username/Password missing)</li>
+    </ul>
+</div>

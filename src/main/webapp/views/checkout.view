@@ -1,0 +1,114 @@
+<div class="row page-header">
+    <h1>Check Out Equipment</h1>
+</div>
+<div class="row">
+    <h3 class="showEditICO">User Info <i class="hovICO fa fa-edit" onclick="showClientEditModal()"></i></h3>
+
+    <div class="col-md-6 form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">RedID: </label>
+            <div class="col-sm-9">
+                <p class="form-control-static">123456789</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Name: </label>
+            <div class="col-sm-9">
+                <p class="form-control-static">John Doe</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Phone: </label>
+            <div class="col-sm-9">
+                <p class="form-control-static">619-594-6348</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Email: </label>
+            <div class="col-sm-9">
+                <p class="form-control-static">jdoe@mail.sdsu.edu</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Department: </label>
+            <div class="col-sm-9">
+                <p class="form-control-static">Geography</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Designation: </label>
+            <div class="col-sm-9">
+                <p class="form-control-static">Faculty</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h3>Items</h3>
+    <table class="checkoutItems table">
+        <tr>
+            <th class="icon"></th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Condition</th>
+            <th class="remove">Remove</th>
+        </tr>
+        <tr id="checkout-item-lap-001">
+            <td><img class="icon" src="ICONs/LAP.png"></td>
+            <th scope="row">LAP-001</th>
+            <td>Mac Laptop</td>
+            <td>Condition</td>
+            <td class="remove"><i class="fa fa-trash fa-lg" aria-disabled="true"></i></td>
+        </tr>
+        <tr id="checkout-item-proj-001">
+            <td><img class="icon" src="ICONs/PROJ.png"></td>
+            <th scope="row">PROJ-001</th>
+            <td>Portable Projector</td>
+            <td>Condition</td>
+            <td class="remove"><i class="fa fa-trash fa-lg" aria-disabled="true"></i></td>
+        </tr>
+        <tr id="checkout-item-cab-001">
+            <td><img class="icon" src="ICONs/CAB.png"></td>
+            <th scope="row">CAB-001</th>
+            <td>VGA Cable</td>
+            <td>Condition</td>
+            <td class="remove"><i class="fa fa-trash fa-lg" aria-disabled="true"></i></td>
+        </tr>
+    </table>
+</div>
+
+<div class="row">
+    <h3>Summary</h3>
+    <div class="col-md-6 form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Due Date: </label>
+            <div class="col-sm-9">
+                <p class="form-control-static">On or Before <span id="returnDate">July 4</span></p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Number of Items: </label>
+            <div class="col-sm-9">
+                <p class="form-control-static">3</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Total: </label>
+            <div class="col-sm-9">
+                <p class="form-control-static">$0000</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-9"></div>
+    <div class="col-md-3">
+        <button type="button" class="btn btn-primary btn-lg">Submit &nbsp;<span class="fa fa-check" aria-disabled="true"></span></button>
+    </div>
+</div>

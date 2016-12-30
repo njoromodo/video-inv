@@ -1,35 +1,59 @@
-.mainHead {
-    padding-top: 1.5em;
-    padding-bottom: 1em;
+#alerts {
+    margin-top: 30px;
+    margin-bottom: -30px;
+}
+
+#clientNotFoundAlert {
+    margin-bottom: 30px;
+}
+
+#create-user-btn {
+    float: right;
+    margin-top: -5px;
+}
+
+#checkoutJumbo {
+    margin-top: 45px;
+    padding-top: 15px;
+}
+
+.hovICO {
+    display: none;
+    padding-left: 10px;
+    padding-bottom: -3px;
+}
+
+.showEditICO:hover .hovICO {
+    display: inline-block;
+}
+
+table.checkoutItems {
+    table-layout: fixed;
+}
+
+table.checkoutItems tr > td, table.checkoutItems tr > th {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    vertical-align: middle;
+}
+
+#returnDate {
+    font-weight: bold;
+}
+
+img.icon {
+    margin: auto;
+    height: 36px;
+}
+
+th.icon {
+    width: 50px;
+}
+
+table.checkoutItems .remove {
     text-align: center;
-    font-size: 4em;
 }
 
-.prompt {
-    text-align: center;
-    font-size: 2em;
-    line-height: 1.5;
-    width: 75%;
-
-    padding: 0 1em 0;
-}
-
-.quote {
-    text-align: center;
-    font-size: 1.5em;
-    font-style: italic;
-    line-height: 1.5;
-    width: 1px;
-
-}
-
-#options {
-    padding-top: 1.5em;
-    width: 26em;
-}
-
-#logo {
-    height: 7em;
-    display: block;
-    margin: 5.5em auto 3em;
+#checkout-content {
+    margin-bottom: 100px;
 }

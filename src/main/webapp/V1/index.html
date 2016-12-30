@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/index.css">
+
+    <script type="application/javascript" src="js/common.js"></script>
+    <script type="application/javascript" src="js/index.js"></script>
+</head>
+<body>
+<table class="main">
+    <tr>
+        <td class="mainHead">Equipment Checkout</td>
+    </tr>
+    <tr>
+        <td>
+            <table id="login">
+                <tr>
+                    <td class="prompt">Scan or enter your ID to continue...<br>
+                        then press return.
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <div id="badCred" class="error" style="visibility: hidden;">User Credentials Invalid...</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <form onsubmit="login(); return false;">
+                            <input id="userID" class="userID" title="User ID" name="id" type="text" autofocus
+                                   autocomplete="off">
+                        </form>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td id="quote" class="quote"></td>
+                </tr>
+            </table>
+
+            <table id="options" style="display: none">
+                <tr>
+                    <td class="prompt" colspan="2">Choose an option to get started...</td>
+                </tr>
+                <tr>
+                    <td>
+                        <button class="panelButton bold" type="button" onclick="check_out()">Check Out<br>Equipment
+                        </button>
+                    </td>
+                    <td>
+                        <button class="panelButton bold" type="button" onclick="check_in()">Check In<br>Equipment
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button id="toolsB" class="panelButton full halfHeight bold" type="button" onclick="tools()">Tools
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img id="logo" src="video_logo.png" alt="ITS Logo">
+        </td>
+    </tr>
+</table>
+
+<script src="js/js.cookie.js" type="application/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+<script>
+    // Load the Quote of the Day once the page is loaded
+    loadQuote();
+</script>
+
+</body>
+</html>

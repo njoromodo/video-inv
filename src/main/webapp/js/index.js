@@ -1,113 +1,186 @@
 /**
- * Manage Index Page Interactions, Routing, and Dynamically loaded content
- * Created by tpaulus on 2/15/16.
+ * Index Page Functions.
+ * Manages User Status (Login/Log out), etc.
+ *
+ * Created by tpaulus on 4/28/16.
  */
-var userID;
 
-function check_out() {
-    window.top.location = "checkout.html";
-}
+var user = null;
 
-function check_in() {
-    window.top.location = "checkin.html";
-}
+var pageHistory = ['index'];
 
-function tools() {
-    window.top.location = "tools/index.html";
-}
+window.onload = function () {
+    checkLoggedIn();
+    loadView("index");
+};
 
-function login() {
-    getUser($("#userID").val());
-}
-
-/**
- * Call the API to see if a UserID is valid
- * @param id ID from Form
- */
-function getUser(id) {
-    var xmlHttp = new XMLHttpRequest();
-
-    xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4) {
-            var response = xmlHttp;
-            console.log("Status: " + response.status);
-            var user = null;
-
-            if (response.status == 200) {
-                user = JSON.parse(xmlHttp.responseText);
-                console.log(user);
-            }
-            doLogin(user);
-            Cookies.set("current_user", JSON.parse(xmlHttp.responseText));
-        }
-    };
-
-    xmlHttp.open('GET', "api/user?id=" + id);
-    xmlHttp.send();
-}
-
-/**
- * Login a User
- * @param user User to Login (Retrieved from getUser)
- */
-function doLogin(user) {
-    if (user != null) {
-        // Login Valid
-
-        userID = user.pubID;
-        $("#login").hide();
-        $("#options").show();
-
-        if (user.supervisor) {
-            $("#toolsB").show();
-        }
-    } else {
-        document.getElementById("badCred").style.visibility = "visible";
-        $("#userID").val("");
-    }
-
-}
-/**
- * Retrieve the Daily quote from the server
- */
-function loadQuote() {
-    var quoteText = Cookies.get("quoteText");
-    var quoteAuthor = Cookies.get("quoteAuthor");
-    if (quoteText == null || quoteText == "" || quoteAuthor == null || quoteAuthor == "") {
+function checkLoggedIn() {
+    var userInfo = Cookies.getJSON("user");
+    var sessionToken = Cookies.get("session");
+    if (sessionToken != null && sessionToken.length > 0 && userInfo != null) {
         var xmlHttp = new XMLHttpRequest();
 
         xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState == 4) {
                 var response = xmlHttp;
                 console.log("Status: " + response.status);
-                var quote = null;
+                console.log("Response:" + response.responseText);
 
                 if (response.status == 200) {
-                    quote = JSON.parse(xmlHttp.responseText);
-                    console.log(quote);
-                    var qText = quote.text;
-                    var qAuthor = quote.author;
-
-                    Cookies.set("quoteText", qText, {expires: 1});
-                    Cookies.set("quoteAuthor", qAuthor, {expires: 1});
-
-                    setQuote(qText, qAuthor);
+                    console.log("Previous Session token is still valid, auto-logging in");
+                    doStaffLogin(userInfo);
+                } else {
+                    console.log("Previous session token is no longer valid. Please login again.")
                 }
             }
         };
 
-        xmlHttp.open('GET', "api/quote");
+        xmlHttp.open('get', "api/session/verify");
+        xmlHttp.setRequestHeader("session", sessionToken);
         xmlHttp.send();
     }
-    else {
-        setQuote(Cookies.get("quoteText"), Cookies.get("quoteAuthor"));
+}
+
+function showHome() {
+    if (user != null) showPage("welcome", "menu-home");
+    else showPage("index", "menu-home");
+}
+
+function loadView(viewName) {
+    var xmlHttp = new XMLHttpRequest();
+
+    xmlHttp.onreadystatechange = function () {
+        if (xmlHttp.readyState == 4) {
+            $('#view-container').html(xmlHttp.responseText);
+        }
+    };
+
+    xmlHttp.open('get', "views/" + viewName + ".view");
+    xmlHttp.send();
+}
+
+function showPage(pageName, navMenuID) {
+    // // Will only work if the user is logged in.
+    // if (pageName == "index" || user != null && pageName != pageHistory[pageHistory.length - 1]) {
+    //     // Change the page only if page hasn't change
+    //     $('#' + pageHistory[pageHistory.length - 1]).hide();
+    //     $('#' + pageName).show();
+    //     pageHistory[pageHistory.length] = pageName;
+    //
+    //     if (navMenuID != null) updateNav(navMenuID);
+    // }
+
+
+}
+
+function updateNav(newActivePage) {
+    $('.active').removeClass('active');
+    $('#' + newActivePage).addClass('active');
+}
+
+function showStaffLoginModal() {
+    if (user == null) {
+        $('#userDropdown').prop("disabled", true);
+        $('#staffLoginModal').modal('show');
+        $('#inputUsername').focus();
     }
 }
-/**
- * Update and Display the Quote on the Index Page
- * @param text Quote Text
- * @param author Quote Author
- */
-function setQuote(text, author) {
-    $('#quote').html(text + "<br>~" + author)
+
+function hideStaffLoginModal() {
+    $('#staffLoginModal').modal('hide');
+    $('#userNotFoundAlert').hide();
+}
+
+function loginStaff() {
+    $('#userNotFoundAlert').hide();
+    var json = '{"username": "' + $('#inputUsername').val() + '",' +
+        '"password": "' + $('#inputPassword').val() + '"' +
+        '}';
+
+    var xmlHttp = new XMLHttpRequest();
+
+    xmlHttp.onreadystatechange = function () {
+        if (xmlHttp.readyState == 4) {
+            var response = xmlHttp;
+            console.log("Status: " + response.status);
+
+            if (response.status == 200) {
+                var responseJSON = JSON.parse(xmlHttp.responseText);
+                console.log(responseJSON);
+                Cookies.set("session", xmlHttp.getResponseHeader("session"), {expires: 1});
+                doStaffLogin(responseJSON);
+            } else {
+                doStaffLogin(null);
+            }
+        }
+    };
+
+    xmlHttp.open('POST', "api/login");
+    xmlHttp.setRequestHeader("Content-type", "application/json");
+    xmlHttp.send(json);
+}
+
+function doStaffLogin(userJSON) {
+    user = userJSON;
+    if (userJSON != null) {
+        Cookies.set("user", JSON.stringify(userJSON), {expires: 1});
+        $('#header-user-name').html(userJSON.firstName + " " + userJSON.lastName + '<span class="caret"></span>');
+        $('#staffLoginModal').modal('hide');
+        $('#userDropdown').prop("disabled", false);
+
+        // TODO Show/Hide Admin Link based on User Perms.
+        // TODO Fill Welcome Page Content
+
+        $('#welcomePageName').text(userJSON.firstName + " " + userJSON.lastName);
+
+
+        $('#link-checkout').removeClass('disabled');
+        $('#link-checkin').removeClass('disabled');
+
+        if (userJSON.admin) {
+            $('#menu-admin').show();
+        }
+
+        showPage('welcome-content');
+        setUpdateStaffModalContent(userJSON);
+        $('#loginForm')[0].reset();
+    } else {
+        $('#userNotFoundAlert').show();
+    }
+}
+
+function setUpdateStaffModalContent(userInfo) {
+    $('#updateStaffUsername').text(userInfo.username);
+    $('#updateStaffFirstName').val(userInfo.firstName);
+    $('#updateStaffLastName').val(userInfo.lastName);
+    $('#updateStaffPhoneNumber').val(userInfo.phone);
+    $('#updateStaffEmail').val(userInfo.email);
+}
+
+function updateStaff() {
+    $('#staffInfoModal').modal('hide');
+    // TODO
+}
+
+function showStaffInfoModal() {
+    $('#staffInfoModal').modal('show');
+}
+
+function logout() {
+    user = null;
+    Cookies.remove("user");
+    Cookies.remove("session");
+    showHome();
+    pageHistory = ['index-content']; // Reset Page History for User
+
+    $('#header-user-name').text("Login");
+    $('#userDropdown').prop("disabled", true);
+
+    $('#link-checkout').addClass('disabled');
+    $('#link-checkin').addClass('disabled');
+
+    $('#logoutAlert').show();
+    window.setTimeout(function () {
+        $('#logoutAlert').alert('close');
+    }, 5000)
 }

@@ -354,5 +354,5 @@ function doFinish(status) {
     Cookies.set("action", "in");
     Cookies.set("count", items.length);
 
-    window.location = "conf.html";
+    window.location = "../conf.html";
 }
