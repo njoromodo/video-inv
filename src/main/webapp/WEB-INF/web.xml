@@ -20,7 +20,9 @@
 
         <load-on-startup>1</load-on-startup>
     </servlet>
-
+    <listener>
+        <listener-class>edu.sdsu.its.video_inv.Init</listener-class>
+    </listener>
     <servlet-mapping>
         <servlet-name>edu.sdsu.its.video_inv</servlet-name>
         <url-pattern>/api/*</url-pattern>
