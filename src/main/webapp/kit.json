@@ -1,0 +1,36 @@
+{
+  "Capture": [
+    {
+      "Name": "Camera",
+      "Category": "CAM"
+    },
+    {
+      "Name": "Lens",
+      "Category": "LENS"
+    },
+    {
+      "Name": "Storage",
+      "Category": "STO"
+    },
+    {
+      "Name": "Battery",
+      "Category": "BATT"
+    }
+  ],
+  "Audio": [
+    {
+      "Name": "Microphone",
+      "Category": "MIC"
+    },
+    {
+      "Name": "Headphones",
+      "Category": "HP"
+    }
+  ],
+  "Mounting": [
+    {
+      "Name": "Tripod",
+      "Category": "TRI"
+    }
+  ]
+}

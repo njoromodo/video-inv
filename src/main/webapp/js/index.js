@@ -5,6 +5,7 @@
  * Created by tpaulus on 4/28/16.
  */
 
+var changesMade = false;
 var user = null;
 
 var pageHistory = ['index'];
@@ -35,7 +36,7 @@ function checkLoggedIn() {
             }
         };
 
-        xmlHttp.open('get', "api/session/verify");
+        xmlHttp.open('get', "api/session/verify", true);
         xmlHttp.setRequestHeader("session", sessionToken);
         xmlHttp.send();
     }
@@ -55,26 +56,54 @@ function loadView(viewName) {
         }
     };
 
-    xmlHttp.open('get', "views/" + viewName + ".view");
+    xmlHttp.open('get', "views/" + viewName + ".view", true);
+    xmlHttp.send();
+}
+
+function loadChildView(childName) {
+    var xmlHttp = new XMLHttpRequest();
+
+    xmlHttp.onreadystatechange = function () {
+        if (xmlHttp.readyState == 4) {
+            $('#view-container-child').html(xmlHttp.responseText);
+        }
+    };
+
+    xmlHttp.open('get', "views/" + pageHistory[pageHistory.length - 1] + "-" + childName + ".view", true);
     xmlHttp.send();
 }
 
 function showPage(pageName, navMenuID) {
-    // // Will only work if the user is logged in.
-    // if (pageName == "index" || user != null && pageName != pageHistory[pageHistory.length - 1]) {
-    //     // Change the page only if page hasn't change
-    //     $('#' + pageHistory[pageHistory.length - 1]).hide();
-    //     $('#' + pageName).show();
-    //     pageHistory[pageHistory.length] = pageName;
-    //
-    //     if (navMenuID != null) updateNav(navMenuID);
-    // }
+    // Will only work if the user is logged in.
+    if (pageName == "index" || user != null && pageName != pageHistory[pageHistory.length - 1]) {
+        // Change the page only if page hasn't change
+        if (changesMade) {
+            swal({
+                title: "Are you sure?",
+                text: "Any and all changes you have made will be lost forever!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, change the page!",
+                closeOnConfirm: false,
+                html: false
+            }, function () {
+                changesMade = false;
+                showPage(pageName, navMenuID);
+            });
+        }
+        else {
+            loadView(pageName);
+            pageHistory[pageHistory.length] = pageName;
 
-
+            if (navMenuID != null) updateNav(navMenuID);
+            changesMade = false;
+        }
+    }
 }
 
 function updateNav(newActivePage) {
-    $('.active').removeClass('active');
+    $('#main-nav .active').removeClass('active');
     $('#' + newActivePage).addClass('active');
 }
 
@@ -115,7 +144,7 @@ function loginStaff() {
         }
     };
 
-    xmlHttp.open('POST', "api/login");
+    xmlHttp.open('POST', "api/login", true);
     xmlHttp.setRequestHeader("Content-type", "application/json");
     xmlHttp.send(json);
 }
@@ -137,11 +166,11 @@ function doStaffLogin(userJSON) {
         $('#link-checkout').removeClass('disabled');
         $('#link-checkin').removeClass('disabled');
 
-        if (userJSON.admin) {
+        if (userJSON.supervisor) {
             $('#menu-admin').show();
         }
 
-        showPage('welcome-content');
+        showPage('welcome');
         setUpdateStaffModalContent(userJSON);
         $('#loginForm')[0].reset();
     } else {
@@ -153,8 +182,6 @@ function setUpdateStaffModalContent(userInfo) {
     $('#updateStaffUsername').text(userInfo.username);
     $('#updateStaffFirstName').val(userInfo.firstName);
     $('#updateStaffLastName').val(userInfo.lastName);
-    $('#updateStaffPhoneNumber').val(userInfo.phone);
-    $('#updateStaffEmail').val(userInfo.email);
 }
 
 function updateStaff() {
@@ -171,7 +198,7 @@ function logout() {
     Cookies.remove("user");
     Cookies.remove("session");
     showHome();
-    pageHistory = ['index-content']; // Reset Page History for User
+    pageHistory = ['index']; // Reset Page History for User
 
     $('#header-user-name').text("Login");
     $('#userDropdown').prop("disabled", true);

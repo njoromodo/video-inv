@@ -37,23 +37,7 @@ table.checkoutItems tr > td, table.checkoutItems tr > th {
     vertical-align: middle;
 }
 
-#returnDate {
-    font-weight: bold;
-}
-
 img.icon {
     margin: auto;
     height: 36px;
-}
-
-th.icon {
-    width: 50px;
-}
-
-table.checkoutItems .remove {
-    text-align: center;
-}
-
-#checkout-content {
-    margin-bottom: 100px;
 }
