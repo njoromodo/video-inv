@@ -142,7 +142,7 @@ public class TestItems {
     @Test
     public void itemCategory() throws Exception {
         LOGGER.info("Adding Item1 to Test Category");
-        item1.category = category;
+        item1.category.id = category.id;
         LOGGER.debug("Updated Item: " + item1.toString());
         DB.updateItem(item1);
 
