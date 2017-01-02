@@ -190,9 +190,9 @@ public class Items {
 
         Item[] item = DB.getItem(String.format("i.pub_id = %d OR i.id = %d", deleteItem.pubID, deleteItem.id));
         if (item.length == 0) return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "Unknown Item ID"))).build();
-        if (item[0].lastTransactionID != null) return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "Item has Transaction History. Cannot Delete."))).build();
+        if (item[0].lastTransactionID != null && !item[0].lastTransactionID.isEmpty()) return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "Item has Transaction History. Cannot Delete."))).build();
 
-        DB.deleteItem(deleteItem);
+        DB.deleteItem(item[0]);
 
         return Response.status(Response.Status.OK).entity(gson.toJson(new SimpleMessage("Deleted Item"))).build();
     }
@@ -239,9 +239,9 @@ public class Items {
      * @return {@link int} 6-digit ID
      */
     private int formatID(int rawID) {
-        if (rawID / (int) Math.pow(10, 7) > 0)
+        if (intLength(rawID) > 6)
             return rawID / 10;
-        return 0;
+        return rawID;
     }
 
     private int intLength(int i) {

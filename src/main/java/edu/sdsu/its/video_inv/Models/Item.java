@@ -68,7 +68,7 @@ public class Item {
     public String toString() {
         return "Item{" +
                 "id=" + id +
-                ", username=" + pubID +
+                ", pubID=" + pubID +
                 ", category=" + category +
                 ", name='" + name + '\'' +
                 ", shortName='" + shortName + '\'' +

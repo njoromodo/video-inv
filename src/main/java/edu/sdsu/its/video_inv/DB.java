@@ -554,8 +554,8 @@ public class DB {
      * @param item {@link Item} Item to Create
      */
     public static void createItem(final Item item) {
-        final String sql = "INSERT INTO inventory(pub_id, name, short_name) VALUES (" + item.pubID + ", '" +
-                sanitize(item.name) + "', '" + sanitize(item.shortName) + "');";
+        final String sql = "INSERT INTO inventory(pub_id, name, short_name, category) VALUES (" + item.pubID + ", '" +
+                sanitize(item.name) + "', '" + sanitize(item.shortName) + "', " + (item.category.id != null && item.category.id != 0 ? item.category.id : "null") + ");";
         executeStatement(sql);
     }
 
@@ -569,7 +569,7 @@ public class DB {
         String values = "";
         if (item.pubID != 0) values += "pub_id = " + item.pubID + ",";
         if (item.category != null)
-            values += "category = " + (item.category.id != null ? item.category.id : "null") + ",";
+            values += "category = " + (item.category.id != null && item.category.id != 0 ? item.category.id : "null") + ",";
         if (item.name != null) values += "name = '" + item.name + "',";
         if (item.shortName != null) values += "short_name = '" + item.shortName + "',";
         if (item.comments != null) values += "comments = '" + item.comments + "',";
