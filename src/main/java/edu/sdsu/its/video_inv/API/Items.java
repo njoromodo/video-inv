@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import edu.sdsu.its.video_inv.DB;
 import edu.sdsu.its.video_inv.Label;
 import edu.sdsu.its.video_inv.Models.Item;
+import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
 import org.apache.log4j.Logger;
 
@@ -189,8 +190,10 @@ public class Items {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "No valid identifier supplied"))).build();
 
         Item[] item = DB.getItem(String.format("i.pub_id = %d OR i.id = %d", deleteItem.pubID, deleteItem.id));
-        if (item.length == 0) return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "Unknown Item ID"))).build();
-        if (item[0].lastTransactionID != null && !item[0].lastTransactionID.isEmpty()) return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "Item has Transaction History. Cannot Delete."))).build();
+        if (item.length == 0)
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "Unknown Item ID"))).build();
+        if (item[0].lastTransactionID != null && !item[0].lastTransactionID.isEmpty())
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "Item has Transaction History. Cannot Delete."))).build();
 
         DB.deleteItem(item[0]);
 
@@ -228,6 +231,24 @@ public class Items {
 
         Item item = DB.getItem("i.pub_id = " + itemID)[0];
         return Response.status(Response.Status.OK).entity(Label.generateLabel(item.shortName, itemID)).build();
+    }
+
+    /**
+     * Access an Items Transaction History and return a Transaction Array as JSON
+     *
+     * @param itemID {@link int} Item's Public ID
+     * @return {@link Response} Transaction History for an Item JSON
+     */
+    @GET
+    @Path("history")
+    @Consumes(MediaType.WILDCARD)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getItemHistory(@QueryParam("id") final int itemID) {
+        Item item = DB.getItem("i.pub_id = " + itemID)[0];
+        Transaction[] history = DB.getTransaction("t.item_id = " + itemID);
+        LOGGER.debug(String.format("Item History for %s(%d) returned %d transactions", item.name, item.id, history.length));
+        Gson gson = new Gson();
+        return Response.status(Response.Status.OK).entity(gson.toJson(history)).build();
     }
 
     /**
