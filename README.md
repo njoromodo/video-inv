@@ -56,7 +56,8 @@ CREATE TABLE users (
 );
 CREATE TABLE categories (
   `id`   INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  `name` TEXT
+  `name` TEXT,
+  `icon` BLOB
 );
 CREATE TABLE inventory (
   `id`          INT PRIMARY KEY AUTO_INCREMENT NOT NULL,

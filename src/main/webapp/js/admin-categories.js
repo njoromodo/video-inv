@@ -17,7 +17,8 @@ function loadCategories() {
                     row.id = "cat-" + category.id;
                     row.insertCell(0).innerHTML = category.id;
                     row.insertCell(1).innerHTML = category.name;
-                    row.insertCell(2).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showEdit(' + category.id + ');"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp; Edit</button>';
+                    row.insertCell(2).innerHTML = '<img src="api/category/icon/' + category.id + '" class="categoryIcon" id="cat-ico-' + category.id + '" onerror="this.style.visibility = \'hidden\'">';
+                    row.insertCell(3).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showEdit(' + category.id + ');"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp; Edit</button>';
                 }
             }
         }
@@ -51,6 +52,11 @@ function addCategory() {
     xmlHttp.setRequestHeader("Content-type", "application/json");
     xmlHttp.setRequestHeader("session", Cookies.get("session"));
     xmlHttp.send(json);
+
+    var $categoryIcon = $('#categoryIcon');
+    if ($categoryIcon[0].files.length > 0) {
+        updateCategoryIcon(categoryID, $categoryIcon[0].files[0]);
+    }
 }
 
 function showEdit(id) {
@@ -106,6 +112,11 @@ function updateCategory() {
     xmlHttp.setRequestHeader("Content-type", "application/json");
     xmlHttp.setRequestHeader("session", Cookies.get("session"));
     xmlHttp.send(json);
+
+    var $updateCategoryIcon = $('#updateCategoryIcon');
+    if ($updateCategoryIcon[0].files.length > 0) {
+        updateCategoryIcon(categoryID, $updateCategoryIcon[0].files[0]);
+    }
 }
 
 function deleteCategory() {
@@ -149,4 +160,35 @@ function deleteCategory() {
         xmlHttp.setRequestHeader("session", Cookies.get("session"));
         xmlHttp.send(json);
     });
+}
+
+function updateCategoryIcon(categoryID, icon) {
+    // Check the file type.
+    if (!icon.type.match('image.*')) {
+        swal("Oops...", "That wasn't an a image type", "warning");
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append('icon', icon, icon.name);
+
+    var xmlHttp = new XMLHttpRequest();
+
+    xmlHttp.onreadystatechange = function () {
+        if (xmlHttp.readyState == 4) {
+            var response = xmlHttp;
+            console.log("Status: " + response.status);
+
+            if (response.status != 200) {
+                $("#cat-ico-" + categoryID).prop("src", 'api/category/icon/' + categoryID + '?' + new Date().valueOf());
+            } else {
+                console.log(xmlHttp.responseText);
+                swal("Oops...", JSON.parse(xmlHttp.responseText).message, "error");
+            }
+        }
+    };
+
+    xmlHttp.open('POST', "api/category/updateICO/" + categoryID);
+    xmlHttp.setRequestHeader("session", Cookies.get("session"));
+    xmlHttp.send(formData);
 }

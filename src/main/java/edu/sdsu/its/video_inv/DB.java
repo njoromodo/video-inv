@@ -2,9 +2,12 @@ package edu.sdsu.its.video_inv;
 
 import edu.sdsu.its.video_inv.API.Quote;
 import edu.sdsu.its.video_inv.Models.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -770,6 +773,52 @@ public class DB {
         //language=SQL
         String sql = "DELETE FROM categories WHERE id = " + category.id + ";";
         executeStatement(sql);
+    }
+
+    public static String getCategoryIcon(final int categoryID) {
+        Connection connection = getConnection();
+        Statement statement = null;
+        String icon = "";
+
+        try {
+            statement = connection.createStatement();
+            final String sql = "SELECT `icon` FROM categories WHERE id=" + categoryID + ";";
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            if (resultSet.next()) {
+                icon = resultSet.getString("icon");
+            }
+
+            resultSet.close();
+
+        } catch (SQLException e) {
+            LOGGER.error(String.format("Problem querying DB for Category %d icon", categoryID), e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+        return icon;
+    }
+
+    public static void updateCategoryIcon(final int categoryID, final File icon) {
+        try {
+            byte[] encodedIcon = org.apache.commons.codec.binary.Base64.encodeBase64(FileUtils.readFileToByteArray(icon));
+            String encodedIconString = new String(encodedIcon, "UTF8");
+
+            //language=SQL
+            String sql = "UPDATE categories SET icon = '" + encodedIconString + "' WHERE id=" + categoryID + ";";
+            executeStatement(sql);
+        } catch (IOException e) {
+            LOGGER.error("Could not update Category Icon", e);
+        }
     }
 
     private static String sanitize(final String s) {

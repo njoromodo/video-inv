@@ -50,3 +50,11 @@
 div.modal-footer button.delete, div.modal-footer button.reprint {
     float: left;
 }
+
+input[type=file] {
+    margin-top: 7px;
+}
+
+#category-list img.categoryIcon {
+    height: 35px;
+}
