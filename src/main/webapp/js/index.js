@@ -85,7 +85,7 @@ function showPage(pageName, navMenuID) {
                 showCancelButton: true,
                 confirmButtonColor: "#DD6B55",
                 confirmButtonText: "Yes, change the page!",
-                closeOnConfirm: false,
+                closeOnConfirm: true,
                 html: false
             }, function () {
                 changesMade = false;
@@ -103,7 +103,7 @@ function showPage(pageName, navMenuID) {
 }
 
 function updateNav(newActivePage) {
-    $('#main-nav .active').removeClass('active');
+    $('#navbar').find('.active').removeClass('active');
     $('#' + newActivePage).addClass('active');
 }
 

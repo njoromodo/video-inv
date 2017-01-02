@@ -79,6 +79,8 @@ public class Session {
      */
     public static User validate(final String token) {
         if (!ENCRYPTOR.isInitialized()) initializeEncryptor();
+        if (token == null || token.isEmpty()) return null;
+
         LOGGER.debug(String.format("Validating Token: \"%s\"", token));
         final String decodedToken = new String(Base64.decodeBase64(token.getBytes()));
         LOGGER.debug(String.format("Decoded Token: \"%s\"", decodedToken));

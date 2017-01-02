@@ -73,7 +73,7 @@ function reset() {
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "Yes, reset it!",
-            closeOnConfirm: false,
+            closeOnConfirm: true,
             html: false
         }, function(){
             loadView("checkout");
