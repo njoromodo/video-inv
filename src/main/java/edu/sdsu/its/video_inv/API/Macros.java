@@ -30,7 +30,7 @@ public class Macros {
      * List either all, or a specific macro. If no ID is provided, all Macros will be returned.
      *
      * @param sessionToken {@link String} User Session Token
-     * @param macroID {@link int} MacroID, if null, all Macros will be returned
+     * @param macroID      {@link int} MacroID, if null, all Macros will be returned
      * @return {@link Response} JSON Macro Array {@see Models.Macro}
      */
     @GET
@@ -50,7 +50,8 @@ public class Macros {
 
         Macro[] macros = DB.getMacro(restriction);
 
-        if (macroID != 0 && macros.length == 0) return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(new SimpleMessage("Error", "Macro not found"))).build();
+        if (macroID != 0 && macros.length == 0)
+            return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(new SimpleMessage("Error", "Macro not found"))).build();
         return Response.status(Response.Status.OK).entity(gson.toJson(macros)).build();
     }
 
@@ -108,7 +109,7 @@ public class Macros {
      * The Macro's ID must be supplied, and cannot be changed.
      *
      * @param sessionToken {@link String} User Session Token
-     * @param payload {@link String} JSON Macro Object {@see Models.Macro}
+     * @param payload      {@link String} JSON Macro Object {@see Models.Macro}
      * @return {@link Response} Status Message
      */
     @PUT
@@ -131,7 +132,8 @@ public class Macros {
         }
 
         Macro updateMacro = gson.fromJson(payload, Macro.class);
-        if (updateMacro.id == 0) return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "No Identifier Supplied"))).build();
+        if (updateMacro.id == 0)
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "No Identifier Supplied"))).build();
 
         if (DB.getMacro("id = " + updateMacro.id).length == 0)
             return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(new SimpleMessage("Error", "Macro Not Found. You may need to create it first"))).build();
@@ -149,7 +151,7 @@ public class Macros {
      * This action is permanent, and not-revertible. The Macro's ID must be supplied in the payload.
      *
      * @param sessionToken {@link String} User Session Token
-     * @param payload {@link String} JSON Macro Object {@see Models.Macro}
+     * @param payload      {@link String} JSON Macro Object {@see Models.Macro}
      * @return {@link Response} Status Message
      */
     @DELETE
@@ -172,7 +174,8 @@ public class Macros {
         }
 
         Macro deleteMacro = gson.fromJson(payload, Macro.class);
-        if (deleteMacro.id == 0) return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "No Identifier Supplied"))).build();
+        if (deleteMacro.id == 0)
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new SimpleMessage("Error", "No Identifier Supplied"))).build();
 
         if (DB.getMacro("id = " + deleteMacro.id).length == 0)
             return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(new SimpleMessage("Error", "Macro Not Found"))).build();
@@ -186,7 +189,7 @@ public class Macros {
      * Generate DYMO Label XML for a Macro
      *
      * @param sessionToken {@link String} User Session Token
-     * @param macroID {@link int} Macro ID
+     * @param macroID      {@link int} Macro ID
      * @return {@link Response} Label XML
      */
     @Path("label")
@@ -213,6 +216,7 @@ public class Macros {
         return Response.status(Response.Status.OK).entity(Label.generateMacroLabel(macroID)).build();
     }
 
+
     /**
      * All Core IDs are 6 digits, but barcodes have an 8 digit ID, which is scanned by the barcode reader.
      * For BarcodeIDs, the first digit is always 0 and the last digit is the checksum. This last digit is the
@@ -222,11 +226,17 @@ public class Macros {
      * @return {@link int} 6-digit ID
      */
     private int formatID(int rawID) {
-        if (rawID / (int) Math.pow(10, 7) > 0)
+        if (intLength(rawID) > 6)
             return rawID / 10;
-        return 0;
+        return rawID;
     }
 
+    /**
+     * Calculate the number of digits in an int. Useful for when decoding numeral only barcodes.
+     *
+     * @param i {@link int} int
+     * @return {@link int} Length
+     */
     private int intLength(int i) {
         if (i == 0) return 0;
         if (i < 0) i = i * -1;

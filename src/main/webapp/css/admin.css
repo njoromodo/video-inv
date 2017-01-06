@@ -58,3 +58,11 @@ input[type=file] {
 #category-list img.categoryIcon {
     height: 35px;
 }
+
+div.macroListContainer {
+    overflow: auto;
+    max-height: 550px;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-bottom: 0;
+}

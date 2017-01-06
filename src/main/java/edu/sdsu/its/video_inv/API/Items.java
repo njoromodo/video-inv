@@ -265,6 +265,12 @@ public class Items {
         return rawID;
     }
 
+    /**
+     * Calculate the number of digits in an int. Useful for when decoding numeral only barcodes.
+     *
+     * @param i {@link int} int
+     * @return {@link int} Length
+     */
     private int intLength(int i) {
         if (i == 0) return 0;
         if (i < 0) i = i * -1;
