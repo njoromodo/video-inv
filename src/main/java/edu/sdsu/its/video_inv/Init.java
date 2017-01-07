@@ -36,7 +36,8 @@ public class Init implements ServletContextListener {
         if (users.length == 0) {
             LOGGER.info("No users were found in the DB. Creating default User.");
             User user = new User(DEFAULT_USERNAME, DEFAULT_FIRST_NAME, DEFAULT_LAST_NAME, true);
-            DB.createUser(user, DEFAULT_PASSWORD);
+            user.setPassword(DEFAULT_PASSWORD);
+            DB.createUser(user);
 
             LOGGER.info(String.format("Initial Staff Created.\n " +
                     "Username: \"%s\"\n" +
