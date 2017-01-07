@@ -4,9 +4,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +38,7 @@ public class Label {
 
         try {
             File barcode = File.createTempFile(Integer.toString(id), ".png");
-            Barcode.generateBarcode("0" + Integer.toString(id), barcode);
+            Barcode.generateUPCEBarcode("0" + Integer.toString(id), barcode);
 
             byte[] encodedBarcode = Base64.encodeBase64(FileUtils.readFileToByteArray(barcode));
             String encodedBarcodeString = new String(encodedBarcode, "UTF8");
