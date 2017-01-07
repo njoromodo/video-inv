@@ -15,7 +15,7 @@ public class Transaction {
     public User owner;
     public User supervisor;
     public Timestamp time;
-    public boolean direction; // 0 for our; 1 for in
+    public boolean direction; // 0 for out; 1 for in
     public List<Component> components;
 
     public Transaction(String id, User owner, User supervisor, Timestamp time, boolean direction) {

@@ -3,7 +3,7 @@
 </div>
 
 <ul class="nav nav-tabs" id="admin-nav">
-    <li role="presentation" class="admin-menu-home active"><a href="#" onclick="showSection('home')">Home</a></li>
+    <li role="presentation" class="admin-menu-home active"><a href="#" onclick="showSection('index')">Home</a></li>
 
     <li role="presentation" class="admin-menu-items"><a href="#" onclick="showSection('items')">Items</a></li>
     <li role="presentation" class="admin-menu-macros"><a href="#" onclick="showSection('macros')">Macros</a></li>
@@ -19,5 +19,5 @@
 
 <script src="js/admin.js"></script>
 <script>
-    loadChildView('home');
+    loadChildView('index');
 </script>

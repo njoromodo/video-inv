@@ -48,7 +48,6 @@ and then choose "Update Info".</p>
                     var table = $('#itemsOutTable')[0];
                     for (var i = 0; i < itemsOut.length; i++) {
                         var item = itemsOut[i];
-                        console.log(item);
                         var row = table.insertRow();
                         row.insertCell(0).innerHTML = item.name + " (ID: " + item.pubID + ")";
                         row.insertCell(1).innerHTML = item.lastTransactionDate;

@@ -103,9 +103,9 @@ public class Item {
     }
 
     public static class Popular extends Item {
-        public Integer frequency;
+        public int frequency;
 
-        public Popular(int id, int pubID, Category category, String name, String shortName, String comments, boolean checked_out, Integer frequency) {
+        public Popular(int id, int pubID, Category category, String name, String shortName, String comments, boolean checked_out, int frequency) {
             super(id, pubID, category, name, shortName, comments, checked_out);
             this.frequency = frequency;
         }

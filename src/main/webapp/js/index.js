@@ -205,6 +205,7 @@ function logout() {
 
     $('#link-checkout').addClass('disabled');
     $('#link-checkin').addClass('disabled');
+    $('#menu-admin').hide();
 
     $('#logoutAlert').show();
     window.setTimeout(function () {

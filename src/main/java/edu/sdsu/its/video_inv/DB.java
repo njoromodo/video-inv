@@ -575,7 +575,7 @@ public class DB {
                     "  i.pub_id as `pub_id`,\n" +
                     "  i.name as `name`,\n" +
                     "  i.category as `categoryID`,\n" +
-                    "  c.name as `catgeory_name`,\n" +
+                    "  c.name as `category_name`,\n" +
                     "  i.short_name as `short_name`,\n" +
                     "  i.comments as `comments`,\n" +
                     "  i.checked_out as `checked_out`,\n" +
