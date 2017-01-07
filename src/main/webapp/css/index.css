@@ -42,9 +42,12 @@ img.icon {
     height: 36px;
 }
 
+.jumbotron {
+    margin-top: 40px;
+}
+
 #quote {
     text-align: center;
-    margin-top: 50px;
     font-size: 21px;
     font-weight: lighter;
     line-height: 1.75;
@@ -57,4 +60,20 @@ img.icon {
 
 #quoteAuthor {
     font-style: italic;
+}
+
+#checkoutJumbo {
+    opacity: 0;
+}
+
+#noItemsOut {
+    opacity: 0;
+    text-align: center;
+    font-weight: bold;
+    font-size: 36px;
+}
+
+#noItemsOut .fa-check-circle {
+    margin-right: 7px;
+    color: green;
 }

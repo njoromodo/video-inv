@@ -3,14 +3,13 @@ package edu.sdsu.its.video_inv.API;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import edu.sdsu.its.video_inv.DB;
-import edu.sdsu.its.video_inv.Label;
+import edu.sdsu.its.video_inv.Models.Item;
 import edu.sdsu.its.video_inv.Models.User;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Random;
 
 /**
  * User Endpoints (List, Create, Update, and Label)
@@ -53,6 +52,7 @@ public class Users {
 
         User[] users;
 
+        // fixme
         if (dbID != 0) {
             final String restriction = "id = " + dbID;
 
@@ -134,7 +134,7 @@ public class Users {
     public Response updateUser(@HeaderParam("session") final String sessionToken,
                                final String payload) {
         User user = Session.validate(sessionToken);
-        if (user == null ) {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
         if (!user.supervisor) {
@@ -160,31 +160,25 @@ public class Users {
         return Response.status(Response.Status.OK).entity(mGson.toJson(new SimpleMessage("User Updated"))).build();
     }
 
-
     /**
-     * Get the DYMO Label XML for a User Label
+     * List all checked-out items for the current user (determined by the sessionToken)
      *
      * @param sessionToken {@link String} User Session Token
-     * @param userID       {@link int} User's Public Identifier
-     * @return {@link Response} Label XML
+     * @return {@link Response} Item JSON
      */
-    @Path("label")
+    @Path("checkedOut")
     @GET
     @Consumes(MediaType.WILDCARD)
-    @Produces(MediaType.APPLICATION_XML)
-    public Response getUserLabel(@HeaderParam("session") final String sessionToken,
-                                 @QueryParam("id") int userID) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCheckedOut(@HeaderParam("session") final String sessionToken) {
         User user = Session.validate(sessionToken);
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
+        Item[] items = DB.getItem("checked_out = 1 AND t1.owner = " + user.dbID);
 
-        userID = formatID(userID);
-        if (intLength(userID) != 6) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "Invalid ID Length"))).build();
-        }
-
-        return Response.status(Response.Status.OK).entity(Label.generateUserLabel(userID)).build();
+        Gson gson = new Gson(); // We need a different GSON since mGSON is setup to deal with Users, not Items
+        return Response.status(Response.Status.OK).entity(gson.toJson(items)).build();
     }
 
     /**
