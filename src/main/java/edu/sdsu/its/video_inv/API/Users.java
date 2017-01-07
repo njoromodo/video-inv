@@ -34,7 +34,7 @@ public class Users {
      * Get all users, or a specific user based on their public or their internal identifier.
      *
      * @param sessionToken {@link String} User Session Token
-     * @param publicID     {@link int} User's Public (Barcode) Identifier
+     * @param username     {@link String} User's Username
      * @param dbID         {@link int} User's Internal Identifier
      * @return {@link Response} JSON Array of Users
      */
@@ -42,30 +42,25 @@ public class Users {
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUser(@HeaderParam("session") final String sessionToken,
-                            @QueryParam("id") final int publicID,
+                            @QueryParam("username") final String username,
                             @QueryParam("db-id") final int dbID) {
         User user = Session.validate(sessionToken);
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
-        LOGGER.info(String.format("Recieved Request for User in DB Where PublicID=%d OR dbID=%d", publicID, dbID));
+        LOGGER.info(String.format("Recieved Request for User in DB Where Username=%s OR dbID=%d", username, dbID));
 
         User[] users;
 
-        // fixme
         if (dbID != 0) {
             final String restriction = "id = " + dbID;
 
             LOGGER.debug(String.format("Retrieving Users with Internal ID Restriction, \"%s\"", restriction));
             users = DB.getUser(restriction);
-        } else if (publicID != 0) {
-            int id = formatID(publicID);
-            if (intLength(id) != 6) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "Invalid ID Length"))).build();
-            }
-            final String restriction = "pub_id = " + id;
+        } else if (username != null && !username.isEmpty()) {
+            final String restriction = "username = '" + username + "'";
 
-            LOGGER.debug(String.format("Retrieving Users with Public ID Restriction, \"%s\"", restriction));
+            LOGGER.debug(String.format("Retrieving Users with Username Restriction, \"%s\"", restriction));
             users = DB.getUser(restriction);
         } else {
             LOGGER.debug("Retrieving all users in DB");
@@ -105,19 +100,10 @@ public class Users {
         LOGGER.debug("POST Payload: " + payload);
 
         User createUser = mGson.fromJson(payload, User.class);
-//        int id;
-//        do {
-//            Random rnd = new Random();
-//            id = 100000 + rnd.nextInt(900000);
-//        }
-//        while (DB.getUser("pub_id = " + id).length > 0); // Generate 6 Digit ID, and check that it doesn't already exist
-//        user.username = id;
-//        DB.createUser(createUser);
-
-        // fixme - User Creation Setting the username
-        // Should be supplied by the creator
-
-        return Response.status(Response.Status.CREATED).entity(mGson.toJson(new SimpleMessage("User Created Successfully"))).build();
+        if (DB.createUser(createUser))
+            return Response.status(Response.Status.CREATED).entity(mGson.toJson(new SimpleMessage("User Created Successfully"))).build();
+        else
+            return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("error", "A user with that username already exists"))).build();
     }
 
     /**
@@ -179,26 +165,5 @@ public class Users {
 
         Gson gson = new Gson(); // We need a different GSON since mGSON is setup to deal with Users, not Items
         return Response.status(Response.Status.OK).entity(gson.toJson(items)).build();
-    }
-
-    /**
-     * All Core IDs are 6 digits, but barcodes have an 8 digit ID, which is scanned by the barcode reader.
-     * For BarcodeIDs, the first digit is always 0 and the last digit is the checksum. This last digit is the
-     * one that needs to be discarded.
-     *
-     * @param rawID {@link int} Original
-     * @return {@link int} 6-digit ID
-     */
-    private int formatID(int rawID) {
-        if (rawID / (int) Math.pow(10, 7) > 0)
-            return rawID / 10;
-        return 0;
-    }
-
-    private int intLength(int i) {
-        if (i == 0) return 0;
-        if (i < 0) i = i * -1;
-
-        return (int) (Math.log10(i) + 1);
     }
 }

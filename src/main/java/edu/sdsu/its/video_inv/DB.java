@@ -131,7 +131,7 @@ public class DB {
 
         try {
             statement = connection.createStatement();
-            final String sql = "SELECT * FROM users WHERE username='" + username.toLowerCase() + "';";
+            final String sql = "SELECT * FROM users WHERE username='" + sanitize(username.toLowerCase()) + "';";
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
@@ -168,12 +168,12 @@ public class DB {
      * @param user {@link User} User to Create
      * @return {@link boolean} If user was created successfully
      */
-    public static boolean createUser(final User user, final String password) {
-        if (DB.getUser("username = '" + user.username.toLowerCase() + "'").length > 0) return false;
+    public static boolean createUser(final User user) {
+        if (DB.getUser("username = '" + sanitize(user.username.toLowerCase()) + "'").length > 0) return false;
 
         final String sql = "INSERT INTO users(username, first_name, last_name, supervisor, password) VALUES ( '" + sanitize(user.username.toLowerCase()) +
                 "', '" + sanitize(user.firstName) + "', '" + sanitize(user.lastName) + "', " + (user.supervisor ? 1 : 0) + "," +
-                "'" + PASSWORD_ENCRYPTOR.encryptPassword(password) + "');";
+                "'" + PASSWORD_ENCRYPTOR.encryptPassword(user.getPassword()) + "');";
         executeStatement(sql);
         return true;
     }
@@ -186,7 +186,7 @@ public class DB {
      */
     public static void updateUser(final User user) {
         String values = "";
-        if (user.username != null) values += "username= '" + user.username.toLowerCase() + "',";
+        if (user.username != null) values += "username= '" + sanitize(user.username.toLowerCase()) + "',";
         if (user.firstName != null && user.firstName.length() > 0)
             values += "first_name='" + sanitize(user.firstName) + "',";
         if (user.lastName != null && user.lastName.length() > 0)
