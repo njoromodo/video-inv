@@ -234,6 +234,56 @@ public class Items {
     }
 
     /**
+     * Get the most popular items.
+     * Returns a slightly modified item which includes the frequency of checkouts over its lifetime.
+     *
+     * @param sessionToken {@link String} User Session Token
+     * @param count        {@link int} Number of items to get
+     * @return {@link Response} Item.Popular JSON
+     */
+    @Path("popular")
+    @GET
+    @Consumes(MediaType.WILDCARD)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPopularItems(@HeaderParam("session") final String sessionToken,
+                                    @QueryParam("count") int count) {
+        User user = Session.validate(sessionToken);
+        Gson gson = new Gson();
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
+        }
+        if (count == 0) {
+            LOGGER.debug("Using Default Item count for Popular Item Request");
+        }
+
+        LOGGER.info(String.format("Recieved Request the most popular %d items", count));
+        Item.Popular[] populars = DB.getPopularItem(count);
+        return Response.status(Response.Status.OK).entity(gson.toJson(populars)).build();
+    }
+
+    /**
+     * Get all items currently checked out
+     *
+     * @param sessionToken {@link String} User Session Token
+     * @return {@link Response} Checked out Items JSON
+     */
+    @Path("out")
+    @GET
+    @Consumes(MediaType.WILDCARD)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCheckedOut(@HeaderParam("session") final String sessionToken) {
+        User user = Session.validate(sessionToken);
+        Gson gson = new Gson();
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
+        }
+        LOGGER.info("Recieved Request the currently checked out items");
+        Item[] items = DB.getItem("checked_out = 1");
+        return Response.status(Response.Status.OK).entity(gson.toJson(items)).build();
+    }
+
+
+    /**
      * Access an Items Transaction History and return a Transaction Array as JSON
      *
      * @param itemID {@link int} Item's Public ID
@@ -244,6 +294,7 @@ public class Items {
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getItemHistory(@QueryParam("id") final int itemID) {
+        // TODO Add Session Checker
         Item item = DB.getItem("i.pub_id = " + itemID)[0];
         Transaction[] history = DB.getTransaction("t.item_id = " + itemID);
         LOGGER.debug(String.format("Item History for %s(%d) returned %d transactions", item.name, item.id, history.length));

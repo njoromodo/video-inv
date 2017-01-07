@@ -159,7 +159,7 @@ public class DB {
         }
 
 
-        return password != null && PASSWORD_ENCRYPTOR.checkPassword(password, passHash) ? user : null;
+        return password != null && !passHash.isEmpty() && PASSWORD_ENCRYPTOR.checkPassword(password, passHash) ? user : null;
     }
 
     /**
@@ -218,13 +218,18 @@ public class DB {
 
     // ====================== Transactions ======================
 
+    public static Transaction[] getTransaction(String restriction) {
+        return getTransaction(restriction, 0);
+    }
+
     /**
      * Retrieve All, or a specific transaction(s) based on a SQL Restriction statement.
      *
      * @param restriction {@link String} SQL WHERE condition, Excluding WHERE Operator
+     * @param limit       {@link int} Maximum number of transactions to get, ignored if 0
      * @return {@link Transaction[]} Transactions meeting the specified restriction
      */
-    public static Transaction[] getTransaction(String restriction) {
+    public static Transaction[] getTransaction(String restriction, int limit) {
         Connection connection = getConnection();
         Statement statement = null;
         Map<String, Transaction> transactions = new HashMap<>();
@@ -234,7 +239,7 @@ public class DB {
             if (restriction == null || restriction.length() == 0) restriction = "TRUE";
 
             //langauge=SQL
-            final String sql = "SELECT\n" +
+            String sql = "SELECT\n" +
                     "  t.id         AS `transaction_id`,\n" +
                     "  u.id         AS `owner_db_id`,\n" +
                     "  u.username   AS `owner_username`,\n" +
@@ -259,7 +264,11 @@ public class DB {
                     "  LEFT OUTER JOIN categories c ON i.category = c.id\n" +
                     "  LEFT OUTER JOIN users u ON t.owner = u.id\n" +
                     "  LEFT OUTER JOIN users s ON t.supervisor = s.id\n" +
-                    "WHERE " + restriction + ";";
+                    "WHERE " + restriction + "\n" +
+                    "ORDER BY t.time DESC\n";
+            if (limit > 0) sql += " LIMIT " + limit;
+            sql += ";";
+
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
@@ -549,6 +558,68 @@ public class DB {
         }
 
         return items.toArray(new Item[]{});
+    }
+
+    public static Item.Popular[] getPopularItem(int count) {
+        Connection connection = getConnection();
+        Statement statement = null;
+        List<Item.Popular> items = new ArrayList<>();
+
+        try {
+            statement = connection.createStatement();
+            if (count == 0) count = 5;
+
+            //language=SQL
+            final String sql = "SELECT\n" +
+                    "  t.item_id as `id`,\n" +
+                    "  i.pub_id as `pub_id`,\n" +
+                    "  i.name as `name`,\n" +
+                    "  i.category as `categoryID`,\n" +
+                    "  c.name as `catgeory_name`,\n" +
+                    "  i.short_name as `short_name`,\n" +
+                    "  i.comments as `comments`,\n" +
+                    "  i.checked_out as `checked_out`,\n" +
+                    "  COUNT(*) as `frequency`\n" +
+                    "FROM transactions t\n" +
+                    "  LEFT JOIN inventory i ON t.item_id = i.id\n" +
+                    "  LEFT JOIN categories c ON i.category = c.id\n" +
+                    "GROUP BY item_id\n" +
+                    "ORDER BY frequency DESC\n" +
+                    "LIMIT " + count + ";";
+
+            LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                Item.Popular item = new Item.Popular(resultSet.getInt("id"),
+                        resultSet.getInt("pub_id"),
+                        new Category(resultSet.getInt("categoryID"), resultSet.getString("category_name")),
+                        resultSet.getString("name"),
+                        resultSet.getString("short_name"),
+                        resultSet.getString("comments") != null ? resultSet.getString("comments") : "",
+                        resultSet.getBoolean("checked_out"),
+                        resultSet.getInt("frequency"));
+
+                items.add(item);
+            }
+            LOGGER.debug(String.format("Retrieved the %d most popular items from the DB", count));
+
+            resultSet.close();
+
+        } catch (SQLException e) {
+            LOGGER.warn("Problem retrieving items from DB", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    LOGGER.warn("Problem Closing Statement", e);
+                }
+            }
+        }
+
+        return items.toArray(new Item.Popular[]{});
     }
 
     /**

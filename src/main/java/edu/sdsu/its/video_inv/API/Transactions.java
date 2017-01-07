@@ -41,7 +41,8 @@ public class Transactions {
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTransaction(@HeaderParam("session") final String sessionToken,
-                                   @QueryParam("id") String transactionID) {
+                                   @QueryParam("id") String transactionID,
+                                   @QueryParam("limit") int limit) {
 
         User user = Session.validate(sessionToken);
         Gson gson = new Gson();
@@ -56,7 +57,7 @@ public class Transactions {
             restriction = "t.id = " + transactionID;
         }
 
-        Transaction[] transactions = DB.getTransaction(restriction);
+        Transaction[] transactions = DB.getTransaction(restriction, limit);
         if (transactionID.length() > 0 && transactions.length == 0)
             return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(new SimpleMessage("Error", "No transaction with that ID was found"))).build();
 

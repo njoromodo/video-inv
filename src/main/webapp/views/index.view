@@ -1,20 +1,31 @@
 <div class="page-header">
     <h1>ITS Video Inventory Manager</h1>
 </div>
-<p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML
-    and CSS.</p>
-<p>Use the sticky footer with a fixed navbar if need be, too.</p>
+<p class="lead">Welcome to the ITS Video Productions Inventory Manager.</p>
+<p>To get started, you will need to login, which can be done by clicking on the button
+in the top right corner. If you need an account, or are having trouble logging in, please
+contact your supervisor, or the system administrator.</p>
 
-<br>
-<br>
-<div class="jumbotron">
-    <h3>TODOs</h3>
-    <ul>
-        <li>Home Page Content</li>
-        <li>Staff Welcome Page Content Loading JS</li>
-        <li>Update/Replace Update Info option for Staff Member</li>
-        <li>Start Work on Check Out/In Pages and how clients will login there</li>
-        <li>How will clients be handled by the frontend? Backend?</li>
-        <li>Alert on Login Modal incomplete (Username/Password missing)</li>
-    </ul>
+<div id="quote" class="jumbotron">
+    <span id="quoteText"></span>
+    <br>
+    <span id="quoteAuthor"></span>
 </div>
+
+<script>
+    var xmlHttp = new XMLHttpRequest();
+
+    xmlHttp.onreadystatechange = function () {
+        if (xmlHttp.readyState == 4) {
+            if (xmlHttp.status == 200) {
+                var quote = JSON.parse(xmlHttp.responseText);
+                $('#quoteText').text(quote.text);
+                $('#quoteAuthor').text(quote.author);
+                $('#quote').delay(500).animate({ opacity: 1 }, 500);
+            }
+        }
+    };
+
+    xmlHttp.open('GET', "api/quote");
+    xmlHttp.send();
+</script>

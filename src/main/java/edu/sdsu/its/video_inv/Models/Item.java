@@ -21,6 +21,9 @@ public class Item {
     public String lastTransactionDate;
     public String lastTransactionID;
 
+    public Item() {
+    }
+
     public Item(int id, int pubID, Category category, String name, String shortName, String comments, boolean checked_out) {
         this.id = id;
         this.pubID = pubID;
@@ -97,5 +100,14 @@ public class Item {
     @Override
     public int hashCode() {
         return id;
+    }
+
+    public static class Popular extends Item {
+        public Integer frequency;
+
+        public Popular(int id, int pubID, Category category, String name, String shortName, String comments, boolean checked_out, Integer frequency) {
+            super(id, pubID, category, name, shortName, comments, checked_out);
+            this.frequency = frequency;
+        }
     }
 }
