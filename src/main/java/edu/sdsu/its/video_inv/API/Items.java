@@ -286,19 +286,31 @@ public class Items {
     /**
      * Access an Items Transaction History and return a Transaction Array as JSON
      *
-     * @param itemID {@link int} Item's Public ID
+     * @param sessionToken {@link String} User Session Token
+     * @param itemID       {@link int} Item's Public ID
      * @return {@link Response} Transaction History for an Item JSON
      */
     @GET
     @Path("history")
     @Consumes(MediaType.WILDCARD)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getItemHistory(@QueryParam("id") final int itemID) {
-        // TODO Add Session Checker
-        Item item = DB.getItem("i.pub_id = " + itemID)[0];
-        Transaction[] history = DB.getTransaction("t.item_id = " + itemID);
-        LOGGER.debug(String.format("Item History for %s(%d) returned %d transactions", item.name, item.id, history.length));
+    public Response getItemHistory(@HeaderParam("session") final String sessionToken,
+                                   @QueryParam("id") final int itemID) {
+        User user = Session.validate(sessionToken);
         Gson gson = new Gson();
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
+        }
+        if (!user.supervisor) {
+            return Response.status(Response.Status.FORBIDDEN).entity(gson.toJson(new SimpleMessage("Error", "You are not allowed to do that."))).build();
+        }
+
+        Item item = DB.getItem("i.pub_id = " + itemID)[0];
+        if (item == null)
+            return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(new SimpleMessage("Error", "Item not found"))).build();
+
+        Transaction[] history = DB.getTransaction("i.pub_id = " + itemID);
+        LOGGER.debug(String.format("Item History for %s(%d) returned %d transactions", item.name, item.id, history.length));
         return Response.status(Response.Status.OK).entity(gson.toJson(history)).build();
     }
 
