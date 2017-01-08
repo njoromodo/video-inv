@@ -24,6 +24,7 @@ public class User {
     @Expose
     public Boolean supervisor;
 
+    // Should be Base64 encoded in transit!
     @Expose(serialize = false)
     private String password;
 

@@ -53,18 +53,6 @@ public class Label {
         }
     }
 
-
-    /**
-     * Generate Label XML for a User Sticker for the JS Framework
-     *
-     * @param id {@link int} User ID (No Checksum)
-     * @return {@link String} Label XML
-     */
-    public static String generateUserLabel(final int id) {
-        LOGGER.info("Generating User Template for ID: " + id);
-        return generateLabel(USER_LABEL_HEAD, id);
-    }
-
     /**
      * Generate Label XML for an Item Macro for the JS Framework
      *

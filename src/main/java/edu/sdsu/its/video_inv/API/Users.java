@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import edu.sdsu.its.video_inv.DB;
 import edu.sdsu.its.video_inv.Models.Item;
 import edu.sdsu.its.video_inv.Models.User;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
@@ -68,7 +69,7 @@ public class Users {
         }
 
         if (users.length > 0) {
-            return Response.status(Response.Status.OK).entity(mGson.toJson(user)).build();
+            return Response.status(Response.Status.OK).entity(mGson.toJson(users)).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(mGson.toJson(new SimpleMessage("Error", "No user exists with the specified ID"))).build();
         }
@@ -100,6 +101,11 @@ public class Users {
         LOGGER.debug("POST Payload: " + payload);
 
         User createUser = mGson.fromJson(payload, User.class);
+
+        // Decode Password from Base 64
+        byte[] decodedPassword = Base64.decodeBase64(createUser.getPassword());
+        createUser.setPassword(new String(decodedPassword));
+
         if (DB.createUser(createUser))
             return Response.status(Response.Status.CREATED).entity(mGson.toJson(new SimpleMessage("User Created Successfully"))).build();
         else
@@ -108,7 +114,7 @@ public class Users {
 
     /**
      * Update a User. The Internal Identifier (DB ID) cannot be changed since it is used to identify the user to update.
-     * Either the user's current Public ID, or their internal identifier needs to be supplied to update the user.
+     * Either the user's username, or their internal identifier needs to be supplied to update the user.
      *
      * @param sessionToken {@link String} User Session Token
      * @param payload      {@link String} User JSON {@see Models.User}
@@ -132,19 +138,69 @@ public class Users {
         User updateUser = mGson.fromJson(payload, User.class);
         if (updateUser.dbID == 0 && updateUser.username == null)
             return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "No Identifier supplied"))).build();
-        if (DB.getUser("pub_id = " + user.username + " OR id = " + user.dbID).length == 0)
+        if (DB.getUser("username = '" + user.username + "' OR id = " + user.dbID).length == 0)
             return Response.status(Response.Status.NOT_FOUND).entity(mGson.toJson(new SimpleMessage("Error", "User does not exist"))).build();
         if (updateUser.dbID == 0) {
             if (updateUser.username == null || updateUser.username.isEmpty())
                 return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "Invalid username"))).build();
 
-            updateUser.dbID = DB.getUser("username = " + updateUser.username)[0].dbID;
+            updateUser.dbID = DB.getUser("username = '" + updateUser.username + "'")[0].dbID;
+        }
+        if (updateUser.getPassword() != null && !updateUser.getPassword().isEmpty()) {
+            // Decode Password from Base 64
+            byte[] decodedPassword = Base64.decodeBase64(updateUser.getPassword());
+            updateUser.setPassword(new String(decodedPassword));
         }
 
         DB.updateUser(updateUser);
 
         return Response.status(Response.Status.OK).entity(mGson.toJson(new SimpleMessage("User Updated"))).build();
     }
+
+    /**
+     * Delete a User. The Internal Identifier (DB ID) cannot be changed since it is used to identify the user to update.
+     * Either the user's username, or their internal identifier needs to be supplied to delete the user.
+     * The User may not have any transaction history, either owning or approving, since a Primary Key/Foreign key
+     * relationship exists, preventing deletion.
+     *
+     * @param sessionToken {@link String} User Session Token
+     * @param payload      {@link String} User JSON {@see Models.User}
+     * @return {@link Response} Status Message
+     */
+    @DELETE
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteUser(@HeaderParam("session") final String sessionToken,
+                               final String payload) {
+        User user = Session.validate(sessionToken);
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
+        }
+        if (!user.supervisor) {
+            return Response.status(Response.Status.FORBIDDEN).entity(mGson.toJson(new SimpleMessage("Error", "You are not allowed to do that."))).build();
+        }
+        if (payload == null || payload.length() == 0)
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity(mGson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
+
+        User deleteUser = mGson.fromJson(payload, User.class);
+        if (deleteUser.dbID == 0 && deleteUser.username == null)
+            return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "No Identifier supplied"))).build();
+        if (DB.getUser("username = '" + user.username + "' OR id = " + user.dbID).length == 0)
+            return Response.status(Response.Status.NOT_FOUND).entity(mGson.toJson(new SimpleMessage("Error", "User does not exist"))).build();
+        if (deleteUser.dbID == 0) {
+            if (deleteUser.username == null || deleteUser.username.isEmpty())
+                return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "Invalid username"))).build();
+
+            deleteUser.dbID = DB.getUser("username = '" + deleteUser.username + "'")[0].dbID;
+        }
+        if (DB.getTransaction("u.id = " + deleteUser.dbID + " OR s.id = " + deleteUser.dbID).length > 0)
+            return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "User has transaction history. Cannot be deleted."))).build();
+
+        DB.deleteUser(deleteUser);
+
+        return Response.status(Response.Status.OK).entity(mGson.toJson(new SimpleMessage("User Deleted"))).build();
+    }
+
 
     /**
      * List all checked-out items for the current user (determined by the sessionToken)
