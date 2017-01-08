@@ -37,7 +37,6 @@ and then choose "Update Info".</p>
         if (xmlHttp.readyState == 4) {
             if (xmlHttp.status == 200) {
                 var itemsOut = JSON.parse(xmlHttp.responseText);
-                console.log(itemsOut);
 
                 if (itemsOut.length == 0) {
                     $('#checkoutJumbo').hide();
