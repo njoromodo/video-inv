@@ -4,12 +4,12 @@ import com.google.gson.Gson;
 import edu.sdsu.its.video_inv.DB;
 import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Random;
 
 /**
  * Manage Transaction Endpoints (Get and Create).
@@ -24,8 +24,8 @@ public class Transactions {
     private static final Logger LOGGER = Logger.getLogger(Transactions.class);
 
     private static String generateTransactionID() {
-        String s = RandomStringUtils.random(TRANSACTION_ID_LENGTH);
-        LOGGER.debug("GGenerated Transaction ID: " + s);
+        String s = new RandomString(TRANSACTION_ID_LENGTH).nextString().toUpperCase();
+        LOGGER.debug("Generated Transaction ID: " + s);
         return s;
     }
 
@@ -61,7 +61,7 @@ public class Transactions {
         if (transactionID.length() > 0 && transactions.length == 0)
             return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(new SimpleMessage("Error", "No transaction with that ID was found"))).build();
 
-        return Response.status(Response.Status.OK).entity(gson.toJson(transactionID)).build();
+        return Response.status(Response.Status.OK).entity(gson.toJson(transactions)).build();
     }
 
     /**
