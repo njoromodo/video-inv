@@ -2,11 +2,14 @@ package edu.sdsu.its.video_inv.API;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import edu.sdsu.its.video_inv.DB;
 import edu.sdsu.its.video_inv.Models.User;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -44,8 +47,13 @@ public class Login {
         if (user.username == null)
             return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "No valid identifier supplied"))).build();
 
+        // Decode Password from Base 64
+        byte[] decodedPassword = Base64.decodeBase64(user.getPassword());
+        user.setPassword(new String(decodedPassword));
+
         User loginUser = user.login();
-        if ( loginUser == null) return Response.status(Response.Status.NOT_FOUND).entity(mGson.toJson(new SimpleMessage("Error", "That user does not exist or the password is incorrect."))).build();
+        if (loginUser == null)
+            return Response.status(Response.Status.NOT_FOUND).entity(mGson.toJson(new SimpleMessage("Error", "That user does not exist or the password is incorrect."))).build();
 
         Session session = new Session(loginUser);
         return Response.status(Response.Status.OK).entity(mGson.toJson(loginUser)).header("session", session.getToken()).build();

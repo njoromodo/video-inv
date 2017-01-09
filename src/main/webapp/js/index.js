@@ -123,7 +123,7 @@ function hideStaffLoginModal() {
 function loginStaff() {
     $('#userNotFoundAlert').hide();
     var json = '{"username": "' + $('#inputUsername').val() + '",' +
-        '"password": "' + $('#inputPassword').val() + '"' +
+        '"password": "' + btoa($('#inputPassword').val()) + '"' +
         '}';
 
     var xmlHttp = new XMLHttpRequest();
