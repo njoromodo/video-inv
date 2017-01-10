@@ -27,7 +27,7 @@ function addItem() {
                 var table = $('#checkoutItems')[0];
                 for (var i = 0; i < json.length; i++) {
                     var item = json[i];
-                    if (item.checkedOut) {
+                    if (item.checked_out) {
                         swal("Oops...", "That item is currently checked out! Please check it in first.", "warning");
                         continue;
                     }
