@@ -265,14 +265,12 @@ public class DB {
                     "  LEFT OUTER JOIN users u ON t.owner = u.id\n" +
                     "  LEFT OUTER JOIN users s ON t.supervisor = s.id\n" +
                     "WHERE " + restriction + "\n" +
-                    "ORDER BY t.time DESC\n";
-            if (limit > 0) sql += " LIMIT " + limit;
-            sql += ";";
+                    "ORDER BY t.time DESC;";
 
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", sql));
             ResultSet resultSet = statement.executeQuery(sql);
 
-            while (resultSet.next()) {
+            while (resultSet.next() && (limit == 0 || transactions.size() < limit)) {
                 String transaction_id = resultSet.getString("transaction_id").trim();
                 if (!transactions.containsKey(transaction_id)) {
                     // Add the transaction shell if it does not yet exist in the MAP
