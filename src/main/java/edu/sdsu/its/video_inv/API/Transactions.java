@@ -4,11 +4,13 @@ import com.google.gson.Gson;
 import edu.sdsu.its.video_inv.DB;
 import edu.sdsu.its.video_inv.Models.Transaction;
 import edu.sdsu.its.video_inv.Models.User;
+import edu.sdsu.its.video_inv.Report;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.util.Random;
 
 /**
@@ -105,6 +107,28 @@ public class Transactions {
 
         return Response.status(Response.Status.CREATED).entity(gson.toJson(createTransaction)).build();
     }
+
+    @GET
+    @Path("receipt/{id}")
+    @Consumes(MediaType.WILDCARD)
+    @Produces("application/pdf")
+    public Response getTransactionReceipt(@PathParam("id") final String transactionID) {
+        Gson gson = new Gson();
+        if (transactionID == null || transactionID.length() == 0)
+            return Response.status(Response.Status.PRECONDITION_FAILED).entity(gson.toJson(new SimpleMessage("Error", "No Transaction ID Specified"))).build();
+
+
+        Transaction[] transactions = DB.getTransaction("t.id = '" + transactionID + "'");
+        if (transactionID.length() > 0 && transactions.length == 0)
+            return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(new SimpleMessage("Error", "No transaction with that ID was found"))).build();
+
+        File report = Report.transactionReport(transactions[0]);
+
+        Response.ResponseBuilder response = Response.ok(report);
+        response.header("Content-Disposition", String.format("inline; filename=transaction-%s.pdf", transactionID));
+        return response.build();
+    }
+
     public static class RandomString {
 
         private static final char[] symbols;
