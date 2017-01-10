@@ -25,15 +25,15 @@ th.icon {
     width: 50px;
 }
 
-table.checkoutItems .remove {
+table.transactionItems .remove {
     text-align: center;
 }
 
-table.checkoutItems .remove i{
+table.transactionItems .remove i {
     color: black;
 }
 
-table.checkoutItems .remove i:hover{
+table.transactionItems .remove i:hover {
     color: dimgray;
 }
 
@@ -60,10 +60,10 @@ form.form-inline > div.form-group > label {
     margin-right: 5px;
 }
 
-#checkoutItems img.categoryIcon {
+.transactionItems img.categoryIcon {
     height: 35px;
 }
 
-#checkoutItems td input[type=text]{
+.transactionItems td input[type=text] {
     width: auto;
 }

@@ -1,5 +1,5 @@
 <div class="row page-header">
-    <h1>Check Out</h1>
+    <h1>Check Out Equipment</h1>
 </div>
 
 <!-- Supervisor Login Modal -->
@@ -56,7 +56,7 @@
     </div>
     <div class="col-md-8">
         <h3>Items</h3>
-        <table class="checkoutItems table" id="checkoutItems">
+        <table class="transactionItems table" id="checkoutItems">
             <tr>
                 <th class="icon"></th>
                 <th>ID</th>
