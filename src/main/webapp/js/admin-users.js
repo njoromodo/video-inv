@@ -1,5 +1,5 @@
 /**
- * TODO Docs
+ * Admin Users View Scripts
  *
  * Created by tpaulus on 1/7/17.
  */
@@ -24,6 +24,8 @@ function loadUsers() {
                     else row.insertCell(4).innerHTML = '<i class="fa fa-id-badge" aria-hidden="true"></i> User';
                     row.insertCell(5).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showEdit(\'' + u.username + '\');"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp; Edit</button>';
                 }
+
+                sorttable.makeSortable(table);
             }
         }
     };
@@ -148,7 +150,7 @@ function updateUser() {
                 $row.find("td:nth-child(4)").text(lastName);
                 if (supervisor) $row.find("td:nth-child(5)").html('<i class="fa fa-user-o" aria-hidden="true"></i> Supervisor');
                 else $row.find("td:nth-child(5)").html('<i class="fa fa-id-badge" aria-hidden="true"></i> User');
-
+                sorttable.makeSortable(document.getElementById("user-list"));
                 $updateModal.find('form').trigger("reset");
             } else {
                 swal("Oops...", JSON.parse(xmlHttp.responseText).message, "error");
@@ -191,6 +193,7 @@ function deleteUser() {
                 if (response.status == 200) {
                     swal("User Deleted!", username + " has been deleted!", "success");
                     $('#user-' + userID).remove();
+                    sorttable.makeSortable(document.getElementById("user-list"));
                 } else {
                     console.log(xmlHttp.responseText);
                     swal("Oops...", JSON.parse(xmlHttp.responseText).message, "error");

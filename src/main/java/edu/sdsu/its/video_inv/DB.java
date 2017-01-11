@@ -117,7 +117,7 @@ public class DB {
     }
 
     /**
-     * Login a Provided User. The User is fected, and their saved password is compared to the supplied password.
+     * Login a Provided User. The User is fetched, and their saved password is compared to the supplied password.
      *
      * @param username {@link String} Username
      * @param password {@link String} Password, plaintext
@@ -527,7 +527,7 @@ public class DB {
                 }
 
                 if (transactionDate != null) {
-                    SimpleDateFormat ft = new SimpleDateFormat("E. MMMM dd hh:mm a");
+                    SimpleDateFormat ft = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss aa");
                     item.lastTransactionDate = ft.format(transactionDate);
                 } else {
                     item.lastTransactionDate = "None";

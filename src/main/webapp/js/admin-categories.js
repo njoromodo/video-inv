@@ -1,5 +1,5 @@
 /**
- * TODO Docs
+ * Admin Categories View Scripts
  *
  * Created by tpaulus on 12/31/16.
  */
@@ -20,6 +20,7 @@ function loadCategories() {
                     row.insertCell(2).innerHTML = '<img src="api/category/icon/' + category.id + '" class="categoryIcon" id="cat-ico-' + category.id + '" onerror="this.style.visibility = \'hidden\'">';
                     row.insertCell(3).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showEdit(' + category.id + ');"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp; Edit</button>';
                 }
+                sorttable.makeSortable(table);
             }
         }
     };
@@ -100,7 +101,7 @@ function updateCategory() {
             if (response.status == 200) {
                 $('#cat-' + categoryID).find("td:nth-child(2)").text(categoryName);
                 $updateModal.find('form').trigger("reset");
-
+                sorttable.makeSortable(document.getElementById('category-list'));
             } else {
                 console.log(xmlHttp.responseText);
                 swal("Oops...", JSON.parse(xmlHttp.responseText).message, "error");
@@ -148,6 +149,7 @@ function deleteCategory() {
                 if (response.status == 200) {
                     swal("Category Deleted!", $updateCategoryName + " has been deleted!", "success");
                     $('#cat-' + categoryID).remove();
+                    sorttable.makeSortable(document.getElementById('category-list'));
                 } else {
                     console.log(xmlHttp.responseText);
                     swal("Oops...", JSON.parse(xmlHttp.responseText).message, "error");

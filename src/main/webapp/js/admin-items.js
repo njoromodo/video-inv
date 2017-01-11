@@ -1,5 +1,5 @@
 /**
- * TODO Docs
+ * Item View Scripts
  *
  * Created by tpaulus on 12/30/16.
  */
@@ -105,6 +105,7 @@ function updateItem() {
                 itemsList.find('#item-' + pubID + ' td:nth-child(2)').text(name);
                 itemsList.find('#item-' + pubID + ' td:nth-child(3)').text(short);
                 itemsList.find('#item-' + pubID + ' td:nth-child(4)').html(catID != 0 ? $("#itemCategory").find("option[value='" + catID + "']").text() : "<i>None</i>");
+                sorttable.makeSortable(document.getElementById('items-list'));
                 $('#updateModal').find('form').trigger("reset");
             } else {
                 swal("Oops...", "Something went wrong!", "error");
@@ -153,6 +154,7 @@ function deleteItem() {
                 if (response.status == 200) {
                     swal("Item Deleted!", itemName + " has been deleted!", "success");
                     $('#item-' + itemID).remove();
+                    sorttable.makeSortable(document.getElementById('items-list'));
                 } else {
                     console.log(xmlHttp.responseText);
                     swal("Oops...", JSON.parse(xmlHttp.responseText).message, "error");
@@ -181,12 +183,17 @@ function doLoadItems(json) {
         shortName.style.fontStyle = "italic";
         row.insertCell(3).innerHTML = item.category.name != null ? item.category.name : "<i>None</i>";
         row.insertCell(4).innerHTML = item.checked_out == false ? '<i class="fa fa-check"></i>&nbsp; In' : '<i class="fa fa-times"></i>&nbsp; Out';
-        row.insertCell(5).innerHTML = item.lastTransactionDate;
-        var histButton = row.insertCell(6);
-        histButton.innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showHist(' + item.pubID + ');" ' + (item.lastTransactionDate.toLowerCase() == "none" ? "disabled" : "") + '><i class="fa fa-history" aria-hidden="true"></i>&nbsp; History</button>';
+        var date = row.insertCell(5);
+        date.innerHTML = item.lastTransactionDate;
+        if (item.lastTransactionDate.toLowerCase() == "none") date.setAttribute("sorttable_customkey", "99999999999999s");
+        else date.setAttribute("sorttable_customkey", moment(item.lastTransactionDate, "MMM d, YYYY hh:mm:ss a").format("YYYYMMDDHHmmss"));
+
+        row.insertCell(6).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showHist(' + item.pubID + ');" ' + (item.lastTransactionDate.toLowerCase() == "none" ? "disabled" : "") + '><i class="fa fa-history" aria-hidden="true"></i>&nbsp; History</button>';
 
         row.insertCell(7).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showEdit(' + item.pubID + ');"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp; Edit</button>';
     }
+
+    sorttable.makeSortable(table);
 }
 
 function showHist(pubID) {

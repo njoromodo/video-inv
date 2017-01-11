@@ -1,5 +1,5 @@
 /**
- * TODO Docs
+ * Admin Macros View Scripts
  *
  * Created by tpaulus on 1/5/17.
  */
@@ -26,6 +26,7 @@ function loadMacros() {
                     else row.insertCell(2).innerHTML = macro.items.length.toString() + " items";
                     row.insertCell(3).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showEdit(' + macro.id + ');"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp; Edit</button>';
                 }
+                sorttable.makeSortable(table);
             }
         }
     };
@@ -128,6 +129,7 @@ function updateMacro() {
                 var $updateModal = $('#updateModal');
                 $updateModal.modal('hide');
                 $updateModal.find('form').trigger("reset");
+                sorttable.makeSortable(document.getElementById('macro-list'));
             } else {
                 console.log(xmlHttp.responseText);
                 swal("Oops...", "Something went wrong", "error");
@@ -240,6 +242,7 @@ function deleteMacro() {
                 if (response.status == 200) {
                     swal("Macro Deleted!", macroName + " has been deleted!", "success");
                     $('#macro-' + macroID).remove();
+                    sorttable.makeSortable(document.getElementById('macro-list'));
                 } else {
                     console.log(xmlHttp.responseText);
                     swal("Oops...", JSON.parse(xmlHttp.responseText).message, "error");

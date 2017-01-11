@@ -4,12 +4,12 @@
     </button>
 </div>
 
-<table id="category-list" class="table table-hover">
+<table id="category-list" class="table table-hover sortable">
     <tr class="header">
         <th>ID</th>
         <th>Name</th>
-        <th>Icon</th>
-        <th class="button">Edit Category</th>
+        <th class="sorttable_nosort">Icon</th>
+        <th class="button sorttable_nosort">Edit Category</th>
     </tr>
 </table>
 

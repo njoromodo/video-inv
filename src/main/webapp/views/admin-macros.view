@@ -97,12 +97,12 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<table id="macro-list" class="table table-hover">
+<table id="macro-list" class="table table-hover sortable">
     <tr class="header">
         <th>Public ID</th>
         <th>Macro Name</th>
         <th>Size</th>
-        <th class="button">Edit Macro</th>
+        <th class="button sorttable_nosort">Edit Macro</th>
     </tr>
 </table>
 

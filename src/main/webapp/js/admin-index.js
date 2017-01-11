@@ -1,5 +1,5 @@
 /**
- * TODO Docs
+ * Index for Admin View Scripts
  *
  * Created by tpaulus on 1/6/17.
  */

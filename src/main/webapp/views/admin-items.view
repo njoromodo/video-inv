@@ -4,7 +4,7 @@
     </button>
 </div>
 
-<table id="items-list" class="table table-hover">
+<table id="items-list" class="table table-hover sortable">
     <tr class="header">
         <th>Public ID</th>
         <th>Item Name</th>
@@ -12,8 +12,8 @@
         <th>Category</th>
         <th>Status</th>
         <th>Last Transaction</th>
-        <th class="button">View History</th>
-        <th class="button">Edit Item</th>
+        <th class="button sorttable_nosort">View History</th>
+        <th class="button sorttable_nosort">Edit Item</th>
     </tr>
 </table>
 

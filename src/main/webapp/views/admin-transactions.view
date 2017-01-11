@@ -2,21 +2,17 @@
     <h2 class=".h2">Transactions</h2>
 </div>
 
-<table class="table" id="transactionsTable">
-    <thead>
-    <tr>
-        <th>Direction</th>
+<table class="table sortable" id="transactionsTable">
+    <tr class="header">
+    <th>Direction</th>
         <th>Date</th>
         <th>ID</th>
         <th>Owner</th>
         <th>Number of Items</th>
         <th>Approved By</th>
-        <th>View Receipt</th>
+        <th class="sorttable_nosort">View Receipt</th>
     </tr>
-    </thead>
-    <tbody>
     <!-- Items will be added On Load-->
-    </tbody>
 </table>
 
 <script src="js/admin-transactions.js"></script>

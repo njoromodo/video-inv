@@ -157,9 +157,6 @@ function doStaffLogin(userJSON) {
         $('#staffLoginModal').modal('hide');
         $('#userDropdown').prop("disabled", false);
 
-        // TODO Show/Hide Admin Link based on User Perms.
-        // TODO Fill Welcome Page Content
-
         $('#welcomePageName').text(userJSON.firstName + " " + userJSON.lastName);
 
 
