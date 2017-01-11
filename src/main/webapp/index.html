@@ -160,6 +160,21 @@
                             <input type="text" class="form-control" id="updateStaffLastName" value="Doe" required>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="updateStaffPassword1" class="col-sm-3 control-label">Password: </label>
+                        <div class="col-sm-8 passwordInput">
+                            <input class="form-control" title="User Password" type="password" id="updateStaffPassword1">
+                            <span class="help-block">Leave blank to not change password.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateStaffPassword2" class="col-sm-3 control-label">Confirm: </label>
+                        <div class="col-sm-8 passwordInput">
+                            <input class="form-control" title="Confirm Password" type="password" id="updateStaffPassword2"
+                            >
+                            <span class="help-block passwordMismatchErr" style="display: none">Please make sure that the passwords match.</span>
+                        </div>
+                    </div>
                     <input type="submit" style="display:none"/>
                 </form>
             </div>

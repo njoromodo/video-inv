@@ -182,11 +182,119 @@ function setUpdateStaffModalContent(userInfo) {
 }
 
 function updateStaff() {
-    $('#staffInfoModal').modal('hide');
-    // TODO
+    var $password1 = $('#updateStaffPassword1');
+    var $password2 = $('#updateStaffPassword2');
+
+    if ($password1.val() != "" && $password1.val() != $password2.val()) {
+        $('.passwordInput').addClass("has-error");
+        $('.passwordMismatchErr').show();
+        return false;
+    } else {
+        $('.passwordInput').removeClass("has-error");
+        $('.passwordMismatchErr').hide();
+    }
+
+    var $staffInfoModal = $('#staffInfoModal');
+    $staffInfoModal.modal('hide');
+
+    var json = '{' +
+        '"username": "' + $('#updateStaffUsername').text() + '",' +
+        '"firstName": "' + $('#updateStaffFirstName').val() + '",' +
+        '"lastName": "' + $('#updateStaffLastName').val() + '"';
+
+    var updatePassword = $password1.val() != "";
+
+    if (updatePassword) {
+        json += ',' +
+            '"password": "' + btoa($password1.val()) + '"';
+    }
+
+    json += '}';
+
+    if (updatePassword) {
+        // Check current password
+        swal({
+                title: "Quick Question!",
+                text: "Before you update your password, what is your current password?",
+                type: "input",
+                inputType: "password",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                inputPlaceholder: "***********",
+                showLoaderOnConfirm: true
+            },
+            function (inputValue) {
+                if (inputValue === false) return false;
+
+                if (inputValue === "") {
+                    swal.showInputError("You need to write something!");
+                    return false
+                }
+
+                var loginJSON = '{"username": "' + user.username + '",' +
+                    '"password": "' + btoa(inputValue) + '"' +
+                    '}';
+
+                var xmlHttp = new XMLHttpRequest();
+
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState == 4) {
+                        var response = xmlHttp;
+                        console.log("Status: " + response.status);
+                        if (response.status == 200) {
+                            doStaffUpdate(json);
+                        } else {
+                            swal.showInputError("Invalid Password!");
+                        }
+                    }
+                };
+
+                xmlHttp.open('POST', "api/login", true);
+                xmlHttp.setRequestHeader("Content-type", "application/json");
+                xmlHttp.send(loginJSON);
+            });
+    } else {
+        doStaffUpdate(json);
+    }
+
+    setUpdateStaffModalContent(user); // Reset the Modal to the Original Content
+}
+
+
+function doStaffUpdate(json) {
+    var xmlHttp = new XMLHttpRequest();
+
+    xmlHttp.onreadystatechange = function () {
+        if (xmlHttp.readyState == 4) {
+            var response = xmlHttp;
+            console.log("Status: " + response.status);
+            if (response.status == 200) {
+                var putJSON = JSON.parse(json);
+
+                user.firstName = putJSON.firstName;
+                user.lastName = putJSON.lastName;
+
+                doStaffLogin(user);
+
+                swal("Profile Updated!", "Your changes have been saved!", "success")
+            } else {
+                swal("Oops...", "Something went wrong.", "error");
+                console.log(xmlHttp.responseText);
+            }
+        }
+    };
+
+    xmlHttp.open('PUT', "api/user", true);
+    xmlHttp.setRequestHeader("Content-type", "application/json");
+    xmlHttp.setRequestHeader("session", Cookies.get("session"));
+    xmlHttp.send(json);
+
 }
 
 function showStaffInfoModal() {
+    $('.passwordInput').removeClass("has-error");
+    $('.passwordMismatchErr').hide();
+
     $('#staffInfoModal').modal('show');
 }
 

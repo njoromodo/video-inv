@@ -129,13 +129,22 @@ public class Users {
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(mGson.toJson(new SimpleMessage("Error", "Invalid Session Token"))).build();
         }
-        if (!user.supervisor) {
-            return Response.status(Response.Status.FORBIDDEN).entity(mGson.toJson(new SimpleMessage("Error", "You are not allowed to do that."))).build();
-        }
         if (payload == null || payload.length() == 0)
             return Response.status(Response.Status.PRECONDITION_FAILED).entity(mGson.toJson(new SimpleMessage("Error", "Empty Request Payload"))).build();
 
         User updateUser = mGson.fromJson(payload, User.class);
+
+        if (!user.supervisor && !user.username.equals(updateUser.username)) {
+            return Response.status(Response.Status.FORBIDDEN).entity(mGson.toJson(new SimpleMessage("Error", "You are not allowed to do that."))).build();
+        }
+        if (user.username.equals(updateUser.username)) {
+            LOGGER.debug("User updating own parameters");
+            if (!user.supervisor) {
+                // Remove the ability to change supervisor status from non-supervisory users
+                updateUser.supervisor = null;
+            }
+        }
+
         if (updateUser.dbID == 0 && updateUser.username == null)
             return Response.status(Response.Status.BAD_REQUEST).entity(mGson.toJson(new SimpleMessage("Error", "No Identifier supplied"))).build();
         if (DB.getUser("username = '" + user.username + "' OR id = " + user.dbID).length == 0)
