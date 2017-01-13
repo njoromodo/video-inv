@@ -44,7 +44,8 @@ public class TestTransactions {
     public static void setUp() throws Exception {
         LOGGER.info("Creating New Test User");
         USER = new User(TEST_USERNAME, TEST_USER_FNAME, TEST_USER_LNAME, TEST_USER_ACCESS);
-        assertTrue(DB.createUser(USER, TEST_PASSWORD));
+        USER.setPassword(TEST_PASSWORD);
+        assertTrue(DB.createUser(USER));
 
         USER.completeUser();
         LOGGER.debug("Created New User: " + USER.toString());

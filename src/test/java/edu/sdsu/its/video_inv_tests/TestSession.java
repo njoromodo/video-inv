@@ -31,7 +31,8 @@ public class TestSession {
     public static void setUp() throws Exception {
         LOGGER.info("Creating new Test User");
         USER = new User(TEST_USERNAME, TEST_USER_FNAME, TEST_USER_LNAME, true);
-        assertTrue(DB.createUser(USER, TEST_USER_PASSWORD));
+        USER.setPassword(TEST_USER_PASSWORD);
+        assertTrue(DB.createUser(USER));
         LOGGER.debug("Created new Test User: " + USER.toString());
 
         SESSION = new Session(USER);
