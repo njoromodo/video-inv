@@ -1,86 +1,69 @@
-table.items {
-    text-align: left;
-    border-collapse: collapse;
-    overflow-y: auto;
-
-    line-height: 2em;
+h3 {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
 }
 
-.pageHead {
-    padding-top: 1em;
-    padding-bottom: .5em;
+.table > tbody > tr > th {
+    border: none;
+}
 
+div.controlBar > div {
     text-align: center;
-
-    font-size: 2.5em;
-    font-weight: bold;
+    vertical-align: middle;
 }
 
-.pageSubHead {
-    text-align: center;
-    font-size: 1.25em;
-    line-height: 1.5em;
-
-    padding-bottom: 2.5em;
+div.controlBar {
+    margin-top: 25px;
+    margin-bottom: 25px;
 }
 
-.header {
-    font-size: 1em;
-    font-weight: bold;
-    border-bottom: thin solid black;
+div.controlBar .form-inline {
+    margin-top: 12px;
 }
 
-td.delete {
-    text-align: center;
-    font-size: 1.25em;
+th.icon {
+    width: 50px;
 }
 
-tr.header > td {
-    padding: 0 0 .25em;
-    line-height: normal;
-    font-size: inherit;
-}
-
-
-footer {
-    position: fixed;
-    bottom: 1.5em;
-    width: 100%;
-
+table.transactionItems .remove {
     text-align: center;
 }
 
-button {
-    font-size: 1em;
-
-    width: 10em;
-    height: 2.5em;
-
-    text-align: center;
+table.transactionItems .remove i {
+    color: black;
 }
 
-button.complete_button {
-    margin: 0 7em 1.25em;
+table.transactionItems .remove i:hover {
+    color: dimgray;
 }
 
-#error {
-    text-align: center;
+div.checkout-component {
+    position: relative;
+    display: block;
+    margin: 10px 0 10px 20px;
+    font-size: 16px;
+}
+
+.fa-times-circle, .fa-check-circle {
+    margin-right: 7px;
+}
+
+.fa-times-circle {
     color: red;
-    font-size: 1em;
 }
 
-.error {
-    margin-top: -1.5em;
+.fa-check-circle {
+    color: green;
 }
 
-.comments {
-    width: 100%;
-    max-width: 24em;
-    height: 1.5em;
-
-    margin-top: .5em;
+form.form-inline > div.form-group > label {
+    margin-right: 5px;
 }
 
-#supervisor_pin {
-    text-align: center;
+.transactionItems img.categoryIcon {
+    height: 35px;
+}
+
+.transactionItems td input[type=text] {
+    width: auto;
 }

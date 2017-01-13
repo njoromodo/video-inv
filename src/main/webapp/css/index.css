@@ -1,35 +1,79 @@
-.mainHead {
-    padding-top: 1.5em;
-    padding-bottom: 1em;
-    text-align: center;
-    font-size: 4em;
+#alerts {
+    margin-top: 30px;
+    margin-bottom: -30px;
 }
 
-.prompt {
-    text-align: center;
-    font-size: 2em;
-    line-height: 1.5;
-    width: 75%;
-
-    padding: 0 1em 0;
+#clientNotFoundAlert {
+    margin-bottom: 30px;
 }
 
-.quote {
+#create-user-btn {
+    float: right;
+    margin-top: -5px;
+}
+
+#checkoutJumbo {
+    margin-top: 45px;
+    padding-top: 15px;
+}
+
+.hovICO {
+    display: none;
+    padding-left: 10px;
+    padding-bottom: -3px;
+}
+
+.showEditICO:hover .hovICO {
+    display: inline-block;
+}
+
+table.transactionItems {
+    table-layout: fixed;
+}
+
+table.transactionItems tr > td, table.transactionItems tr > th {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    vertical-align: middle;
+}
+
+img.icon {
+    margin: auto;
+    height: 36px;
+}
+
+.jumbotron {
+    margin-top: 40px;
+}
+
+#quote {
     text-align: center;
-    font-size: 1.5em;
+    font-size: 21px;
+    font-weight: lighter;
+    line-height: 1.75;
+    opacity: 0;
+}
+
+#quoteAuthor:before {
+    content: '~ ';
+}
+
+#quoteAuthor {
     font-style: italic;
-    line-height: 1.5;
-    width: 1px;
-
 }
 
-#options {
-    padding-top: 1.5em;
-    width: 26em;
+#checkoutJumbo {
+    opacity: 0;
 }
 
-#logo {
-    height: 7em;
-    display: block;
-    margin: 5.5em auto 3em;
+#noItemsOut {
+    opacity: 0;
+    text-align: center;
+    font-weight: bold;
+    font-size: 36px;
+}
+
+#noItemsOut .fa-check-circle {
+    margin-right: 7px;
+    color: green;
 }
