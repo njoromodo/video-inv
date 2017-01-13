@@ -18,8 +18,9 @@ VIMS is written primarily in Java and is run using the TomCat framework to run
 the website. A MySQL DB is used to store user information, as well as store the
 inventory and record check out/in transactions.
 
-VIMS uses [Key Server](https://github.com/sdsu-its/key-server) to access
-credentials for various tools and services (DataBase, APIs, Email, etc.)
+VIMS uses Vault to access credentials for various tools and services
+(DataBase, APIs, Email, etc.). Details on how to setup Vault for this WebApp
+can be found towards the bottom of the ReadMe.
 
 Unit Testing is a feature in VIMS that allows most Classes and Methods of the
 WebApp's Backend to be tested.
