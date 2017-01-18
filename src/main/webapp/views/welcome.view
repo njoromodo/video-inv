@@ -6,6 +6,12 @@
 If you need to update your personal information, like your password, click on the User icon in the top right corner,
 and then choose "Update Info".</p>
 
+<p>Software issues can be reported in YouTrack, via the link below. Please be as descriptive as possible, and please
+include screenshots if applicable.
+<br>
+    <a href="http://morden.sdsu.edu:9000/newIssue?project=VIMS&clearDraft=true&c=" target="_blank">http://morden.sdsu.edu:9000</a>
+</p>
+
 <div class="jumbotron" id="checkoutJumbo">
     <h3>Currently Checked Out</h3>
     <table class="table" id="itemsOutTable">
