@@ -1,7 +1,7 @@
 {
   "Capture": [
     {
-      "Name": "Camera",
+      "Name": "Body",
       "Category": "CAM"
     },
     {
@@ -9,12 +9,22 @@
       "Category": "LENS"
     },
     {
-      "Name": "Storage",
+      "Name": "Storage Media",
       "Category": "STO"
     },
     {
       "Name": "Battery",
       "Category": "BATT"
+    }
+  ],
+  "Lighting": [
+    {
+      "Name": "Lights",
+      "Category": "LIGHT"
+    },
+    {
+      "Name": "Light Stand",
+      "Category": "LS"
     }
   ],
   "Audio": [
@@ -25,6 +35,10 @@
     {
       "Name": "Headphones",
       "Category": "HP"
+    },
+    {
+      "Name": "Cables",
+      "Category": "CAB"
     }
   ],
   "Mounting": [
