@@ -81,7 +81,7 @@
     </div>
 
     <div class="col-md-8">
-        <h3>Items</h3>
+        <h3>Items Being Checked In</h3>
         <table class="transactionItems table" id="checkinItems">
             <tr>
                 <th class="icon"></th>
