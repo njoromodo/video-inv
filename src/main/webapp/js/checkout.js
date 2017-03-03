@@ -49,7 +49,7 @@ function addItem() {
                     rmBtn.className = 'remove';
                     rmBtn.innerHTML = '<i class="fa fa-trash fa-lg" aria-disabled="true" onclick="removeItem(' + item.pubID + ')"></i>';
 
-                    markCategoryComplete(item.category.name);
+                    markCategoryComplete(item.category.name.toUpperCase());
                     var component = {
                         "id": item.id,
                         "pubID": item.pubID,
@@ -98,7 +98,7 @@ function loadKitList(fileName) {
 
                     checklist.append(
                         '<div class="checkout-component">' +
-                        '<i class="fa fa-times-circle cat-' + component.Category + '" aria-hidden="true"></i>' + component.Name +
+                        '<i class="fa fa-times-circle cat-' + component.Category.toUpperCase() + '" aria-hidden="true"></i>' + component.Name +
                         '</div>'
                     );
                 }
@@ -111,6 +111,7 @@ function loadKitList(fileName) {
 }
 
 function markCategoryComplete(categoryName) {
+    var categoryName = categoryName.toUpperCase();
     $('.cat-' + categoryName).removeClass("fa-times-circle").addClass("fa-check-circle");
     if (!catCount.hasOwnProperty(categoryName)) {
         catCount[categoryName] = 0;
