@@ -40,7 +40,7 @@ public class Category {
 
         Category category = (Category) o;
 
-        return id == category.id && name.equals(category.name);
+        return id.equals(category.id) && name.equals(category.name);
 
     }
 
