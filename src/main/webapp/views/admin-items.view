@@ -9,6 +9,7 @@
         <th>Public ID</th>
         <th>Item Name</th>
         <th>Short Name</th>
+        <th>Asset/Serial</th>
         <th>Category</th>
         <th>Status</th>
         <th>Last Transaction</th>
@@ -58,6 +59,12 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="assetID" class="col-sm-2 control-label">Serial/Asset: </label>
+                        <div class="col-sm-10">
+                            <input class="form-control" title="Item Asset/Serial Number" type="text" id="assetID">
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -104,6 +111,12 @@
                             <select class="form-control itemCategory" id="updateItemCategory" title="Item Category">
                                 <option value="0">No Category</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateAssetID" class="col-sm-2 control-label">Serial/Asset: </label>
+                        <div class="col-sm-10">
+                            <input class="form-control" title="Item Asset/Serial Number" type="text" id="updateAssetID">
                         </div>
                     </div>
                 </form>

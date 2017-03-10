@@ -16,6 +16,7 @@ public class Item {
     public String name;
     public String shortName;
     public String comments;
+    public String assetID;
 
     public boolean checked_out;
     public String lastTransactionDate;
@@ -24,13 +25,14 @@ public class Item {
     public Item() {
     }
 
-    public Item(int id, int pubID, Category category, String name, String shortName, String comments, boolean checked_out) {
+    public Item(int id, int pubID, Category category, String name, String shortName, String comments, String assetID, boolean checked_out) {
         this.id = id;
         this.pubID = pubID;
         this.category = category;
         this.name = name;
         this.shortName = shortName;
         this.comments = comments;
+        this.assetID = assetID;
         this.checked_out = checked_out;
     }
 
@@ -105,8 +107,9 @@ public class Item {
     public static class Popular extends Item {
         public int frequency;
 
-        public Popular(int id, int pubID, Category category, String name, String shortName, String comments, boolean checked_out, int frequency) {
-            super(id, pubID, category, name, shortName, comments, checked_out);
+        public Popular(int id, int pubID, Category category, String name, String shortName,
+                       String comments, String assetID, boolean checked_out, int frequency) {
+            super(id, pubID, category, name, shortName, comments, assetID, checked_out);
             this.frequency = frequency;
         }
     }

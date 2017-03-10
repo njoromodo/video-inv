@@ -169,7 +169,8 @@ public class DB {
      * @return {@link boolean} If user was created successfully
      */
     public static boolean createUser(final User user) {
-        if (DB.getUser("username = '" + sanitize(user.username.toLowerCase()) + "'").length > 0) return false;
+        if (DB.getUser("username = '" + sanitize(user.username.toLowerCase()) + "'").length > 0)
+            return false;
 
         final String sql = "INSERT INTO users(username, first_name, last_name, supervisor, password) VALUES ( '" + sanitize(user.username.toLowerCase()) +
                 "', '" + sanitize(user.firstName) + "', '" + sanitize(user.lastName) + "', " + (user.supervisor ? 1 : 0) + "," +
@@ -186,7 +187,8 @@ public class DB {
      */
     public static void updateUser(final User user) {
         String values = "";
-        if (user.username != null) values += "username= '" + sanitize(user.username.toLowerCase()) + "',";
+        if (user.username != null)
+            values += "username= '" + sanitize(user.username.toLowerCase()) + "',";
         if (user.firstName != null && user.firstName.length() > 0)
             values += "first_name='" + sanitize(user.firstName) + "',";
         if (user.lastName != null && user.lastName.length() > 0)
@@ -492,6 +494,7 @@ public class DB {
                     "  cat.name    AS category_name,\n" +
                     "  short_name,\n" +
                     "  comments,\n" +
+                    "  asset_id, \n" +
                     "  checked_out,\n" +
                     "  t1.time AS last_transaction_time,\n" +
                     "  t1.id as last_transaction_id\n" +
@@ -515,6 +518,7 @@ public class DB {
                         resultSet.getString("name"),
                         resultSet.getString("short_name"),
                         resultSet.getString("comments") != null ? resultSet.getString("comments") : "",
+                        resultSet.getString("asset_id"),
                         resultSet.getBoolean("checked_out"));
 
                 Timestamp transactionDate;
@@ -576,6 +580,7 @@ public class DB {
                     "  c.name as `category_name`,\n" +
                     "  i.short_name as `short_name`,\n" +
                     "  i.comments as `comments`,\n" +
+                    "  i.asset_id as asset_id, \n" +
                     "  i.checked_out as `checked_out`,\n" +
                     "  COUNT(*) as `frequency`\n" +
                     "FROM transactions t\n" +
@@ -595,6 +600,7 @@ public class DB {
                         resultSet.getString("name"),
                         resultSet.getString("short_name"),
                         resultSet.getString("comments") != null ? resultSet.getString("comments") : "",
+                        resultSet.getString("asset_id"),
                         resultSet.getBoolean("checked_out"),
                         resultSet.getInt("frequency"));
 
@@ -626,8 +632,8 @@ public class DB {
      * @param item {@link Item} Item to Create
      */
     public static void createItem(final Item item) {
-        final String sql = "INSERT INTO inventory(pub_id, name, short_name, category) VALUES (" + item.pubID + ", '" +
-                sanitize(item.name) + "', '" + sanitize(item.shortName) + "', " + (item.category.id != null && item.category.id != 0 ? item.category.id : "null") + ");";
+        final String sql = "INSERT INTO inventory(pub_id, name, short_name, category, assetID) VALUES (" + item.pubID + ", '" +
+                sanitize(item.name) + "', '" + sanitize(item.shortName) + "', " + (item.category.id != null && item.category.id != 0 ? item.category.id : "null") + ", '" + sanitize(item.assetID) + "');";
         executeStatement(sql);
     }
 
@@ -644,6 +650,7 @@ public class DB {
             values += "category = " + (item.category.id != null && item.category.id != 0 ? item.category.id : "null") + ",";
         if (item.name != null) values += "name = '" + item.name + "',";
         if (item.shortName != null) values += "short_name = '" + item.shortName + "',";
+        if (item.assetID != null) values += "asset_id = '" + item.assetID + "',";
         if (item.comments != null) values += "comments = '" + item.comments + "',";
 
         //language=SQL

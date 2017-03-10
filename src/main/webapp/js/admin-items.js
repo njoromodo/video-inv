@@ -25,6 +25,7 @@ function createItem() {
     var name = $("#itemName").val();
     var short = $("#itemShortName").val();
     var catID = $("#updateItemCategory").val();
+    var assetID = $('#assetID').val();
     var xmlHttp = new XMLHttpRequest();
 
     var json = '{' +
@@ -32,7 +33,8 @@ function createItem() {
         '"shortName": "' + short + '"' +
         '"category" : {' +
         '   "id" :' + catID +
-        '   }' +
+        '   },' +
+        '"assetID": "' + assetID + '"' +
         '}';
 
     xmlHttp.onreadystatechange = function () {
@@ -87,6 +89,7 @@ function updateItem() {
     var name = $("#updateItemName").val();
     var short = $("#updateItemShortName").val();
     var catID = $("#updateItemCategory").val();
+    var assetID = $('#updateAssetID').val();
     var xmlHttp = new XMLHttpRequest();
 
     var json = '{' +
@@ -95,7 +98,8 @@ function updateItem() {
         '"shortName": "' + short + '",' +
         '"category" : {' +
         '   "id" :' + catID +
-        '   }' +
+        '   },' +
+        '"assetID": "' + assetID + '"' +
         '}';
 
     $('#updateModal').modal('hide');
@@ -108,7 +112,8 @@ function updateItem() {
                 var itemsList = $('#items-list');
                 itemsList.find('#item-' + pubID + ' td:nth-child(2)').text(name);
                 itemsList.find('#item-' + pubID + ' td:nth-child(3)').text(short);
-                itemsList.find('#item-' + pubID + ' td:nth-child(4)').html(catID != 0 ? $("#itemCategory").find("option[value='" + catID + "']").text() : "<i>None</i>");
+                itemsList.find('#item-' + pubID + ' td:nth-child(4)').text(assetID);
+                itemsList.find('#item-' + pubID + ' td:nth-child(5)').html(catID != 0 ? $("#itemCategory").find("option[value='" + catID + "']").text() : "<i>None</i>");
                 sorttable.makeSortable(document.getElementById('items-list'));
                 $('#updateModal').find('form').trigger("reset");
             } else {
@@ -185,16 +190,19 @@ function doLoadItems(json) {
         var shortName = row.insertCell(2);
         shortName.innerHTML = item.shortName != null ? item.shortName : "";
         shortName.style.fontStyle = "italic";
-        row.insertCell(3).innerHTML = item.category.name != null ? item.category.name : "<i>None</i>";
-        row.insertCell(4).innerHTML = item.checked_out == false ? '<i class="fa fa-check"></i>&nbsp; In' : '<i class="fa fa-times"></i>&nbsp; Out';
-        var date = row.insertCell(5);
+
+        row.insertCell(3).innerHTML = item.assetID != null ? item.assetID : "";
+
+        row.insertCell(4).innerHTML = item.category.name != null ? item.category.name : "<i>None</i>";
+        row.insertCell(5).innerHTML = item.checked_out == false ? '<i class="fa fa-check"></i>&nbsp; In' : '<i class="fa fa-times"></i>&nbsp; Out';
+        var date = row.insertCell(6);
         date.innerHTML = item.lastTransactionDate;
         if (item.lastTransactionDate.toLowerCase() == "none") date.setAttribute("sorttable_customkey", "99999999999999s");
         else date.setAttribute("sorttable_customkey", moment(item.lastTransactionDate, "MMM d, YYYY hh:mm:ss a").format("YYYYMMDDHHmmss"));
 
-        row.insertCell(6).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showHist(' + item.pubID + ');" ' + (item.lastTransactionDate.toLowerCase() == "none" ? "disabled" : "") + '><i class="fa fa-history" aria-hidden="true"></i>&nbsp; History</button>';
+        row.insertCell(7).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showHist(' + item.pubID + ');" ' + (item.lastTransactionDate.toLowerCase() == "none" ? "disabled" : "") + '><i class="fa fa-history" aria-hidden="true"></i>&nbsp; History</button>';
 
-        row.insertCell(7).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showEdit(' + item.pubID + ');"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp; Edit</button>';
+        row.insertCell(8).innerHTML = '<button class="btn btn-default btn-xs" type="button" onclick="showEdit(' + item.pubID + ');"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp; Edit</button>';
     }
 
     sorttable.makeSortable(table);
@@ -246,6 +254,7 @@ function showEdit(pubID) {
                 $('#updateItemName').val(json[0].name);
                 $('#updateItemShortName').val(json[0].shortName);
                 $('#updateItemCategory').val(json[0].category.id);
+                $('#updateAssetID').val(json[0].assetID);
                 $('button.delete').prop("disabled", $('#items-list').find('#item-' + pubID + ' td:nth-child(6)').text().toLowerCase() != "none");
 
                 $('#updateModal').modal('show');
