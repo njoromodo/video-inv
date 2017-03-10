@@ -198,7 +198,7 @@ public class Report {
                 Phrase phrase1 = new Phrase();
                 phrase1.add(new Chunk(component.name + "\n", FONT_BODY));
                 if (component.assetID != null && !component.assetID.isEmpty())
-                    phrase1.add(new Chunk("AssetID: " + component.assetID, FONT_CAPTION)
+                    phrase1.add(new Chunk("Serial/Asset: " + component.assetID, FONT_CAPTION)
                             .setLineHeight(12));
 
                 table.addCell(new Phrase(Integer.toString(component.pubID), FONT_BODY));
