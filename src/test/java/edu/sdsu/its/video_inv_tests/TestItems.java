@@ -102,8 +102,8 @@ public class TestItems {
             assertTrue("Item not Complete - Name Missing", i.name != null && i.name.length() > 0);
             assertTrue("Item not Complete - DB ID Missing", i.id != 0);
             assertTrue("Item not Complete - Public ID Missing", i.pubID != 0);
-            if (i.equals(item1)) test_item1_found = true;
-            if (i.equals(item2)) test_item2_found = true;
+            if (i.pubID == item1.pubID) test_item1_found = true;
+            if (i.pubID == item2.pubID) test_item2_found = true;
         }
         assertTrue("Test Item 1 not found in DB", test_item1_found);
         assertTrue("Test Item 2 not found in DB", test_item2_found);
@@ -122,8 +122,8 @@ public class TestItems {
             assertTrue("Item not Complete - Name Missing", i.name != null && i.name.length() > 0);
             assertTrue("Item not Complete - DB ID Missing", i.id != 0);
             assertTrue("Item not Complete - Public ID Missing", i.pubID != 0);
-            if (i.equals(item1)) test_item1_found = true;
-            if (i.equals(item2)) test_item2_found = true;
+            if (i.pubID == item1.pubID) test_item1_found = true;
+            if (i.pubID == item2.pubID) test_item2_found = true;
         }
         assertTrue("Test Item 1 not part of Macro", test_item1_found);
         assertTrue("Test Item 2 not part of Macro", test_item2_found);

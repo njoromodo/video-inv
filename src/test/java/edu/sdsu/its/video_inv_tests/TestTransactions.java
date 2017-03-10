@@ -59,7 +59,7 @@ public class TestTransactions {
 
         LOGGER.info("Creating Test Transaction");
         List<Transaction.Component> componentList = new ArrayList<>();
-        componentList.add(new Transaction.Component(ITEM.id, ITEM.pubID, ITEM.category, ITEM.name, TEST_ITEM_CONDITION));
+        componentList.add(new Transaction.Component(ITEM.id, ITEM.pubID, ITEM.category, ITEM.name, ITEM.assetID, TEST_ITEM_CONDITION));
         TRANSACTION = new Transaction(TEST_TRANSACTION_ID, USER, USER, TEST_TRANSACTION_DIRECTION, componentList);
         DB.createTransaction(TRANSACTION);
 

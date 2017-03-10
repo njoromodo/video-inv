@@ -811,7 +811,7 @@ public class DB {
 
         try {
             statement = connection.createStatement();
-            LOGGER.info(String.format("Executing SQL Statement - \"%s\"", statement));
+            LOGGER.info(String.format("Executing SQL Statement - \"%s\"", statement_sql));
             statement.execute(statement_sql);
 
             LOGGER.info(String.format("Executing SQL Query - \"%s\"", query_sql));
