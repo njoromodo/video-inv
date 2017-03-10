@@ -30,7 +30,7 @@ function createItem() {
 
     var json = '{' +
         '"name": "' + name + '" ,' +
-        '"shortName": "' + short + '"' +
+        '"shortName": "' + short + '",' +
         '"category" : {' +
         '   "id" :' + catID +
         '   },' +
