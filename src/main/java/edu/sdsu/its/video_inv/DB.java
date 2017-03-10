@@ -632,8 +632,8 @@ public class DB {
      * @param item {@link Item} Item to Create
      */
     public static void createItem(final Item item) {
-        final String sql = "INSERT INTO inventory(pub_id, name, short_name, category, assetID) VALUES (" + item.pubID + ", '" +
-                sanitize(item.name) + "', '" + sanitize(item.shortName) + "', " + (item.category.id != null && item.category.id != 0 ? item.category.id : "null") + ", '" + sanitize(item.assetID) + "');";
+        final String sql = "INSERT INTO inventory(pub_id, name, short_name, category, asset_id) VALUES (" + item.pubID + ", '" +
+                sanitize(item.name) + "', '" + sanitize(item.shortName) + "', " + (item.category.id != null && item.category.id != 0 ? item.category.id : "null") + ", '" + sanitize(item.assetID != null ? item.assetID : "") + "');";
         executeStatement(sql);
     }
 

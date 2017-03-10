@@ -95,6 +95,7 @@ public class Item {
         if (pubID != item.pubID) return false;
         if (checked_out != item.checked_out) return false;
         if (!name.equals(item.name)) return false;
+        if (assetID != null ? !assetID.equals(item.assetID) : item.assetID != null) return false;
         if (shortName != null ? !shortName.equals(item.shortName) : item.shortName != null) return false;
         return comments != null ? comments.equals(item.comments) : item.comments == null;
     }

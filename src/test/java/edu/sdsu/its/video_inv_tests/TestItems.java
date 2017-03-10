@@ -9,6 +9,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static org.junit.Assert.*;
 
 /**
@@ -44,6 +46,7 @@ public class TestItems {
     public static void setUp() throws Exception {
         LOGGER.info("Creating Test Item #1");
         item1 = new Item(TEST_ITEM_1_PUBID, TEST_ITEM_1_NAME, TEST_ITEM_1_SHORT_NAME);
+        item1.assetID = "ti-" + UUID.randomUUID().toString();
         DB.createItem(item1);
 
         item1.completeItem();
@@ -132,6 +135,7 @@ public class TestItems {
         LOGGER.debug("Current Item: " + item1.toString());
         item1.name = UPDATE_ITEM_1_NAME;
         item1.shortName = UPDATE_ITEM_1_SHORT_NAME;
+        item1.assetID = "ti-" + UUID.randomUUID().toString();
         DB.updateItem(item1);
         LOGGER.debug("Updated Item: " + item1.toString());
 
@@ -156,5 +160,12 @@ public class TestItems {
 
         assertEquals(item1, DB.getItem("i.id = " + item1.id)[0]);
 
+    }
+
+    @Test
+    public void itemAssetID() throws Exception {
+        assertNotNull("Test Item #1 has not Asset ID defined", item1.assetID);
+        assertTrue("AssetID was not included in Create",
+                item1.assetID.equals(DB.getItem("i.pub_id = " + item1.pubID)[0].assetID));
     }
 }
