@@ -37,6 +37,8 @@ public class Report {
     private static final Font FONT_BODY_BOLD = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK);
     private static final Font FONT_BODY_ITALIC = new Font(Font.FontFamily.HELVETICA, 12, Font.ITALIC, BaseColor.BLACK);
 
+    private static final Font FONT_CAPTION = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL, COLOR_GRAY);
+
     private static final Font FONT_FOOTER_PAGE_NUM = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
     private static final Font FONT_FOOTER_TIMESTAMP = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL, COLOR_GRAY);
 
@@ -193,8 +195,14 @@ public class Report {
                     table.addCell("");
                 }
 
+                Phrase phrase1 = new Phrase();
+                phrase1.add(new Chunk(component.name + "\n", FONT_BODY));
+                if (component.assetID != null && !component.assetID.isEmpty())
+                    phrase1.add(new Chunk("AssetID: " + component.assetID, FONT_CAPTION)
+                            .setLineHeight(12));
+
                 table.addCell(new Phrase(Integer.toString(component.pubID), FONT_BODY));
-                table.addCell(new Phrase(component.name, FONT_BODY));
+                table.addCell(phrase1);
                 table.addCell(new Phrase(component.comments, FONT_BODY));
 
                 if (count++ % 5 == 0) {

@@ -41,13 +41,15 @@ public class Transaction {
         public Category category;
 
         public String name;
+        public String assetID;
         public String comments;
 
-        public Component(int id, int pubID, Category category, String name, String comments) {
+        public Component(int id, int pubID, Category category, String name, String assetID, String comments) {
             this.id = id;
             this.pubID = pubID;
             this.category = category;
             this.name = name;
+            this.assetID = assetID;
             this.comments = comments;
         }
 

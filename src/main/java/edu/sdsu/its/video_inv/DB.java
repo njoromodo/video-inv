@@ -260,6 +260,7 @@ public class DB {
                     "  i.category   AS `component_cat_id`,\n" +
                     "  c.name       AS `component_cat_name`,\n" +
                     "  i.name       AS `component_name`,\n" +
+                    "  i.asset_id   AS `component_asset_id`,\n" +
                     "  i.comments   AS `component_condition`\n" +
                     "FROM transactions t\n" +
                     "  LEFT OUTER JOIN inventory i ON t.item_id = i.id\n" +
@@ -307,6 +308,7 @@ public class DB {
                                 resultSet.getString("component_cat_name")
                         ),
                         resultSet.getString("component_name"),
+                        resultSet.getString("component_asset_id"),
                         resultSet.getString("component_condition")
                 );
 
