@@ -68,6 +68,7 @@ CREATE TABLE inventory (
   `short_name`  TEXT,
   `comments`    TEXT,
   `checked_out` TINYINT(1) DEFAULT 0,
+  `asset_id`    TEXT,
   FOREIGN KEY (`category`) REFERENCES categories (`id`)
 );
 CREATE TABLE transactions (
