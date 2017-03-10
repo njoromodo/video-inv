@@ -24,11 +24,15 @@ function loadItems() {
 function createItem() {
     var name = $("#itemName").val();
     var short = $("#itemShortName").val();
+    var catID = $("#updateItemCategory").val();
     var xmlHttp = new XMLHttpRequest();
 
     var json = '{' +
         '"name": "' + name + '" ,' +
         '"shortName": "' + short + '"' +
+        '"category" : {' +
+        '   "id" :' + catID +
+        '   }' +
         '}';
 
     xmlHttp.onreadystatechange = function () {
@@ -263,7 +267,10 @@ function loadCategories() {
                 var categoryListSelect = $('select.itemCategory');
                 for (var c = 0; c < JSON.parse(xmlHttp.responseText).length; c++) {
                     var category = JSON.parse(xmlHttp.responseText)[c];
-                    categoryListSelect.append($('<option>', {value: category.id, text: category.name}));
+                    categoryListSelect.append($('<option>', {
+                        value: category.id,
+                        text: category.name
+                    }));
                 }
             }
         }
